@@ -1,0 +1,36 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v6.0.0"
+    hooks:
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+        args: [--unsafe]
+      - id: check-json
+        exclude: ^.devcontainer/devcontainer.json
+      # Three trees must never be reformatted, for the reason old-sitemaps/ must not be
+      # reformatted in the library: a hook that only means to add a trailing newline makes a byte
+      # comparison fail.
+      #
+      #   docs/typedoc/       vendored release asset of idfkit-js, compared byte for byte against
+      #                       the pinned docs level by scripts/sync_js_artifacts.py --check
+      #   docs/snippets/js/   vendored from the same release, same comparison
+      #   docs/weather/browse/ copied from the installed library at build time, and gitignored
+      #
+      # old-sitemaps/ is NOT excluded here, because it does not live here. It stays with the
+      # redirects in idfkit (contracts/repository-layout.md).
+      - id: pretty-format-json
+        exclude: ^(.devcontainer/devcontainer.json|.*\.ipynb$|docs/typedoc/|docs/snippets/js/|docs/weather/browse/)
+        args: [--autofix, --no-sort-keys]
+      - id: end-of-file-fixer
+        exclude: ^(docs/typedoc/|docs/snippets/js/|docs/weather/browse/)
+      - id: trailing-whitespace
+        exclude: ^(docs/typedoc/|docs/snippets/js/|docs/weather/browse/)
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.14.9"
+    hooks:
+      - id: ruff-check
+        args: [ --exit-non-zero-on-fix ]
+      - id: ruff-format

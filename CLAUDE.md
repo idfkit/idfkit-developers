@@ -1,0 +1,75 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this
+repository.
+
+## Project Overview
+
+**idfkit-developers** is the source of <https://developers.idfkit.com>, the unified documentation
+site for idfkit in Python and in JavaScript.
+
+This repository holds a site and the tooling that builds and checks it. **It holds no library.**
+The Python library is at `idfkit/`, the JavaScript one at `idfkit-js/`, and both are inputs here,
+pinned to exact versions. The site lives outside both because it documents a capability the two of
+them implement, and a shared page cannot live inside one of the things it compares.
+
+**Python:** 3.12 | **License:** MIT | **Package manager:** uv
+
+## Commands
+
+```bash
+make install     # virtual environment + pre-commit hooks
+make docs        # serve at http://127.0.0.1:8000
+make docs-test   # one strict build, as CI does
+make check       # the quality gate
+make test        # pytest over tests/
+```
+
+Before committing: `make check && make docs-test`.
+
+## Architecture
+
+```text
+docs/               ~580 authored pages
+  hooks/            mkdocs hooks: pinned_levels, parity_ledger, parity_macro, typedoc_shim
+  snippets/         Python examples type-checked by pyright; js/ is vendored
+  typedoc/          vendored TypeDoc JSON from idfkit-js
+  weather/browse/   copied from the installed library at build time; gitignored
+  tape/             terminal recordings
+scripts/            seven site scripts + the duplicated _governance_source.py
+tests/              covers scripts/
+```
+
+No `src/`. Nothing here is built as a distribution.
+
+## The six things that go wrong
+
+1. **`docs/hooks/*.py` must stay under `docs/`.** Moving them to `scripts/` looks like tidying and
+   breaks the portable build, which copies `docs/` and `mkdocs.yml` and nothing else.
+2. **No file under `docs/` may compute a path above `docs/`.** The guard is depth-aware and names
+   the file, the line, the steps taken and the steps allowed.
+3. **`docs/typedoc/` and `docs/snippets/js/` are vendored** from a published `idfkit-js` release and
+   compared byte for byte. Advance the level and run `sync_js_artifacts.py`; never hand-edit.
+4. **A failing documentation check means a wrong page, not a wrong check.** When a library release
+   renames something documented, the fix is the page.
+5. **`scripts/_governance_source.py` is duplicated** with `idfkit/scripts/`. A change to one must
+   land in the other in the same feature; a test compares them.
+6. **`docs/weather/browse/` is never committed.** It comes out of the installed library at build
+   time.
+
+## The four pinned levels
+
+`[tool.idfkit.library]`, `[tool.idfkit.docs]`, `[tool.idfkit.governance]` and
+`[tool.idfkit.conformance]` in `pyproject.toml`. The build refuses to start when any is undeclared,
+and each names an immutable tag or an exact version, never a branch or a range.
+
+Levels advance by pull request, opened automatically when either library releases. The site's own
+checks decide whether the pages survive.
+
+## Related repositories
+
+| Repository | Relationship |
+|---|---|
+| `idfkit` | the Python library; installed here at the pinned `library` level. Also serves `py.idfkit.com` redirects |
+| `idfkit-js` | the JavaScript library; publishes the `docs-YYYY.N` artifact this site vendors |
+| `idfkit-conformance` | governance and conformance artifacts, read at pinned tags |

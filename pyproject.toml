@@ -1,0 +1,267 @@
+# This repository publishes a site, not a package. There is no [project] table and no
+# [build-system]: nothing here is built as a distribution or uploaded anywhere. What it does
+# have is the library's tool configuration, so a maintainer who works in idfkit can clone this
+# and have `make check` mean what they expect (contracts/repository-layout.md).
+
+[dependency-groups]
+dev = [
+    "pytest>=7.2.0",
+    "pre-commit>=2.20.0",
+    "tox-uv>=1.11.3",
+    "pyright>=1.1.389",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.11.5",
+    "mkdocs>=1.4.2",
+    "mkdocs-jupyter>=0.24.0",
+    "mkdocs-material[imaging]>=8.5.10",
+    "mkdocstrings[python]>=0.26.1",
+    # The TypeScript half of the reference. It normally shells out to TypeDoc; here it reads the
+    # pinned artifact through docs/hooks/typedoc_shim.py, so no Node toolchain is involved and
+    # 001-FR-058 holds. pydantic opts mkdocstrings option validation in, so a typo in mkdocs.yml
+    # fails the build rather than being ignored.
+    "mkdocstrings-typescript>=0.1",
+    "pydantic>=2",
+]
+
+# ----------------------------------------------------------------------------------------------
+# The four declared levels.
+#
+# Three of these are copied from idfkit's pyproject.toml, where they governed a site that lived
+# inside the library. The fourth is new here and is the whole reason the other three can move:
+# once the site is not inside the library, the library becomes an input like any other, and an
+# input the site renders a reference from must be pinned exactly like the artifacts it renders
+# examples from.
+#
+# The build MUST refuse to start when it cannot state all four (data-model DeclaredLevel rule 1,
+# FR-025). docs/hooks/pinned_levels.py enforces that, and it is what caught the incomplete
+# portable build on 2026-09-03.
+# ----------------------------------------------------------------------------------------------
+
+# Conformance corpus level the site states, as an immutable tag in idfkit-conformance. The corpus
+# itself is the libraries' business; the site reports which level the pages describe.
+[tool.idfkit.conformance]
+level = "conformance-2026.7"
+
+# Governance artifact level the parity and naming pages are rendered from, as an immutable tag in
+# idfkit-conformance. Read by docs/hooks/parity_macro.py, scripts/render_parity_page.py and
+# scripts/render_naming_map.py through the duplicated scripts/_governance_source.py.
+[tool.idfkit.governance]
+level = "governance-2026.9"
+
+# Documentation artifact level the TypeScript half of the site renders from, as an immutable tag
+# in idfkit-js. It carries the TypeScript examples the pages include and the TypeDoc JSON the
+# TypeScript reference is generated from, published together so the two always describe the same
+# commit. Read by scripts/sync_js_artifacts.py and docs/hooks/typedoc_shim.py.
+[tool.idfkit.docs]
+level = "docs-2026.1"
+
+# Library level the Python half of the site renders from, as an exact version on the package
+# index. New in feature 003. Two things read it, and they must agree: mkdocstrings generates the
+# Python reference from this installed distribution, and scripts/copy_shipped_assets.py takes the
+# four weather-browser files out of the same one. Pinning it is what keeps the reference and the
+# assets on a page describing the same version of the library.
+[tool.idfkit.library]
+level = "0.15.0"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+exclude = [
+    ".venv", "**/node_modules", "**/__pycache__",
+    # Vendored from idfkit-js at the pinned docs level and compared byte for byte. Analysing it
+    # here would report on someone else's generated output.
+    "docs/typedoc", "docs/snippets/js",
+    # Copied out of the installed library at build time, gitignored, and not ours to check.
+    "docs/weather/browse",
+    "site",
+]
+
+# Agent reference snippets (docs/snippets/agent_references/) are the source of truth for the
+# examples in the bundled .agents reference docs. They get a STRICTER environment than the rest
+# of docs/snippets: the rules that catch API drift — attribute access, call signatures, argument
+# types — stay ON (that is the whole point of routing the examples through pyright), while the
+# "unknown type" / "untyped" noise that snippet style provokes stays OFF. Pyright uses the FIRST
+# matching execution environment, so this MUST precede the broader docs/snippets block below.
+[[tool.pyright.executionEnvironments]]
+root = "docs/snippets/agent_references"
+reportTypedDictNotRequiredAccess = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportUnknownLambdaType = false
+reportMissingParameterType = false
+reportMissingTypeStubs = false
+reportMissingTypeArgument = false
+reportMissingModuleSource = false
+reportUntypedFunctionDecorator = false
+reportUntypedBaseClass = false
+reportUnusedVariable = false
+reportUnusedExpression = false
+reportUnusedFunction = false
+reportPossiblyUnboundVariable = false
+reportReturnType = false
+# Happy-path doc style: examples assume optional accessors are present (e.g.
+# result.sql.get_timeseries). Attribute TYPOS on the non-None type are still caught by
+# reportAttributeAccessIssue; only the "could be None" noise is silenced. reportAssignmentType is
+# off because placeholder reassignment (declare doc: IDFDocument, then doc = load_idf(...))
+# provokes false positives.
+reportOptionalMemberAccess = false
+reportAssignmentType = false
+# Reference sections legitimately show "here's the importable API" overview blocks whose symbols
+# aren't all exercised. Nonexistent import symbols are still caught by
+# reportAttributeAccessIssue ("unknown import symbol"), so turning this off preserves the
+# existence check.
+reportUnusedImport = false
+# Drift-catching rules deliberately left ON (strict default):
+#   reportAttributeAccessIssue, reportCallIssue, reportArgumentType,
+#   reportFunctionMemberAccess, reportIndexIssue, reportOptionalSubscript,
+#   reportOperatorIssue.
+
+# The tutorials are the first code a new user copies, so they get the same drift-catching
+# treatment as the agent references: a renamed builder or a changed kwarg must fail `make check`,
+# not ship broken. Same rule set as the block above, and it MUST also precede the broader
+# docs/snippets block.
+[[tool.pyright.executionEnvironments]]
+root = "docs/snippets/tutorials"
+reportTypedDictNotRequiredAccess = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportUnknownLambdaType = false
+reportMissingParameterType = false
+reportMissingTypeStubs = false
+reportMissingTypeArgument = false
+reportMissingModuleSource = false
+reportUntypedFunctionDecorator = false
+reportUntypedBaseClass = false
+reportUnusedVariable = false
+reportUnusedExpression = false
+reportUnusedFunction = false
+reportPossiblyUnboundVariable = false
+reportReturnType = false
+reportOptionalMemberAccess = false
+reportAssignmentType = false
+reportUnusedImport = false
+# Drift-catching rules deliberately left ON, as above.
+
+# Every other snippet under docs/snippets. Constitution VI requires that renaming a documented
+# operation breaks the documentation checks, so the four rules that actually detect API drift
+# stay ON here, exactly as they do in the two blocks above: reportAttributeAccessIssue,
+# reportCallIssue, reportArgumentType and reportFunctionMemberAccess. A snippet that calls a
+# method the library does not have, or passes an argument the signature does not accept, now
+# fails `make check` instead of shipping. What stays OFF is the "unknown type" / "untyped" /
+# "unused" noise that snippet style legitimately provokes, plus the structural rules (index,
+# operator, iterable) that partial doc fragments trip over without indicating drift. This block
+# MUST remain last: pyright uses the FIRST matching execution environment.
+[[tool.pyright.executionEnvironments]]
+root = "docs/snippets"
+reportTypedDictNotRequiredAccess = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportOptionalMemberAccess = false
+reportMissingParameterType = false
+reportMissingImports = false
+reportMissingTypeStubs = false
+reportUntypedFunctionDecorator = false
+reportUntypedBaseClass = false
+reportMissingTypeArgument = false
+reportReturnType = false
+reportUnusedVariable = false
+reportUnusedExpression = false
+reportUnusedFunction = false
+reportAssignmentType = false
+reportOptionalIterable = false
+reportOptionalSubscript = false
+reportIncompatibleMethodOverride = false
+reportPossiblyUnboundVariable = false
+reportMatchNotExhaustive = false
+reportMissingModuleSource = false
+reportOperatorIssue = false
+reportGeneralTypeIssues = false  # deprecated but still needed for "not iterable" errors
+reportIndexIssue = false
+reportInvalidTypeForm = false
+reportUnnecessaryComparison = false
+reportUnknownLambdaType = false
+
+[tool.pytest.ini_options]
+# tests/ covers scripts/. There is no package to doctest, which is why --doctest-modules, the
+# library's default, is absent.
+testpaths = ["tests"]
+markers = [
+    "network: marks tests as requiring network access (deselect with '-m \"not network\"')",
+]
+
+[tool.ruff]
+# py312, not the library's py310. The library must run on every interpreter it supports; this
+# repository is built by CI on exactly one, and two of its hooks already require 3.11 for
+# tomllib. Pinning the floor at what .python-version says keeps the two from drifting.
+target-version = "py312"
+line-length = 120
+fix = true
+
+[tool.ruff.lint]
+select = [
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # mccabe
+    "C90",
+    # pycodestyle
+    "E", "W",
+    # pyflakes
+    "F",
+    # pygrep-hooks
+    "PGH",
+    # pyupgrade
+    "UP",
+    # ruff
+    "RUF",
+    # tryceratops
+    "TRY",
+]
+ignore = [
+    # LineTooLong
+    "E501",
+    # DoNotAssignLambda
+    "E731",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+# The scripts print, and they raise with the long messages that are the whole point: a build that
+# stops because the installed library no longer ships a file the site publishes has to say which
+# file, why there is no fallback, and what fixes it. Same waiver, same reason, as docs/hooks below.
+"scripts/*" = ["T201", "TRY003"]
+# The documentation hooks print, and they raise with the long messages that are the whole point:
+# a build that stops because the pinned TypeDoc artifact is missing has to say which file, why
+# there is no fallback, and the command that fixes it. A three-word exception class in front of
+# that would be ceremony.
+"docs/hooks/*" = ["T201", "TRY003"]
+"docs/snippets/*" = ["E402", "F706", "F821", "F841", "F811", "I", "S", "B", "TRY", "UP008"]
+
+[tool.ruff.format]
+preview = true
+
+[tool.coverage.report]
+skip_empty = true
+
+[tool.coverage.run]
+branch = true
+source = ["scripts"]
