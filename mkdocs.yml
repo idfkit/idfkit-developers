@@ -169,6 +169,7 @@ nav:
     - Content-addressed schemas: explanation/content-addressed-schemas.md
     - A synchronous core with async edges: explanation/sync-core-async-edge.md
     - Browser simulation: explanation/browser-simulation.md
+    - A language service for IDF text: explanation/idf-language-service.md
     - What is not finished: explanation/what-is-not-finished.md
     - Simulation architecture: concepts/simulation-architecture.md
     - Weather data pipeline: concepts/weather-pipeline.md

@@ -80,12 +80,12 @@ ledger, where permanent single-language capabilities are recorded as such.
 <!-- BEGIN GENERATED FROM naming.toml. Edit the register, not this page. -->
 
 Generated from
-[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.9/governance/naming.toml)
-at `governance-2026.9`, the governance tag this release pins. It governs `idfkit` and
-`@idfkit/core` and `@idfkit/weather`, and it is read at a pinned governance-YYYY.N tag
-of idfkit-conformance, never the default branch. Correct the register and regenerate; a
-correction made on this page would be overwritten, and it would never reach either
-library's naming gate.
+[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.11/governance/naming.toml)
+at `governance-2026.11`, the governance tag this release pins. It governs `idfkit` and
+`@idfkit/core` and `@idfkit/weather` and `@idfkit/language`, and it is read at a pinned
+governance-YYYY.N tag of idfkit-conformance, never the default branch. Correct the
+register and regenerate; a correction made on this page would be overwritten, and it
+would never reach either library's naming gate.
 
 ## Guessing a name before you look it up
 
@@ -273,7 +273,9 @@ row marked divergent or excluded links to the entry that says why, and a cell re
 | Concept | Python | TypeScript | Kind |
 | ------- | ------ | ---------- | ---- |
 | a parse diagnostic | `idfkit.exceptions.ParseDiagnostic` | `ParseDiagnostic` | aligned |
-| diagnostics from a parse | `IDFParseError.diagnostics` | `ParseResult.diagnostics` | [divergent](#diagnostics-from-a-parse) |
+| a document and its parse findings | `ParseResult` | `ParseResult` | aligned |
+| diagnostics from a parse | `IDFParseError.diagnostics` | `IdfParseError.diagnostics` | aligned |
+| recoverable diagnostics from a parse | `ParseResult.diagnostics` | `ParseResult.diagnostics` | aligned |
 
 ### Weather stations, files, and geocoding { #map-weather-stations-files-and-geocoding }
 
@@ -529,10 +531,14 @@ row marked divergent or excluded links to the entry that says why, and a cell re
 | the difference between two schema versions | *absent* | `SchemaDelta` | [divergent](#the-difference-between-two-schema-versions) |
 | resolve the schema for a detected version | *absent* | `schemaFor` | [divergent](#resolve-the-schema-for-a-detected-version) |
 
-### TypeScript-only structural surfaces { #map-typescript-only-structural-surfaces }
+### The writer's controls { #map-the-writers-controls }
 
 | Concept | Python | TypeScript | Kind |
 | ------- | ------ | ---------- | ---- |
+| indent width | `indent` | `indent` | aligned |
+| comment column | `comment_column` | `commentColumn` | aligned |
+| object ordering | `ordering` | `ordering` | aligned |
+| pin the version object first | `version_first` | `versionFirst` | aligned |
 | the options-object types | *absent* | [5 names](#the-options-object-types) | [excluded](#the-options-object-types) |
 | the static typing surface | *absent* | [4 names](#the-static-typing-surface) | [excluded](#the-static-typing-surface) |
 | the per-type prototype surface | *absent* | [3 names](#the-per-type-prototype-surface) | [excluded](#the-per-type-prototype-surface) |
@@ -547,7 +553,7 @@ row marked divergent or excluded links to the entry that says why, and a cell re
 | an epJSON document value | *absent* | `EpJson` | [divergent](#an-epjson-document-value) |
 | serialize one object | *absent* | `writeObject` | [divergent](#serialize-one-object) |
 | serialize a document to an epJSON value | *absent* | `toEpJson` | [divergent](#serialize-a-document-to-an-epjson-value) |
-| read IDF from disk, keeping diagnostics | *absent* | `loadIdfWithDiagnostics` | [divergent](#read-idf-from-disk-keeping-diagnostics) |
+| read IDF from disk, keeping diagnostics | `load_idf_with_diagnostics` | `loadIdfWithDiagnostics` | aligned |
 
 ### The document's own members { #map-the-documents-own-members }
 
@@ -581,6 +587,43 @@ row marked divergent or excluded links to the entry that says why, and a cell re
 | ------- | ------ | ---------- | ---- |
 | migrate a model without blocking | `async_migrate` | *absent* | [divergent](#migrate-a-model-without-blocking) |
 | create schedule type limits | `create_schedule_type_limits` | `createScheduleTypeLimits` | aligned |
+
+### The language service for IDF text { #map-the-language-service-for-idf-text }
+
+| Concept | Python | TypeScript | Kind |
+| ------- | ------ | ---------- | ---- |
+| scan IDF text | *absent* | `scanIdf` | [excluded](#scan-idf-text) |
+| classify IDF text | *absent* | `classify` | [excluded](#classify-idf-text) |
+| line and column at an offset | *absent* | `lineColumnAt` | [excluded](#line-and-column-at-an-offset) |
+| offset at a line and column | *absent* | `offsetAt` | [excluded](#offset-at-a-line-and-column) |
+| a source region | *absent* | `Region` | [excluded](#a-source-region) |
+| a line and column | *absent* | `LineColumn` | [excluded](#a-line-and-column) |
+| a syntax token | *absent* | `Token` | [excluded](#a-syntax-token) |
+| a syntax token kind | *absent* | `TokenKind` | [excluded](#a-syntax-token-kind) |
+| the syntax layer | *absent* | `SyntaxLayer` | [excluded](#the-syntax-layer) |
+| a written statement | *absent* | `Statement` | [excluded](#a-written-statement) |
+| schema prose pool | *absent* | `ProsePool` | [excluded](#schema-prose-pool) |
+| cursor context | *absent* | `contextAt` | [excluded](#cursor-context) |
+| the cursor context record | *absent* | `CursorContext` | [excluded](#the-cursor-context-record) |
+| completions at an offset | *absent* | `completionsAt` | [excluded](#completions-at-an-offset) |
+| explanation at an offset | *absent* | `explainAt` | [excluded](#explanation-at-an-offset) |
+| declaration at an offset | *absent* | `declarationAt` | [excluded](#declaration-at-an-offset) |
+| position findings | *absent* | `findingsIn` | [excluded](#position-findings) |
+| position findings already in hand | *absent* | `position` | [excluded](#position-findings-already-in-hand) |
+| a positioned finding | *absent* | `PositionedFinding` | [excluded](#a-positioned-finding) |
+| a completion offer | *absent* | `Offer` | [excluded](#a-completion-offer) |
+| an explanation | *absent* | `Explanation` | [excluded](#an-explanation) |
+| a declaration site | *absent* | `Declaration` | [excluded](#a-declaration-site) |
+| the completion options | *absent* | `CompletionOptions` | [excluded](#the-completion-options) |
+| a completion result | *absent* | `CompletionResult` | [excluded](#a-completion-result) |
+| an explanation result | *absent* | `ExplanationResult` | [excluded](#an-explanation-result) |
+| a declaration result | *absent* | `DeclarationResult` | [excluded](#a-declaration-result) |
+
+### The column unit { #map-the-column-unit }
+
+| Concept | Python | TypeScript | Kind |
+| ------- | ------ | ---------- | ---- |
+| column in a finding | `column` | `column` | [divergent](#column-in-a-finding) |
 
 ## What the notes add
 
@@ -795,8 +838,83 @@ Exported by both libraries under the same name. No acronym, so no casing diverge
 
 **a parse diagnostic**
 
-One finding from a parse: a message, a location, and a severity. Python reaches it at
+One finding from a parse: a message, a machine-readable `code`, and as much location as
+the parser had at the point it noticed. Python reaches it at
 `idfkit.exceptions.ParseDiagnostic` rather than through the top-level `__all__`.
+
+There is no severity. An earlier version of this note claimed one, and neither
+implementation has ever carried it: every diagnostic either stopped the parse or was
+recoverable, and which of those it was is told by the path it arrives on rather than by
+a field. The claim is corrected here rather than implemented, because adding a field to
+match a note nobody had checked is the wrong direction.
+
+`code` was added in feature 002 and is the field the corpus compares. It is derived from
+the exception hierarchy by dropping the suffix, so the same eight values exist in both
+languages; the message text is not compared and is free to differ.
+
+TypeScript gained the object concerned in feature 002, and declares a file path and a
+column beside it, so both sides name the same kinds of location (FR-033). Only Python
+fills all four today: the TypeScript lexer counts lines and not columns, and `parseIdf`
+is handed text rather than a path, so neither value exists where a finding is built.
+Both are optional and absent rather than invented. `obj_type` against `typeName` stays
+as it is: that is the casing rule this register already records, not a gap.
+
+**a document and its parse findings**
+
+What the returning path hands back: the document, and the recoverable findings that did
+not stop the parse. A frozen dataclass in Python and an interface in TypeScript, which
+is the house shape for a value object in each language.
+
+TypeScript has returned this since it was written. Python's is new in feature 002 and is
+reached through `load_idf_with_diagnostics`; the field names match, so a reader moving
+between the two reads the same two names in the same order.
+
+Registered in the same change as the path that returns it, and before either shipped.
+
+**diagnostics from a parse**
+
+The findings that stopped a parse, carried by the error that reports it. Both languages
+raise by default and both now carry the whole collection rather than one finding
+flattened into fields.
+
+This entry was recorded as divergent, on the grounds that Python raises and TypeScript
+returns. That was never what the two did: `parse_idf` defaults to `strict_parsing=True`
+and raises, `parseIdf` defaults to `strict: true` and throws. The recorded divergence
+described the non-strict mode while reading as though it described the default. What
+actually differed was narrower, and feature 002 closed it: TypeScript's error carried
+`.line` and `.typeName` from a single finding and now carries the collection, with both
+accessors kept resolving to the first finding's values so no existing caller breaks
+(FR-014).
+
+THIS ENTRY IS THE ERROR'S COLLECTION. The result's is `recoverable diagnostics from a
+parse`, below.
+
+The registered pair was `IDFParseError.diagnostics` against `ParseResult.diagnostics`
+until 2026-09-04. That crossed the two paths, and the crossing was the shape of the
+divergence. Splitting it into one concept per carrier is what makes both entries
+alignable, and it costs one TypeScript rename: this concept's TypeScript name moves from
+`ParseResult.diagnostics`, which has not gone anywhere and is registered below, to
+`IdfParseError.diagnostics`. Python's name does not move, so its budget is untouched.
+
+The rename is spent deliberately and is the cheaper of the two available. Mapping this
+concept to the result instead would have kept the TypeScript name and renamed Python,
+which is the same cost against a name that already exists rather than one that is
+landing in the same feature.
+
+Python's logging announcements are unchanged and are not a third name: they are the same
+findings reaching a caller who installed a handler.
+
+**recoverable diagnostics from a parse**
+
+The findings that did NOT stop the parse, carried alongside the document the parse still
+produced. Reached through `load_idf_with_diagnostics` and `loadIdfWithDiagnostics`, or
+by parsing with the strict flag off.
+
+TypeScript has carried these since it was written; this is the name it has always had,
+unmoved. Python's is new in feature 002 and is registered here before it ships.
+Splitting them from `diagnostics from a parse` above is what lets both concepts be
+aligned rather than one entry pretending an error member and a result member are the
+same name.
 
 **the station index**
 
@@ -1086,6 +1204,56 @@ Registered before it is written, with `calculate_zone_floor_area` and
 **a zone's height**
 
 Registered before it is written, with the other zone measures.
+
+**indent width**
+
+How far each field line is indented. A count of spaces in Python, the string itself in
+TypeScript, which is the shape each language's callers expect and is recorded here
+rather than reconciled.
+
+The DEFAULTS differ and are not moving: two spaces in Python, four in TypeScript. Both
+are published and neither is more correct, which is the whole subject of the `two
+writers, one model` page.
+
+**comment column**
+
+The column field-name comments are padded to. The one writer default of the six that
+already agreed: 30 on both sides.
+
+**object ordering**
+
+How object types are ordered on the way out. Takes `sorted` or `source` rather than a
+boolean, because three behaviours exist across the two languages and two formats and a
+flag cannot say which of the three is wanted.
+
+The defaults differ and are not moving: `sorted` in Python, whose `!-Option SortedOrder`
+header announces it, and `source` in TypeScript, which is insertion order.
+
+**pin the version object first**
+
+Whether `Version` is written ahead of every other type, whatever the ordering. Defaults
+to true on both sides, which is what both writers did before the control existed.
+
+Composes with `object ordering` rather than overriding it: the ordering decides the
+sequence, this decides whether Version is lifted out of it.
+
+**read IDF from disk, keeping diagnostics**
+
+Both languages need two loaders because the recoverable findings are worth keeping and
+most callers do not want to unwrap a result to get the document. `load_idf` and
+`loadIdf` hand back the document and drop the non-fatal findings; these two hand back a
+document and its findings together.
+
+Python had no counterpart until feature 002. The recoverable findings went to the
+logging module and were reachable only by installing a handler before the parse, which
+is not one call and not the same findings the other language returns. The logging
+announcements still fire, unchanged, for callers who rely on them (FR-014); this entry
+adds a second way to reach the same findings, and removes none.
+
+Does the work `strict_parsing=False` does in Python and `strict: false` does in
+TypeScript, without asking for it: a strict parse has no recoverable findings, since the
+first one stops it, so the Python loader takes no `strict_parsing` argument at all. The
+fatal path is unchanged in both and is recorded under `diagnostics from a parse`.
 
 **a document's schema**
 
@@ -1517,23 +1685,6 @@ Absent from Python, and correctly so. TypeScript names the map because the calle
 selects one and passes it as a type argument. Python's stubs apply to every document
 with nothing for a caller to select, so there is no value and no type to name, and a
 Python counterpart would name a choice the Python type checker cannot express.
-
-### Diagnostics from a parse
-
-| Python | TypeScript |
-| ------ | ---------- |
-| `IDFParseError.diagnostics` | `ParseResult.diagnostics` |
-
-Python raises and TypeScript returns. `IDFParseError` carries the diagnostics that
-stopped the parse, which is how a Python caller expects to meet a failure it must
-handle, and the recoverable findings go to the logging module. TypeScript's `parseIdf`
-returns a `ParseResult` whose `diagnostics` array holds the non-fatal findings alongside
-the document, because a throwing parser in a browser costs the caller the partial
-document it could still show.
-
-Each is idiomatic where it lives. The difference is visible to a reader, so the parity
-ledger records it under `parse-diagnostics` and the corpus asserts what each side
-reports for a malformed case.
 
 ### Download a weather file
 
@@ -2310,21 +2461,6 @@ it would be additive and is not part of this feature.
 `serialize epJSON to a string` above is the text-producing operation and is aligned on
 both sides.
 
-### Read IDF from disk, keeping diagnostics
-
-| Python | TypeScript |
-| ------ | ---------- |
-| *absent* | `loadIdfWithDiagnostics` |
-
-TypeScript needs two loaders because it returns rather than raises: `loadIdf` hands back
-the document and drops the non-fatal findings, and this one hands back the `ParseResult`
-with both. A single loader would either force every caller to unwrap a result they
-usually do not want, or throw away findings a viewer wants to show.
-
-Python needs only `load_idf`, because the findings that stop a parse arrive on
-`IDFParseError` and the recoverable ones go to the logging module. That is the
-`diagnostics from a parse` divergence, seen from the disk-reading side.
-
 ### The path a document was read from
 
 | Python | TypeScript |
@@ -2531,6 +2667,28 @@ is the input and output divergence, seen from the migration side.
 `migrate a model to a newer version` above is the operation. Its note already names this
 pair; this entry gives the second name a concept of its own.
 
+### Column in a finding
+
+| Python | TypeScript |
+| ------ | ---------- |
+| `column` | `column` |
+
+Python string indices are code points; JavaScript string indices are UTF-16 code units.
+The two agree for every character below the astral planes and differ for text containing
+anything above them, which in practice means an emoji in a comment.
+
+Each is correct in its own ecosystem, and converting either would make positions wrong
+for that language's own consumers: the Language Server Protocol's default position
+encoding is UTF-16, as are Monaco's columns and CodeMirror's offsets, so the JavaScript
+value is what every JavaScript consumer needs unconverted.
+
+Harmless in practice today: the corpus compares findings on (code, line, typeName) and
+never on a column. Registered because an unregistered divergence is indistinguishable
+from drift.
+
+Canonical form across the boundary: **1-based, counted in the host language's own string
+index unit**.
+
 ## The canonical form across the boundary
 
 A divergence in a name costs you a lookup. A divergence in a value costs you a bug,
@@ -2556,6 +2714,9 @@ model.
 | detect a document version | `get_idf_version` | `getIdfVersion` | string |
 | detect an epJSON document version | `idfkit.epjson_parser.get_epjson_version` | `getEpJsonVersion` | string |
 | [render a version as text](#render-a-version-as-text) | `version_string` | *absent* | string |
+| [a source region](#a-source-region) | *absent* | `Region` | half-open, offsets into the source text, an empty region where start equals end |
+| [a line and column](#a-line-and-column) | *absent* | `LineColumn` | both counts 1-based; the column in the host language's own string index unit |
+| [column in a finding](#column-in-a-finding) | `column` | `column` | 1-based, counted in the host language's own string index unit |
 
 The rule to carry away: keep each language's idiomatic shape in memory, and move the
 canonical form across the boundary. Anything written to a file, sent in a message, or
@@ -3051,6 +3212,332 @@ resolved by the change that withdraws or renames each name, as the `intersect an
 surfaces` and `the vector image surface` entries already say for their own duplicates. A
 withdrawal counts as a rename, so each of these has one budget to spend and no more.
 
+### Scan IDF text
+
+**Python**: none, and never.
+
+**TypeScript**: `scanIdf`.
+
+Second-language-only by decision, recorded on the parity ledger as
+`idf-language-service`. Listed here so that a Python counterpart is never added without
+the ledger's `never` being amended first.
+
+The one entry point to the syntax layer. Takes text and nothing else, and never throws.
+
+### Classify IDF text
+
+**Python**: none, and never.
+
+**TypeScript**: `classify`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The complete-coverage view over a scanned
+layer, yielding trivia as the complement of the stored tokens rather than storing it.
+Listed here so that a Python counterpart is never added without the ledger's `never`
+being amended first.
+
+### Line and column at an offset
+
+**Python**: none, and never.
+
+**TypeScript**: `lineColumnAt`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". Turns an offset into the 1-based line and
+column an editor draws with. Listed here so that a Python counterpart is never added
+without the ledger's `never` being amended first.
+
+### Offset at a line and column
+
+**Python**: none, and never.
+
+**TypeScript**: `offsetAt`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The inverse of `lineColumnAt`, for a consumer
+whose editor speaks in line and column and whose service speaks in offsets. Listed here
+so that a Python counterpart is never added without the ledger's `never` being amended
+first.
+
+### A source region
+
+**Python**: none, and never.
+
+**TypeScript**: `Region`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". A half-open span of the source text, and the
+unit of every position this capability reports. Listed here so that a Python counterpart
+is never added without the ledger's `never` being amended first.
+
+### A line and column
+
+**Python**: none, and never.
+
+**TypeScript**: `LineColumn`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". Derived from a region rather than stored
+beside one, because storing it would double the size of every region to hold two numbers
+that are a function of one. Listed here so that a Python counterpart is never added
+without the ledger's `never` being amended first.
+
+The unit divergence itself is registered separately, under `column in a finding`.
+
+### A syntax token
+
+**Python**: none, and never.
+
+**TypeScript**: `Token`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". One meaningful span of text with a
+grammatical kind, materialised on demand from the layer's packed arrays rather than
+stored as an object. Listed here so that a Python counterpart is never added without the
+ledger's `never` being amended first.
+
+### A syntax token kind
+
+**Python**: none, and never.
+
+**TypeScript**: `TokenKind`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The grammatical kinds a token can carry,
+`trivia` included even though trivia is never stored. Listed here so that a Python
+counterpart is never added without the ledger's `never` being amended first.
+
+### The syntax layer
+
+**Python**: none, and never.
+
+**TypeScript**: `SyntaxLayer`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The whole scan: the text it was built from,
+its statements, and its packed token store. Listed here so that a Python counterpart is
+never added without the ledger's `never` being amended first.
+
+Python has a formatting-preserving concrete syntax tree already, under
+`lossless-round-trip`, and this is not it. That tree exists to be written back out; this
+layer exists to be positioned against, holds no schema meaning, and is built only when a
+caller names `scanIdf`.
+
+### A written statement
+
+**Python**: none, and never.
+
+**TypeScript**: `Statement`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". One semicolon-terminated statement as it
+appears in the text, carrying regions and no schema meaning: it is not an object in the
+model, and a statement with the wrong number of fields is still a statement. Listed here
+so that a Python counterpart is never added without the ledger's `never` being amended
+first.
+
+### Schema prose pool
+
+**Python**: none, and never.
+
+**TypeScript**: `ProsePool`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The deduplicated prose the schema bundle
+carries, which `describeObjectType` already takes as an optional argument. It becomes a
+public name here because `explainAt` cannot name its own optional prose parameter
+without it.
+
+Python has no counterpart because it needs none: its schema access reads prose directly
+rather than through a pool, so there is nothing for a Python name to refer to. Listed
+here so that a Python counterpart is never added without the ledger's `never` being
+amended first.
+
+Declared today at `packages/core/src/introspect/describe.ts` and not re-exported from
+that package's root. Registering it is what lets the change that exports it pass the
+naming gate.
+
+### Cursor context
+
+**Python**: none, and never.
+
+**TypeScript**: `contextAt`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". Which statement an offset falls in, which
+field, and which part, computed by a bounded backward scan rather than by building a
+layer. Listed here so that a Python counterpart is never added without the ledger's
+`never` being amended first.
+
+### The cursor context record
+
+**Python**: none, and never.
+
+**TypeScript**: `CursorContext`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". What `contextAt` returns. A concept of its
+own because the operation and its result are two public names, and FR-005 forbids one
+concept carrying both. Listed here so that a Python counterpart is never added without
+the ledger's `never` being amended first.
+
+### Completions at an offset
+
+**Python**: none, and never.
+
+**TypeScript**: `completionsAt`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". What the schema permits at an offset, taken
+from the schema itself and never from a second table. Listed here so that a Python
+counterpart is never added without the ledger's `never` being amended first.
+
+### Explanation at an offset
+
+**Python**: none, and never.
+
+**TypeScript**: `explainAt`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The schema's own facts about whatever is
+under an offset, reported and never paraphrased. Listed here so that a Python
+counterpart is never added without the ledger's `never` being amended first.
+
+### Declaration at an offset
+
+**Python**: none, and never.
+
+**TypeScript**: `declarationAt`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". Where the name under an offset is declared,
+or nothing when it is declared nowhere, which is the dangling-reference finding's answer
+to give rather than this one's. Listed here so that a Python counterpart is never added
+without the ledger's `never` being amended first.
+
+### Position findings
+
+**Python**: none, and never.
+
+**TypeScript**: `findingsIn`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". Existing parse and validation findings with a
+region attached. It adds no findings of its own and holds no second opinion about the
+schema, which is what keeps this out of Python's way rather than duplicating it. Listed
+here so that a Python counterpart is never added without the ledger's `never` being
+amended first.
+
+### Position findings already in hand
+
+**Python**: none, and never.
+
+**TypeScript**: `position`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The separately exposed half of `findingsIn`,
+for a consumer that already holds findings from its own run and wants regions attached
+without paying for a second parse. It is a distinct public name rather than an option on
+`findingsIn` because the two take different inputs: one takes text and reads it, the
+other takes findings and a layer the caller already built. Listed here so that a Python
+counterpart is never added without the ledger's `never` being amended first.
+
+### A positioned finding
+
+**Python**: none, and never.
+
+**TypeScript**: `PositionedFinding`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". An existing finding with a region and a
+precision attached, generic over the finding type so that a parse diagnostic and a
+validation error travel one path without either being modified. Listed here so that a
+Python counterpart is never added without the ledger's `never` being amended first.
+
+### A completion offer
+
+**Python**: none, and never.
+
+**TypeScript**: `Offer`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". One completion, carrying the region it would
+replace so that a consumer renders and applies a list without measuring anything itself.
+Listed here so that a Python counterpart is never added without the ledger's `never`
+being amended first.
+
+### An explanation
+
+**Python**: none, and never.
+
+**TypeScript**: `Explanation`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The region described, the schema's field
+facts, its prose when the caller supplied a pool, and the manual location. Listed here
+so that a Python counterpart is never added without the ledger's `never` being amended
+first.
+
+Carries `FieldDescription` and `DocsUrl` unchanged; both are already registered above.
+
+### A declaration site
+
+**Python**: none, and never.
+
+**TypeScript**: `Declaration`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". Where a name is declared: the region of the
+declaring statement's name field, and that statement's canonical type. Listed here so
+that a Python counterpart is never added without the ledger's `never` being amended
+first.
+
+### The completion options
+
+**Python**: none, and never.
+
+**TypeScript**: `CompletionOptions`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The optional document and prose pool
+`completionsAt` takes, an options-object rather than two more positional arguments.
+Listed here so that a Python counterpart is never added without the ledger's `never`
+being amended first.
+
+### A completion result
+
+**Python**: none, and never.
+
+**TypeScript**: `CompletionResult`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". A discriminated union rather than an array,
+so that "the schema constrains nothing here" and "I could not consult a schema" are
+different answers instead of the same empty list. Listed here so that a Python
+counterpart is never added without the ledger's `never` being amended first.
+
+### An explanation result
+
+**Python**: none, and never.
+
+**TypeScript**: `ExplanationResult`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The same discriminated shape as
+`CompletionResult`, for `explainAt`. Listed here so that a Python counterpart is never
+added without the ledger's `never` being amended first.
+
+### A declaration result
+
+**Python**: none, and never.
+
+**TypeScript**: `DeclarationResult`.
+
+Part of `idf-language-service`, second-language-only by decision and recorded on the
+parity ledger with absence_kind = "never". The same discriminated shape again, for
+`declarationAt`. Listed here so that a Python counterpart is never added without the
+ledger's `never` being amended first.
+
 ## Names that have spent their rename
 
 Every name gets one rename during the unification. One. A name that has spent it is
@@ -3066,6 +3553,7 @@ library is unstable.
 | [the document class](#the-document-class) | `IdfDocument` | TypeScript | 1 |
 | [untyped collection access](#untyped-collection-access) | *withdrawn* | TypeScript | 1 |
 | [generated object types](#generated-object-types) | `@idfkit/types-v26-1` | TypeScript | 1 |
+| diagnostics from a parse | `IdfParseError.diagnostics` | TypeScript | 1 |
 | detect a document version | `getIdfVersion` | TypeScript | 1 |
 | detect an epJSON document version | `getEpJsonVersion` | TypeScript | 1 |
 

@@ -79,36 +79,36 @@ Ids get added and deprecated. They do not get renamed.
 <!-- BEGIN GENERATED FROM parity.toml. Edit the ledger, not this page. -->
 
 Generated from
-[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.9/governance/parity.toml)
-at `governance-2026.9`, the governance tag this release pins. Correct the ledger and
+[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.11/governance/parity.toml)
+at `governance-2026.11`, the governance tag this release pins. Correct the ledger and
 regenerate; a correction made on this page would be overwritten, and it would never
 reach either library's CI gate.
 
 ## Every capability at a glance { #at-a-glance }
 
-33 capabilities, counted by availability and then listed in full. Follow a capability to
+34 capabilities, counted by availability and then listed in full. Follow a capability to
 read what differs where the two libraries differ, and whether an absence is temporary or
 permanent.
 
 | Availability | Python | JavaScript |
 | ------------ | ------ | ---------- |
-| complete | 28 | 12 |
-| partial | 3 | 4 |
+| complete | 30 | 15 |
+| partial | 1 | 2 |
 | absent, not yet | 0 | 13 |
-| absent, never | 2 | 4 |
+| absent, never | 3 | 4 |
 
 | Capability | Tier | Python | JavaScript |
 | ---------- | ---- | ------ | ---------- |
 | [Reading IDF and epJSON](#parse) | 1 | complete | complete |
-| [Writing IDF and epJSON](#write) | 1 | partial | partial |
+| [Writing IDF and epJSON](#write) | 1 | complete | complete |
 | [Documents, collections, and objects](#document-model) | 1 | complete | complete |
 | [Reference graph](#references) | 1 | complete | complete |
 | [Schema access and the version registry](#schema-access) | 1 | complete | complete |
 | [Model validation](#validation) | 1 | complete | complete |
-| [Describing an object type from the schema](#introspection) | 1 | complete | partial |
+| [Describing an object type from the schema](#introspection) | 1 | complete | complete |
 | [Building EnergyPlus documentation URLs](#documentation-urls) | 1 | complete | complete |
 | [Static types generated from the schema](#generated-object-types) | 1 | partial | complete |
-| [Diagnostics from a parse](#parse-diagnostics) | 1 | partial | complete |
+| [Diagnostics from an IDF parse](#parse-diagnostics) | 1 | complete | complete |
 | [The weather station index](#weather-index) | 1 | complete | partial |
 | [Retrieving weather and design-day files](#weather-download) | 1 | complete | partial |
 | [Declaring the conformance level a release passes](#conformance-declaration) | 1 | complete | complete |
@@ -132,6 +132,7 @@ permanent.
 | [Rendering a three-dimensional scene](#scene-rendering) | permanent | absent (never) | complete |
 | [eppy compatibility surface](#eppy-compatibility) | permanent | complete | absent (never) |
 | [Caching retrieved weather files on disk](#weather-file-cache) | permanent | complete | absent (never) |
+| [Language service for IDF text](#idf-language-service) | permanent | absent (never) | complete |
 
 ## Tier 1: the shared core { #tier-1 }
 
@@ -157,55 +158,7 @@ possibility.
 
 ### Writing IDF and epJSON { #write }
 
-**Python** partial &middot; **JavaScript** partial &middot; Tier 1 &middot; ledger id `write`
-
-!!! info "What differs, and why"
-
-    Both libraries write both formats, and every document either one writes is read back by the other
-    and by EnergyPlus. What they do NOT do is produce the same bytes. One model written from Python and
-    from JavaScript gives two files whose object headers match and whose every field line differs, and
-    neither is more correct than the other, so the difference is recorded here rather than resolved by
-    changing a writer both ecosystems have already published.
-
-    Measured, not asserted. `5ZoneAirCooled.idf` from EnergyPlus 26.1.0, 359 objects, through
-    `load_idf`/`save_idf` and through `loadIdf`/`saveIdf`, differs in seven ways:
-
-      1. Python opens the file with `!-Generator idfkit v<version>` and `!-Option SortedOrder`.
-         TypeScript writes no header.
-      2. Python orders objects by type name, alphabetically, with Version pinned first, which is what
-         its `SortedOrder` header declares. TypeScript groups objects by type in the order the types
-         first appeared in the source, with Version pinned first.
-      3. Python indents field lines two spaces. TypeScript indents four, and takes an `indent` option.
-      4. Both align the `!-` comment at column 30. They therefore overflow at different values, and on
-         overflow Python writes the comment flush against the comma while TypeScript keeps one space.
-      5. Python renders a float with `%g`, so an integral value loses its decimal point: `30.` in the
-         source comes back as `30`, and `0.0` as `0`. TypeScript consults the schema and writes `30.0`
-         and `0.0`, because JavaScript has one number type and a real-valued field would otherwise be
-         indistinguishable from an integer one on the way out.
-      6. Python title-cases every word of the field-name comment, `!- Number Of Vertices` and
-         `!- View Factor To Ground`. TypeScript keeps a list of minor words lowercase so the comment
-         reads as EnergyPlus writes it, `!- Number of Vertices` and `!- View Factor to Ground`. Both
-         drop the unit suffix the source carries, `{deg}` and the rest.
-      7. Python numbers the comment on each repeat of an extensible group, `!- Vertex X Coordinate 2`.
-         TypeScript repeats the unnumbered name on every repeat.
-
-    Blank lines differ with them: Python puts one between every pair of objects, TypeScript one between
-    objects of the same type and two at each type boundary. On this file that is 4031 lines against
-    4125, for the same 359 objects.
-
-    `partial` on BOTH sides, because neither writer's controls contain the other's. Python's `write_idf`
-    takes `output_type`, so `"nocomment"` and `"compressed"`, and `preserve_formatting`; it offers no way
-    to set the indent, the comment column, or the ordering. TypeScript's `writeIdf` takes `comments`,
-    `commentColumn`, `indent`, and `versionFirst`; it has no compressed mode and no lossless mode, the
-    second of which is [`lossless-round-trip`](#lossless-round-trip) rather than part of this entry.
-
-    What is proven, and by what. The corpus asserts that a document survives its OWN writer without
-    structural loss: assertion 3 re-parses each library's IDF output and compares object types, names,
-    field names, field values, and field order against the document it started from. It does not compare
-    the text, and `runners/compare.md` forbids any comparator from ever doing so, because one JSON value
-    has many JSON texts. So the seven differences above are outside every assertion the corpus runs, and
-    recording them here is the only place a reader meets them. A reader who needs byte-identical output
-    from both languages does not have it and is not going to: pass EnergyPlus the model, not a diff.
+**Python** complete &middot; **JavaScript** complete &middot; Tier 1 &middot; ledger id `write`
 
 ??? note "Vocabulary this capability owns in the naming register"
 
@@ -276,24 +229,7 @@ possibility.
 
 ### Describing an object type from the schema { #introspection }
 
-**Python** complete &middot; **JavaScript** partial &middot; Tier 1 &middot; ledger id `introspection`
-
-!!! info "What differs, and why"
-
-    TypeScript never populates `memo` or `note`. Both are members of the two types, so the field set
-    matches, but they are always undefined. Python fills `memo` for 845 of 858 object types and `note`
-    for 6,212 of 12,712 fields in 26.1.0, both from epJSON keys that `@idfkit/schemas` drops on purpose
-    to keep the bundle off the parse critical path. The `@idfkit/schemas/docs` subpath its own header
-    comment promises does not exist. Describing a type is what a REPL, a notebook, and an LSP hover are
-    for, so the prose is most of the value; this is partial rather than complete.
-
-    Two further differences, both small and both pinned by tests. `enumValues` omits the empty string
-    that Python includes for 1,378 of its 2,293 enum-bearing fields, and omits the sentinel lists
-    (`Autosize`, `Autocalculate`) Python recovers from an anyOf branch for 769 fields. Field ORDER
-    differs for exactly two types in 26.1.0, `ZoneProperty:UserViewFactors:BySurfaceName` and
-    `ZoneTerminalUnitList`, and for six more in 8.9.0 through 9.2.0, because the bundle sorts property
-    keys for content-addressing and those types carry no positional field list to restore declaration
-    order from.
+**Python** complete &middot; **JavaScript** complete &middot; Tier 1 &middot; ledger id `introspection`
 
 ??? note "Vocabulary this capability owns in the naming register"
 
@@ -335,26 +271,16 @@ possibility.
     - generated object types
     - a version type map
 
-### Diagnostics from a parse { #parse-diagnostics }
+### Diagnostics from an IDF parse { #parse-diagnostics }
 
-**Python** partial &middot; **JavaScript** complete &middot; Tier 1 &middot; ledger id `parse-diagnostics`
-
-!!! info "What differs, and why"
-
-    Both libraries produce diagnostics for a malformed input; only one hands them back. Python raises
-    IDFParseError carrying the diagnostics that stopped the parse, and reports the recoverable ones
-    (skipped malformed objects, discarded formatting trees, surplus fields on a non-extensible type)
-    through the logging module, where a caller who wants them must install a handler. TypeScript
-    returns them: parseIdf and loadIdfWithDiagnostics both yield a ParseResult whose `diagnostics`
-    array holds the non-fatal findings alongside the document.
-
-    This matters to the conformance corpus, whose `diagnostics` assertion compares what each side
-    reports for a malformed case (contracts/conformance-corpus.md).
+**Python** complete &middot; **JavaScript** complete &middot; Tier 1 &middot; ledger id `parse-diagnostics`
 
 ??? note "Vocabulary this capability owns in the naming register"
 
     - a parse diagnostic
     - diagnostics from a parse
+    - recoverable diagnostics from a parse
+    - a document and its parse findings
 
 ### The weather station index { #weather-index }
 
@@ -806,5 +732,52 @@ two different mechanisms serving two different runtimes.
 ??? note "Vocabulary this capability owns in the naming register"
 
     - the weather file cache
+
+### Language service for IDF text { #idf-language-service }
+
+**Python** absent (never) &middot; **JavaScript** complete &middot; Permanently single-language &middot; ledger id `idf-language-service`
+
+!!! abstract "JavaScript only, permanently"
+
+    Deliberately second-language-only. The answers are computed from byte offsets into the source text,
+    and a second implementation of that arithmetic is the drift surface the corpus is least able to
+    police: it compares findings on (code, line, typeName) and never on a column, so two implementations
+    could disagree about a position for a long time without any gate noticing.
+
+    The editor extension serves both file kinds without a port. Its existing server, written in Python,
+    continues to serve Python source; a second server written in JavaScript serves IDF text and wraps
+    this capability. One implementation, two servers.
+
+    What this costs a reader: getting these answers requires a JavaScript runtime. `pip install idfkit`
+    alone does not provide them.
+
+??? note "Vocabulary this capability owns in the naming register"
+
+    - scan IDF text
+    - classify IDF text
+    - line and column at an offset
+    - offset at a line and column
+    - a source region
+    - a line and column
+    - a syntax token
+    - a syntax token kind
+    - the syntax layer
+    - a written statement
+    - schema prose pool
+    - cursor context
+    - completions at an offset
+    - explanation at an offset
+    - declaration at an offset
+    - position findings
+    - position findings already in hand
+    - the cursor context record
+    - a positioned finding
+    - a completion offer
+    - an explanation
+    - a declaration site
+    - the completion options
+    - a completion result
+    - an explanation result
+    - a declaration result
 
 <!-- END GENERATED FROM parity.toml. -->
