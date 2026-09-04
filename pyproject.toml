@@ -65,7 +65,7 @@ dev = [
 # Conformance corpus level the site states, as an immutable tag in idfkit-conformance. The corpus
 # itself is the libraries' business; the site reports which level the pages describe.
 [tool.idfkit.conformance]
-level = "conformance-2026.7"
+level = "conformance-2026.8"
 
 # Governance artifact level the parity and naming pages are rendered from, as an immutable tag in
 # idfkit-conformance. Read by docs/hooks/parity_macro.py, scripts/render_parity_page.py and
