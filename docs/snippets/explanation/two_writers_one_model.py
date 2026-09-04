@@ -11,6 +11,7 @@ text = idfkit.write_idf(
     indent=4,
     comment_column=45,
     ordering="source",
+    version_first=False,
 )
 # --8<-- [end:controls]
 

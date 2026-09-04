@@ -59,13 +59,22 @@ equal that way, because all seven are presentation.
 
 ## The controls, which do not change any of this
 
-Five controls were closed by [feature 002](conformance.md), so that no control
-sits on one writer with no answer on the other. Two of them are still spelled on
-one side only: Python's `ordering` has no TypeScript counterpart, because that
-writer keeps insertion order and offers no sort, and TypeScript's `versionFirst`
-has no Python counterpart. They let you ask for output shaped differently. They
-do not make the two writers agree, because none of them touches the seven
+Every control now exists on both writers, closed by
+[feature 002](conformance.md). They let you ask for output shaped differently.
+They do not make the two writers agree, because none of them touches the seven
 defaults above.
+
+| Control | Python | TypeScript | Defaults |
+| --- | --- | --- | --- |
+| Comment-free output | `output_type="nocomment"` | `comments: False` | on in both |
+| Compressed output | `output_type="compressed"` | `compressed: True` | off in both |
+| Indent | `indent` | `indent` | two spaces / four |
+| Comment column | `comment_column` | `commentColumn` | 30 in both |
+| Object ordering | `ordering` | `ordering` | `sorted` / `source` |
+| Version pinned first | `version_first` | `versionFirst` | on in both |
+
+Where the defaults differ they stay differing: a control lets you ask for the
+other behaviour, it does not change what you get by asking for nothing.
 
 ```python
 --8<-- "docs/snippets/explanation/two_writers_one_model.py:controls"
