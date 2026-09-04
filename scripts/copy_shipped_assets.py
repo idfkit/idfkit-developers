@@ -69,7 +69,9 @@ def installed_package_root() -> Path:
             "`uv sync`."
         ) from error
 
-    if idfkit.__file__ is None:  # pragma: no cover - namespace package, not a real installation
+    # Typed as `str`, but a namespace package genuinely has None here, and this is the check
+    # that tells a broken environment apart from a working one before anything is copied.
+    if idfkit.__file__ is None:  # pyright: ignore[reportUnnecessaryComparison]  # pragma: no cover
         raise MissingAsset("idfkit resolves to a namespace package rather than an installation.")
     return Path(idfkit.__file__).parent
 

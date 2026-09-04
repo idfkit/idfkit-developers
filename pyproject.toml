@@ -91,6 +91,10 @@ level = "0.15.0"
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
+# docs/hooks is on the path at build time because mkdocs.yml lists the hooks by a path relative to
+# itself, and scripts/render_parity_page.py imports the ledger model down into it rather than
+# duplicating it. Both are real resolutions at runtime; this is how the type checker sees them.
+extraPaths = ["docs/hooks", "scripts"]
 exclude = [
     ".venv", "**/node_modules", "**/__pycache__",
     # Vendored from idfkit-js at the pinned docs level and compared byte for byte. Analysing it
@@ -100,6 +104,37 @@ exclude = [
     "docs/weather/browse",
     "site",
 ]
+
+# scripts/ and docs/hooks/ read TOML, YAML and JSON, which arrive as `Any` and stay that way
+# through every expression that touches them. In the library these were never type-checked at all;
+# checking them here is an improvement, and the "unknown type" family is the noise that improvement
+# would otherwise drown in. It is off for the same reason it is off over the snippets, and the
+# rules that catch a real mistake stay on: reportAttributeAccessIssue, reportCallIssue,
+# reportArgumentType, reportIndexIssue, reportOptionalMemberAccess.
+#
+# reportPrivateUsage is off because these modules deliberately share underscored helpers with each
+# other, which is what _governance_source.py is: a private module two callers import on purpose.
+[[tool.pyright.executionEnvironments]]
+root = "scripts"
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportUnknownLambdaType = false
+reportMissingTypeStubs = false
+reportPrivateUsage = false
+reportPrivateImportUsage = false
+
+[[tool.pyright.executionEnvironments]]
+root = "docs/hooks"
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportUnknownLambdaType = false
+reportMissingTypeStubs = false
+reportPrivateUsage = false
+reportPrivateImportUsage = false
 
 # Agent reference snippets (docs/snippets/agent_references/) are the source of truth for the
 # examples in the bundled .agents reference docs. They get a STRICTER environment than the rest
@@ -279,7 +314,11 @@ ignore = [
 # there is no fallback, and the command that fixes it. A three-word exception class in front of
 # that would be ceremony.
 "docs/hooks/*" = ["T201", "TRY003"]
-"docs/snippets/*" = ["E402", "F706", "F821", "F841", "F811", "I", "S", "B", "TRY", "UP008"]
+# "UP" in full, not just UP008. target-version is py312 because that is what builds this site,
+# but the snippets are examples for a library whose floor is 3.10, and pyupgrade cannot tell the
+# difference. Left on, it rewrote `except asyncio.TimeoutError` to `except TimeoutError`, which is
+# correct from 3.11 and wrong in a page a reader on 3.10 copies from.
+"docs/snippets/*" = ["E402", "F706", "F821", "F841", "F811", "I", "S", "B", "TRY", "UP"]
 
 [tool.ruff.format]
 preview = true

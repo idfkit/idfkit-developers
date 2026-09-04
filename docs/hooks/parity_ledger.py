@@ -37,11 +37,10 @@ import os
 import re
 import sys
 import textwrap
+import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
-
-import tomllib
 
 # The ledger's path inside idfkit/idfkit-conformance. One definition: the lookup below joins it, and
 # `ledger_repo_root` strips it back off.

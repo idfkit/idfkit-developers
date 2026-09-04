@@ -264,7 +264,10 @@ def _contents(self: Any) -> str:
     return ""
 
 
-_models.Source.contents = property(_contents)
+# Monkey-patched onto someone else's model class. The assignment is exactly what it looks
+# like and works at runtime; pyright objects because a read-only property cannot be assigned
+# through the class object in the type system, which is a limit of the description, not a bug.
+_models.Source.contents = property(_contents)  # pyright: ignore[reportAttributeAccessIssue]
 
 
 # Applied last, so the decoder patches above are all in place before anything decodes. The handler

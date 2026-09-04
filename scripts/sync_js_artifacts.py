@@ -109,7 +109,7 @@ def _fetch(level: str, asset: str, destination: Path) -> None:
     url = f"https://github.com/{SOURCE_REPO}/releases/download/{level}/{asset}"
     print(f"Fetching {url}")
     try:
-        with urllib.request.urlopen(url) as response, destination.open("wb") as handle:  # noqa: S310
+        with urllib.request.urlopen(url) as response, destination.open("wb") as handle:
             shutil.copyfileobj(response, handle)
     except urllib.error.HTTPError as error:
         fail_to_run(
@@ -133,10 +133,9 @@ def download_release(level: str, into: Path) -> tuple[Path, Path]:
     extracted = into / "extracted"
     extracted.mkdir()
     with tarfile.open(archive) as tar:
-        if sys.version_info >= (3, 12):
-            tar.extractall(extracted, filter="data")
-        else:  # pragma: no cover - 3.11
-            tar.extractall(extracted)  # noqa: S202
+        # filter="data" unconditionally: this repository's floor is 3.12, so the 3.11 branch that
+        # extracted without a filter is gone. It was the unsafe one, and it is no longer reachable.
+        tar.extractall(extracted, filter="data")
     root = extracted / "docs-snippets"
     if not root.is_dir():
         fail_to_run(f"{ASSET} at {level} carries no docs-snippets/ directory.")

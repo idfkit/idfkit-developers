@@ -36,9 +36,8 @@ from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
-
 import tomllib
+from pathlib import Path
 
 # `scripts/` is sys.path[0] when this file is run as a script and not when it is imported some
 # other way, and `docs/hooks/` is never on the path at all. Put both there so the two imports

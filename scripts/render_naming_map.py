@@ -35,11 +35,10 @@ import os
 import re
 import sys
 import textwrap
+import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
-
-import tomllib
 
 # `scripts/` is sys.path[0] when this file is run as a script, but not when it is imported by
 # path, which is how docs/hooks/parity_macro.py loads it. Make the sibling import work in both.
@@ -438,11 +437,12 @@ def name_cell(entry: Entry, names: tuple[str, ...]) -> str:
     """Render one name column, sending a whole excluded surface to its own section."""
     if not names:
         return "*absent*"
-    if len(names) > 1:
+    first, *rest = names
+    if rest:
         target = f"#{slug(entry.concept)}" if entry.has_detail else ""
         label = f"{len(names)} names"
         return f"[{label}]({target})" if target else label
-    return f"`{cell(names[0])}`"
+    return f"`{cell(first)}`"
 
 
 def kind_cell(entry: Entry) -> str:

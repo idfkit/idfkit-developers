@@ -35,14 +35,13 @@ it, and why this hook computes no path out of its own location.
 from __future__ import annotations
 
 import os
-import sys
+
+# tomllib unconditionally, with no tomli fallback. The fallback existed because this hook lived in
+# a library that supports 3.10; this repository's floor is 3.12, declared in .python-version and in
+# ruff's target-version, so the fallback branch was unreachable code claiming otherwise.
+import tomllib
 from pathlib import Path
 from typing import Any
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:  # pragma: no cover - 3.10 only
-    import tomli as tomllib  # pyright: ignore[reportMissingImports]
 
 #: `(config.extra key, [tool.idfkit.<section>] level, environment override)`.
 _LEVELS: tuple[tuple[str, str, str], ...] = (

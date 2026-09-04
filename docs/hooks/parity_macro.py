@@ -60,11 +60,11 @@ import posixpath
 import re
 import subprocess
 import sys
+import tomllib  # pyright: ignore[reportMissingTypeStubs]
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import tomllib  # pyright: ignore[reportMissingTypeStubs]
 from mkdocs.exceptions import PluginError
 
 # MkDocs loads a hook by path, so this file's own directory is not on sys.path and the sibling

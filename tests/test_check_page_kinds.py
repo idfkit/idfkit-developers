@@ -179,58 +179,49 @@ class TestKindComesFromTheNavigation:
         assert [page.path for page in report.pages] == ["one.md"]
 
 
-class TestTheOneDeclaredException:
-    def test_the_agent_references_tree_is_a_section_without_being_a_kind(self, tmp_path: Path) -> None:
-        config = build(
-            tmp_path,
-            "  - Tutorials:\n    - one.md\n  - Developing with idfkit:\n    - agent-references/index.md\n",
-            {"one.md": "# One\n", "agent-references/index.md": "# Dispatch\n"},
-        )
-        report = gate.run(config, None)
+class TestTheSiteDeclaresNoExceptions:
+    """The site is the four Diataxis kinds and nothing else.
 
-        assert report.ok
-        assert kind_of(report, "agent-references/index.md") == "agent-references"
+    001-FR-059 declared exactly one exception, ``agent-references/``: a navigation section that
+    was not one of the four kinds, for material addressed to automated tooling and shipped inside
+    the Python wheel. The tests that stood here exercised it.
 
-    def test_the_exception_is_recognised_by_path_not_by_title(self, tmp_path: Path) -> None:
-        config = build(
-            tmp_path,
-            "  - Something else entirely:\n    - agent-references/index.md\n",
-            {"agent-references/index.md": "# Dispatch\n"},
-        )
-        report = gate.run(config, None)
+    Feature 003 retired it. Those 16 topic pages are baked into the idfkit wheel and are no longer
+    published at all, because the skill loads the reference set baked into the version installed in
+    the reader's project while a page can only ever show the one version the site pins, which made
+    the published copy the only artifact that could be wrong for a given reader. The one page that
+    survived explains the skill and is filed under Explanation like any other explanation.
 
-        assert report.ok
-        assert kind_of(report, "agent-references/index.md") == "agent-references"
+    So there is nothing left to exercise, and these tests replace those. Declaring an exception
+    again is a constitutional amendment, and the gate refuses to run until the amendment is made.
+    """
 
-    def test_a_human_page_inside_the_exception_section_leaks(self, tmp_path: Path) -> None:
-        config = build(
-            tmp_path,
-            "  - Developing with idfkit:\n    - agent-references/index.md\n    - how-to/one.md\n",
-            {"agent-references/index.md": "# Dispatch\n", "how-to/one.md": "# One\n"},
-        )
-        report = gate.run(config, None)
+    def test_the_tuple_is_empty(self) -> None:
+        assert gate.DECLARED_EXCEPTIONS == ()
 
-        # The section stops being the exception the moment a page outside the tree joins it.
-        assert codes(report) == ["unclassified-section"]
-
-    def test_an_exception_page_filed_under_a_kind_leaks(self, tmp_path: Path) -> None:
-        config = build(
-            tmp_path,
-            "  - Reference:\n    - agent-references/index.md\n",
-            {"agent-references/index.md": "# Dispatch\n"},
-        )
-        report = gate.run(config, None)
-
-        assert "exception-leak" in codes(report)
-
-    def test_a_second_exception_makes_the_gate_refuse_to_run(
+    def test_a_declared_exception_makes_the_gate_refuse_to_run(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
+        """The refusal is the amendment gate. It fires on the first entry now, not the second."""
+        monkeypatch.setattr(gate, "DECLARED_EXCEPTIONS", ("agent-references/",))
         config = build(tmp_path, "  - Tutorials:\n    - one.md\n", {"one.md": "# One\n"})
-        monkeypatch.setattr(gate, "DECLARED_EXCEPTIONS", ("agent-references/", "something-else/"))
 
-        with pytest.raises(gate.Refusal, match="FR-059 permits exactly one"):
+        with pytest.raises(gate.Refusal) as raised:
             gate.run(config, None)
+
+        assert "DECLARED_EXCEPTIONS holds 1" in str(raised.value)
+
+    def test_a_page_under_the_retired_path_is_an_ordinary_page(self, tmp_path: Path) -> None:
+        """Nothing special survives about the path itself: it takes a kind from its section."""
+        config = build(
+            tmp_path,
+            "  - Explanation:\n    - agent-references/index.md\n",
+            {"agent-references/index.md": "# Developing with an AI assistant\n"},
+        )
+        report = gate.run(config, None)
+
+        assert report.ok
+        assert kind_of(report, "agent-references/index.md") == "explanation"
 
 
 class TestReadingPages:
@@ -348,16 +339,23 @@ class TestDuplication:
         assert report.ok
         assert any("single-sourced rather than copied" in warning for warning in report.warnings)
 
-    def test_the_exception_tree_takes_no_part_in_the_scan(self, tmp_path: Path) -> None:
+    def test_the_retired_exception_tree_now_takes_part_in_the_scan(self, tmp_path: Path) -> None:
+        """It used to be skipped. With no declared exception, nothing is.
+
+        While ``agent-references/`` was a declared exception, a heading could appear there and in
+        a real kind without being reported: the tree was addressed to machines and said the same
+        things as the human pages on purpose. Feature 003 retired the exception, and the duplicate
+        detection applies to every page on the site again.
+        """
         heading = "# Load and inspect a document\n"
         config = build(
             tmp_path,
-            "  - Reference:\n    - reference/one.md\n  - Developing with idfkit:\n    - agent-references/one.md\n",
+            "  - Reference:\n    - reference/one.md\n  - Explanation:\n    - agent-references/one.md\n",
             {"reference/one.md": heading, "agent-references/one.md": heading},
         )
         report = gate.run(config, None)
 
-        assert report.ok
+        assert not report.ok
 
 
 class TestExitContract:

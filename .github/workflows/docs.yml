@@ -101,6 +101,18 @@ jobs:
     # It reaches the network and the documentation build does not. That separation is deliberate:
     # 001-FR-058 keeps the build free of any dependency on idfkit-js, and this is not the build.
     steps:
+      - name: The unreleased-library override is not set
+        # 003-FR-023. IDFKIT_LIBRARY_DIR points a build at a working tree instead of the version
+        # [tool.idfkit.library] pins. A build under it is not evidence about the declared level, so
+        # a passing check here would mean nothing if it were set. Asserted rather than assumed,
+        # because the whole value of a green check is what it lets a reader conclude.
+        run: |
+          if [ -n "${IDFKIT_LIBRARY_DIR:-}" ]; then
+            echo "::error::IDFKIT_LIBRARY_DIR is set. CI builds the pinned release, never a checkout."
+            exit 1
+          fi
+          echo "The unreleased-library override is unset, as it must be."
+
       - name: Check out
         uses: actions/checkout@v4
 
@@ -123,6 +135,18 @@ jobs:
     needs: pins
     runs-on: ubuntu-latest
     steps:
+      - name: The unreleased-library override is not set
+        # 003-FR-023. IDFKIT_LIBRARY_DIR points a build at a working tree instead of the version
+        # [tool.idfkit.library] pins. A build under it is not evidence about the declared level, so
+        # a passing check here would mean nothing if it were set. Asserted rather than assumed,
+        # because the whole value of a green check is what it lets a reader conclude.
+        run: |
+          if [ -n "${IDFKIT_LIBRARY_DIR:-}" ]; then
+            echo "::error::IDFKIT_LIBRARY_DIR is set. CI builds the pinned release, never a checkout."
+            exit 1
+          fi
+          echo "The unreleased-library override is unset, as it must be."
+
       - name: Check out
         uses: actions/checkout@v4
 
@@ -181,6 +205,18 @@ jobs:
     needs: pins
     runs-on: ubuntu-latest
     steps:
+      - name: The unreleased-library override is not set
+        # 003-FR-023. IDFKIT_LIBRARY_DIR points a build at a working tree instead of the version
+        # [tool.idfkit.library] pins. A build under it is not evidence about the declared level, so
+        # a passing check here would mean nothing if it were set. Asserted rather than assumed,
+        # because the whole value of a green check is what it lets a reader conclude.
+        run: |
+          if [ -n "${IDFKIT_LIBRARY_DIR:-}" ]; then
+            echo "::error::IDFKIT_LIBRARY_DIR is set. CI builds the pinned release, never a checkout."
+            exit 1
+          fi
+          echo "The unreleased-library override is unset, as it must be."
+
       - name: Choose a scratch directory outside the checkout
         # Outside $GITHUB_WORKSPACE on purpose. A scratch directory inside the checkout would let a
         # relative path escape the documentation tree and still resolve, which is the one thing this

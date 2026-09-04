@@ -17,10 +17,17 @@ an operation is caught on the day it is written.
 
 THE EXEMPTIONS, AND WHY EACH IS ONE
 
-``docs/agent-references/``   FR-059's declared Diataxis exception. It is bundled inside the Python
-                             wheel and read by tooling, not by a person on the site, so a macro
-                             that renders an admonition would put site markup into a shipped
-                             artifact. It is Python material by construction.
+``explanation/developing-with-an-ai-assistant.md``
+                             the page about the bundled agent skill. It teaches no operation: it
+                             explains what the skill is, and why the 16 references it carries are
+                             shipped in the wheel rather than published here. There is nothing on
+                             it whose availability could differ by language.
+
+                             It is what remains of ``docs/agent-references/``, 001-FR-059's
+                             declared Diataxis exception, which was exempt for a related reason:
+                             the pages were read by tooling out of the wheel rather than by a
+                             person on the site, so a macro rendering an admonition would have put
+                             site markup into a shipped artifact. Feature 003 retired that tree.
 ``docs/index.md``            the site root: a landing page, not a page about an operation.
 ``docs/tutorials/index.md``  and the other section landing pages, for the same reason.
 
@@ -41,7 +48,6 @@ REPO = Path(__file__).resolve().parents[1]
 DOCS = REPO / "docs"
 
 EXEMPT_PREFIXES = (
-    "agent-references/",
     # Build wiring rather than pages, and excluded from the site in mkdocs.yml for the same
     # reason. They live under docs/ only because `custom_templates:` and the TypeDoc shim resolve
     # relative to it and have to survive the portable build.
@@ -54,6 +60,8 @@ EXEMPT_PREFIXES = (
     "reference/typescript/",
 )
 EXEMPT_PAGES = frozenset({
+    # About the bundled agent skill, not about an operation. See THE EXEMPTIONS above.
+    "explanation/developing-with-an-ai-assistant.md",
     "index.md",
     "tutorials/index.md",
     "how-to/index.md",
