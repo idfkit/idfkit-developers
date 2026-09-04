@@ -27,7 +27,12 @@ jobs:
           path: gh-pages-deploy
 
       - name: Set up the environment
+        # The shared action defaults to 3.10 and this project requires >=3.12, so without this the
+        # step fails at dependency resolution before it reaches a single page. `docs.yml` has
+        # always passed the version; this workflow never did, and had never succeeded.
         uses: ./.github/actions/setup-python-env
+        with:
+          python-version: "3.12"
 
       - name: Set up the parity ledger
         uses: ./.github/actions/setup-parity-ledger

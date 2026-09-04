@@ -157,6 +157,7 @@ nav:
     - explanation/index.md
     - The hazards of a positional format: explanation/positional-format-hazards.md
     - Why field names come from epJSON: explanation/epjson-field-names.md
+    - Two writers, one model: explanation/two-writers-one-model.md
     # Both generated from the pinned governance tag. They were reachable only by
     # direct link until now, which made a generated page that nothing navigates to.
     - Capability parity: explanation/parity.md

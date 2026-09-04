@@ -156,6 +156,28 @@ Here are some representative messages you will see at each level:
 | `idfkit.idf_parser` | `Skipping unknown object type 'FooBar'` |
 | `idfkit.simulation.runner` | `Simulation exited with code 1 in 5.2s` |
 
+## Logging is no longer the only way to reach a parse finding
+
+The parser's WARNING records were once the only way to see what a non-strict
+parse skipped. They are not any more:
+[`load_idf_with_diagnostics`](../how-to/collect-diagnostics.md) returns the
+findings beside the document, in one call, with no handler installed first.
+
+**Every record above still fires, unchanged.** The returning path was added
+beside the logging path, not in place of it, and code that installed a handler
+sees exactly what it saw before.
+
+Which to reach for:
+
+| | Use |
+| --- | --- |
+| You want to act on what was skipped | `load_idf_with_diagnostics`. A finding is a structured value with a `code`, a line and a column; a log record is a formatted sentence you would have to parse back. |
+| You want to watch a long batch go by | Logging. It fires as the parse proceeds, and nothing accumulates unless you accumulate it. |
+| You want both | Do both. They are independent. |
+
+Logging still carries everything that is not a parse finding: the timings, the
+mmap notices, the simulation records. None of that is reachable any other way.
+
 ## See Also
 
 - [How to handle simulation errors](../simulation/errors.md) — Handling simulation failures
