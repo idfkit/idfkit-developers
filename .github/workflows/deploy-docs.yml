@@ -1,22 +1,25 @@
 name: deploy-docs
 
-# Publishes the unified site to developers.idfkit.com (FR-051).
+# Publishes the unified site to developers.idfkit.com (001-FR-051).
 #
-# This deploy uses force_orphan, so it replaces gh-pages with a single commit and the
-# previous published tree survives in neither the branch nor its history. That tree IS
-# the last full build of py.idfkit.com, and FR-090 requires it be retained as a
-# restorable artefact before the cutover. The guard below refuses to run until it is.
-# Once the archive exists this guard is satisfied forever and costs one API call.
+# THE ARCHIVE GUARD THAT USED TO STAND HERE IS GONE, AND MUST NOT COME BACK.
+#
+# While this workflow lived in idfkit, it refused to run until an unexpired
+# py.idfkit.com-last-full-build artefact existed. That was not ceremony: the deploy uses
+# force_orphan, and in idfkit the branch it replaced held the last full build of
+# py.idfkit.com, which could not be rebuilt from current sources.
+#
+# Here it replaces this repository's own gh-pages, which holds nothing but a previous build of
+# this same site, reproducible from this same tree. There is nothing to retain. The guard would
+# also never pass: it looked for the artefact under ${GITHUB_REPOSITORY}, and the archive lives
+# in idfkit, beside archive-retired-site.yml, which stayed there because it answers for the
+# retired host rather than for the site.
 
 on:
   workflow_dispatch:
 
 permissions:
   contents: write
-  actions: read
-
-env:
-  ARCHIVE_ARTIFACT_NAME: py.idfkit.com-last-full-build
 
 jobs:
   deploy-docs:
@@ -25,25 +28,19 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
-      - name: Require the retained last full build of py.idfkit.com
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: The unreleased-library override is not set
+        # 003-FR-023, the same assertion docs.yml makes. A published site built against a working
+        # tree nobody can install would state a library level it was not built from.
         run: |
-          set -euo pipefail
-          live=$(gh api \
-            "/repos/${GITHUB_REPOSITORY}/actions/artifacts?name=${ARCHIVE_ARTIFACT_NAME}&per_page=100" \
-            --jq '[.artifacts[] | select(.expired == false)] | length')
-          if [ "${live}" = "0" ]; then
-            echo "::error::No unexpired '${ARCHIVE_ARTIFACT_NAME}' artefact exists. This deploy"
-            echo "::error::orphans gh-pages, which still holds the last full build of"
-            echo "::error::py.idfkit.com, and that build cannot be rebuilt from current sources."
-            echo "::error::Run the archive-retired-site workflow first (FR-090)."
+          if [ -n "${IDFKIT_LIBRARY_DIR:-}" ]; then
+            echo "::error::IDFKIT_LIBRARY_DIR is set. The published site is built from the pin."
             exit 1
           fi
-          echo "${live} unexpired copy or copies of ${ARCHIVE_ARTIFACT_NAME} are retained."
 
       - name: Set up the environment
         uses: ./.github/actions/setup-python-env
+        with:
+          python-version: "3.12"
 
       - name: Set up the parity ledger
         uses: ./.github/actions/setup-parity-ledger
