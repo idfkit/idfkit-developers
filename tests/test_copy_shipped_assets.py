@@ -56,9 +56,7 @@ def test_the_destination_is_created(fake_distribution: Path, tmp_path: Path) -> 
 
 
 @pytest.mark.parametrize("absent", [relative for relative, _ in ASSETS])
-def test_a_missing_asset_stops_the_build(
-    fake_distribution: Path, tmp_path: Path, absent: str
-) -> None:
+def test_a_missing_asset_stops_the_build(fake_distribution: Path, tmp_path: Path, absent: str) -> None:
     """Each of the four, one at a time. A build must stop, not render a broken widget."""
     (fake_distribution / absent).unlink()
     destination = tmp_path / "docs" / "weather" / "browse"
