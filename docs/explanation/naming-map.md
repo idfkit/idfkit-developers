@@ -80,8 +80,8 @@ ledger, where permanent single-language capabilities are recorded as such.
 <!-- BEGIN GENERATED FROM naming.toml. Edit the register, not this page. -->
 
 Generated from
-[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.11/governance/naming.toml)
-at `governance-2026.11`, the governance tag this release pins. It governs `idfkit` and
+[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.12/governance/naming.toml)
+at `governance-2026.12`, the governance tag this release pins. It governs `idfkit` and
 `@idfkit/core` and `@idfkit/weather` and `@idfkit/language`, and it is read at a pinned
 governance-YYYY.N tag of idfkit-conformance, never the default branch. Correct the
 register and regenerate; a correction made on this page would be overwritten, and it
@@ -258,6 +258,8 @@ row marked divergent or excluded links to the entry that says why, and a cell re
 | Concept | Python | TypeScript | Kind |
 | ------- | ------ | ---------- | ---- |
 | load a schema for a version | `get_schema` | `SchemaBundle.load` | [divergent](#load-a-schema-for-a-version) |
+| load the schema prose | *absent* | `SchemaBundle.loadProse` | [divergent](#load-the-schema-prose) |
+| the schema prose already loaded | *absent* | `SchemaBundle.prose` | [divergent](#the-schema-prose-already-loaded) |
 | the supported version list | `ENERGYPLUS_VERSIONS` | `SchemaBundle.versions` | [divergent](#the-supported-version-list) |
 | resolve a version string | `find_closest_version` | `resolveVersion` | [divergent](#resolve-a-version-string) |
 
@@ -1599,6 +1601,44 @@ bundler-driven app resolves it through `import()`, so the caller constructs a
 `SchemaBundle` over a `BundleSource` and loads from that. The operation is a method on
 the object that owns the source because there is no process-wide source that would let
 it be a free function. This is the input and output divergence recorded above.
+
+### Load the schema prose
+
+| Python | TypeScript |
+| ------ | ---------- |
+| *absent* | `SchemaBundle.loadProse` |
+
+JavaScript deduplicates every memo and note of all seventeen schemas into one side file
+the manifests carry indices into, and reads it on demand. Python has no counterpart
+because it needs none: it ships the full schemas on disk and reads `note` and `memo`
+straight off the field record it already holds, so there is nothing to load and no
+moment at which to load it.
+
+The same divergence as `SchemaBundle.load` against `get_schema`, and for the same
+reason. The prose is roughly 175 KB the parse path never touches, and a reader who only
+parses a model should not pay for a sentence of English. Keeping the fetch separate is
+what lets the parse path stay unaware the pool exists.
+
+Not a capability difference: `describe_object_type` reports the same prose in both
+languages, and the corpus compares a digest over every memo and note of all 858 types.
+Only the moment of loading differs.
+
+### The schema prose already loaded
+
+| Python | TypeScript |
+| ------ | ---------- |
+| *absent* | `SchemaBundle.prose` |
+
+The synchronous half of `SchemaBundle.loadProse`, and the counterpart of
+`SchemaBundle.loaded`. Python needs neither: its prose is on the record it already
+holds.
+
+It exists because every reader of prose in JavaScript is synchronous.
+`describeObjectType` takes a pool rather than fetching one, and every answer in
+`@idfkit/language` is a pure function so an editor server can answer a cursor without
+holding a thread. A consumer loads once when a document arrives and reads here on the
+request path. Without the pair it would either await inside a path it keeps synchronous
+or build a second cache beside the one the bundle already has.
 
 ### The supported version list
 
