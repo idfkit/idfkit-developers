@@ -71,7 +71,7 @@ level = "conformance-2026.8"
 # idfkit-conformance. Read by docs/hooks/parity_macro.py, scripts/render_parity_page.py and
 # scripts/render_naming_map.py through the duplicated scripts/_governance_source.py.
 [tool.idfkit.governance]
-level = "governance-2026.11"
+level = "governance-2026.12"
 
 # Documentation artifact level the TypeScript half of the site renders from, as an immutable tag
 # in idfkit-js. It carries the TypeScript examples the pages include and the TypeDoc JSON the

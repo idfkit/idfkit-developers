@@ -79,8 +79,8 @@ Ids get added and deprecated. They do not get renamed.
 <!-- BEGIN GENERATED FROM parity.toml. Edit the ledger, not this page. -->
 
 Generated from
-[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.11/governance/parity.toml)
-at `governance-2026.11`, the governance tag this release pins. Correct the ledger and
+[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.12/governance/parity.toml)
+at `governance-2026.12`, the governance tag this release pins. Correct the ledger and
 regenerate; a correction made on this page would be overwritten, and it would never
 reach either library's CI gate.
 
