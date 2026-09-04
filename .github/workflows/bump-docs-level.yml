@@ -1,0 +1,110 @@
+name: bump-docs-level
+
+# Advance [tool.idfkit.docs] to a newly published idfkit-js artifact, as a pull request
+# (003-FR-020, the JavaScript half).
+#
+# idfkit-js's publish-docs-artifacts.yml dispatches this after it cuts a docs-YYYY.N release, so
+# a new set of TypeScript examples and a new TypeDoc reference reach this repository without
+# anyone relaying it. Same reasoning as bump-idfkit.yml: this repository publishes pages about
+# that artifact, and a rename in it makes pages wrong the moment it ships.
+#
+# Unlike the library bump, this one also RE-VENDORS. docs/typedoc/ and docs/snippets/js/ are
+# copies of the release compared against it byte for byte, so advancing the level without
+# re-running the sync would fail check-vendored immediately, correctly and uselessly. The pull
+# request carries both the new pin and the new bytes, and check-vendored on it is then a real
+# comparison rather than a foregone one.
+
+on:
+  workflow_dispatch:
+    inputs:
+      docs_level:
+        description: The docs-YYYY.N tag to advance to.
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: bump-docs-level
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: "3.12"
+
+      - name: Advance the declared level
+        id: bump
+        env:
+          NEW_LEVEL: ${{ inputs.docs_level }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          import pathlib
+          import re
+          import sys
+          import tomllib
+
+          new = os.environ["NEW_LEVEL"]
+          if not re.fullmatch(r"docs-\d{4}\.\d+", new):
+              sys.exit(f"{new!r} is not a docs-YYYY.N tag. The level is an immutable tag, never a branch.")
+
+          path = pathlib.Path("pyproject.toml")
+          text = path.read_text(encoding="utf-8")
+          current = tomllib.loads(text)["tool"]["idfkit"]["docs"]["level"]
+          if current == new:
+              print(f"Already at {new}.")
+              pathlib.Path(os.environ["GITHUB_OUTPUT"]).write_text("changed=false\n")
+              raise SystemExit(0)
+
+          text, hits = re.subn(rf'(\[tool\.idfkit\.docs\]\nlevel = ")({re.escape(current)})(")',
+                               rf'\g<1>{new}\g<3>', text)
+          if hits != 1:
+              sys.exit(f"expected exactly one [tool.idfkit.docs] level at {current}, found {hits}")
+
+          path.write_text(text, encoding="utf-8")
+          with pathlib.Path(os.environ["GITHUB_OUTPUT"]).open("w") as handle:
+              handle.write("changed=true\n")
+              handle.write(f"previous={current}\n")
+              handle.write(f"level={new}\n")
+          print(f"{current} -> {new}")
+          PY
+
+      - name: Re-vendor the TypeScript examples and reference at the new level
+        if: steps.bump.outputs.changed == 'true'
+        run: uv run python scripts/sync_js_artifacts.py --from-release
+
+      - name: The vendored trees now match the new level
+        if: steps.bump.outputs.changed == 'true'
+        run: uv run python scripts/sync_js_artifacts.py --check
+
+      - name: Open the pull request
+        if: steps.bump.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bump-docs-${{ steps.bump.outputs.level }}
+          commit-message: "chore: render the TypeScript half from ${{ steps.bump.outputs.level }}"
+          title: "Render the TypeScript half from ${{ steps.bump.outputs.level }}"
+          body: |
+            idfkit-js published ${{ steps.bump.outputs.level }}, so
+            `[tool.idfkit.docs]` advances from ${{ steps.bump.outputs.previous }}
+            and the vendored trees are re-synced from that release.
+
+            Opened automatically by `publish-docs-artifacts.yml` in idfkit-js.
+
+            The diff under `docs/typedoc/` and `docs/snippets/js/` is not written
+            by hand and must not be edited here: it is a byte-for-byte copy of the
+            release, and `check-vendored` compares it.
+
+            **If the checks are red, a page describes a TypeScript interface this
+            release no longer has under that name.** Fix the page.

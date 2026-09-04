@@ -1,0 +1,114 @@
+name: bump-idfkit
+
+# Advance [tool.idfkit.library] to a newly released idfkit, as a pull request (003-FR-020).
+#
+# idfkit's notify-downstream.yml dispatches this on every release, so a new library version
+# reaches this repository without anyone relaying it. That matters more here than in the other
+# downstream repositories: they consume an API, while this one PUBLISHES PAGES ABOUT IT. A
+# release that renames a documented interface makes pages wrong the moment it ships, and nobody
+# reading them can tell.
+#
+# WHAT THIS DELIBERATELY DOES NOT DO: merge.
+#
+# It opens a pull request and lets the site's own checks decide. The strict build, pyright over
+# docs/snippets, and the vendored comparison all run on it, and a red result means a page
+# describes an interface the new version does not have. The fix is the page. Never relax the
+# check, never pin the level back, never merge past it.
+#
+# The level is stated twice, in [tool.idfkit.library] and in the pinned dependency, because uv
+# resolves dependencies before any of our code runs and the pinned-levels hook must state a level
+# even in the portable build, where there is no pyproject.toml. Both are updated here, and
+# `uv lock --locked` in `make check` fails on the pull request if they ever disagree.
+
+on:
+  workflow_dispatch:
+    inputs:
+      idfkit_version:
+        description: The released idfkit version to advance to, without a leading v.
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: bump-idfkit
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: "3.12"
+
+      - name: Advance the declared level and the pinned dependency
+        id: bump
+        env:
+          NEW_VERSION: ${{ inputs.idfkit_version }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          import pathlib
+          import re
+          import sys
+          import tomllib
+
+          new = os.environ["NEW_VERSION"].lstrip("v")
+          if not re.fullmatch(r"\d+\.\d+\.\d+(?:[.\-+][0-9A-Za-z.\-+]+)?", new):
+              sys.exit(f"{new!r} is not a version. The level is an exact version, never a range.")
+
+          path = pathlib.Path("pyproject.toml")
+          text = path.read_text(encoding="utf-8")
+          current = tomllib.loads(text)["tool"]["idfkit"]["library"]["level"]
+          if current == new:
+              print(f"Already at {new}.")
+              pathlib.Path(os.environ["GITHUB_OUTPUT"]).write_text("changed=false\n")
+              raise SystemExit(0)
+
+          # Both statements of the same fact. Neither may be left behind.
+          text, level_hits = re.subn(rf'(\[tool\.idfkit\.library\]\nlevel = ")({re.escape(current)})(")',
+                                     rf'\g<1>{new}\g<3>', text)
+          text, dep_hits = re.subn(rf'("idfkit==){re.escape(current)}(")', rf'\g<1>{new}\g<2>', text)
+          if level_hits != 1 or dep_hits != 1:
+              sys.exit(f"expected one level and one pin at {current}, found {level_hits} and {dep_hits}")
+
+          path.write_text(text, encoding="utf-8")
+          with pathlib.Path(os.environ["GITHUB_OUTPUT"]).open("w") as handle:
+              handle.write("changed=true\n")
+              handle.write(f"previous={current}\n")
+              handle.write(f"version={new}\n")
+          print(f"{current} -> {new}")
+          PY
+
+      - name: Relock
+        if: steps.bump.outputs.changed == 'true'
+        run: uv lock
+
+      - name: Open the pull request
+        if: steps.bump.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bump-idfkit-${{ steps.bump.outputs.version }}
+          commit-message: "chore: build the site against idfkit ${{ steps.bump.outputs.version }}"
+          title: "Build the site against idfkit ${{ steps.bump.outputs.version }}"
+          body: |
+            idfkit ${{ steps.bump.outputs.version }} was released, so
+            `[tool.idfkit.library]` and the pinned dependency advance from
+            ${{ steps.bump.outputs.previous }}.
+
+            Opened automatically by `notify-downstream.yml` in idfkit. Nobody
+            asked for it, which is the point: a release that renames a documented
+            interface makes pages wrong the moment it ships.
+
+            **The checks on this pull request decide whether the pages survive
+            the new version.** If they are red, a page describes something this
+            release no longer has under that name. Fix the page. Do not relax the
+            check, do not pin the level back, and do not merge past it.
