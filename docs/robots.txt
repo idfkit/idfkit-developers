@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://py.idfkit.com/sitemap.xml
+# The sitemap of THIS host, which mkdocs generates at build time from site_url.
+#
+# It named https://py.idfkit.com/sitemap.xml until feature 003. That was already wrong before
+# the move and would have been actively harmful after it: py.idfkit.com is retired and becomes
+# redirect-only, and the sitemap it serves lists the pre-Diataxis address structure this site
+# replaced. Pointing crawlers there from the live host would have advertised 89 addresses that
+# now answer with a permanent redirect, instead of the 110 this site actually serves.
+Sitemap: https://developers.idfkit.com/sitemap.xml
