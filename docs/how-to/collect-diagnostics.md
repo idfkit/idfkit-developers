@@ -38,29 +38,23 @@ has nothing to do with how the file was parsed.
 
 ## Collect what was skipped
 
-The two libraries report the recoverable findings differently, and the
-difference is idiomatic rather than accidental. TypeScript returns them beside
-the document, because a browser caller that gets a throw loses the partial
-model it could still have shown. Python sends them to the standard library's
-logging module, because a Python caller expects a failure it must handle to
-arrive as an exception and everything else to arrive as a log record.
+Both libraries hand the recoverable findings back beside the document, in one
+call, with nothing to configure first.
+
+Python did not, until recently. The findings went to the standard library's
+logging module and nowhere else, so reaching them meant installing a handler
+before the parse. That still works and is still supported, and the section
+below shows it; it is no longer the only way.
 
 === "Python"
 
     ```python
-    import logging
+    from idfkit import load_idf_with_diagnostics
 
-    from idfkit import parse_idf
-
-
-    class CollectDiagnostics(logging.Handler):
-        def emit(self, record: logging.LogRecord) -> None:
-            print(f"{record.name}: {record.getMessage()}")
-
-
-    logging.getLogger("idfkit").addHandler(CollectDiagnostics())
-    model = parse_idf("model.idf", strict_parsing=False)
-    # idfkit.idf_parser: Skipped 1 unknown object type(s): Nonsense:Type
+    result = load_idf_with_diagnostics("model.idf")
+    for d in result.diagnostics:
+        print(f"{d.code} at line {d.line}: {d.message}")
+    # UnknownObjectType at line 12: Unknown object type 'Nonsense:Type'
     ```
 
 === "TypeScript"
@@ -68,6 +62,36 @@ arrive as an exception and everything else to arrive as a log record.
     ```ts
     --8<-- "docs/snippets/js/how-to/collect-diagnostics/collect_what_was_skipped.ts:example"
     ```
+
+`load_idf_with_diagnostics` always parses non-strictly, because a strict parse
+has no recoverable findings: the first one stops it. There is one finding per
+problem, not one per distinct kind of problem, and each carries its own line.
+
+### The logging path still works
+
+Every log record the parser emitted before it still fires, unchanged. A caller
+who installed a handler sees exactly what they saw, whether or not anything
+calls the returning path.
+
+```python
+import logging
+
+from idfkit import parse_idf
+
+
+class CollectDiagnostics(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        print(f"{record.name}: {record.getMessage()}")
+
+
+logging.getLogger("idfkit").addHandler(CollectDiagnostics())
+model = parse_idf("model.idf", strict_parsing=False)
+# idfkit.idf_parser: Skipped 1 unknown object type(s): Nonsense:Type
+```
+
+The log record is a formatted sentence and the finding is a structured value,
+so the returning path is the better one to build on. The logging path is the
+better one for a long batch you only want to watch.
 
 For a large batch, TypeScript's `onDiagnostic` fires as each problem is found,
 so you never hold every diagnostic for every file at once. The callback fires
@@ -82,8 +106,13 @@ accumulates unless you accumulate it.
 ## Read the error when you do want to stop
 
 Strict parsing is the right default for a script, and it still tells you where
-the problem is. Every diagnostic carries a message and a line, plus the object
-type when the parser knew which object it was inside.
+the problem is. Both libraries raise, and the error carries every finding that
+stopped the parse rather than one flattened into fields.
+
+Every diagnostic carries a message, a machine-readable `code`, and as much
+location as the parser had: a line, and the object type and column when it knew
+them. Match on `code`, never on `message`: the codes are the same eight values
+in both languages, and the wording is free to improve.
 
 === "Python"
 
@@ -114,8 +143,10 @@ diagnostics with it. Use `loadIdfWithDiagnostics` when you want both.
 --8<-- "docs/snippets/js/how-to/collect-diagnostics/keep_the_diagnostics_when_reading_from_a_file.ts:example"
 ```
 
-Python has no equivalent pair: `parse_idf` reads from a path already, and the
-recoverable findings reach you through logging whichever way you call it.
+Python has the same pair, spelled the same way round: `load_idf` returns the
+document and drops the findings, `load_idf_with_diagnostics` returns both. The
+result type is called `ParseResult` in each language and carries the same two
+members, `document` and `diagnostics`, in that order.
 
 ## Diagnostics are not validation
 
