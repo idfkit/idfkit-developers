@@ -1,13 +1,26 @@
-# Developing with idfkit
+# Developing with an AI assistant
 
-The pages in this section are written for **AI coding assistants** writing Python
-against idfkit. They are the same files idfkit ships inside its wheel as the
-`developing-with-idfkit` skill, published here so you can read them yourself.
+idfkit ships a reference set written for **AI coding assistants** writing Python against it,
+bundled inside the wheel as the `developing-with-idfkit` skill. Sixteen topics, each
+self-contained and task-oriented: a "when to use" summary, a quick start, a core API table,
+then the details.
 
-Each page is self-contained and task-oriented: a "when to use" summary, a quick
-start, a core API table, then the details. The code in them comes from
-`docs/snippets/agent_references/`, which is linted with ruff and type-checked
-with pyright under a strict configuration, so the examples run as written.
+## Why they are not on this page
+
+They used to be published here, one page per topic. They are not any more, and the reason is
+the same one that makes the skill worth having.
+
+The skill resolves the idfkit **installed in your project** and loads the references baked
+into that exact version. A page on this site can only ever show one version, the one the site
+is built against, which is stated in the footer. So a published copy is the one artifact in
+the arrangement that can be wrong for a given reader: right for whoever happens to be on the
+pinned version, quietly stale for everyone else. That is precisely the drift the skill exists
+to prevent, and publishing a second copy to reintroduce it would be an odd thing to do.
+
+The references are generated, not written twice. Their prose lives in
+`agent_references/templates/` in the library, their code in `agent_references/snippets/`,
+which is linted with ruff and type-checked with pyright under a strict configuration, so the
+examples run as written. A build step inlines the code into the bundle.
 
 ## Why a skill and not just docs
 

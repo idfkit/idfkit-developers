@@ -6,11 +6,18 @@ and naming claims are read at a `governance-YYYY.N` tag, and both of those are i
 reader looking at the page. SC-023 says they should not be: someone comparing what the site says
 against what their installed copy does needs to know which copy the site is describing.
 
-So three values reach every template through `config.extra`:
+So four values reach every template through `config.extra`:
 
-    conformance_level   the corpus level the Python library declares it passes (FR-024)
-    governance_level    the tag the parity ledger and naming register were read at (FR-081)
-    docs_level          the tag the TypeScript examples and reference came from (FR-062, FR-064)
+    conformance_level   the corpus level the Python library declares it passes (001-FR-024)
+    governance_level    the tag the parity ledger and naming register were read at (001-FR-081)
+    docs_level          the tag the TypeScript examples and reference came from (001-FR-062, -064)
+    library_level       the exact idfkit version the Python reference was generated from, and the
+                        weather browser's four files were copied out of (003-FR-025)
+
+`library_level` is the newest of the four and exists because of where this file now lives. While
+the site sat inside the Python library, the reference was generated from the checkout around it and
+there was nothing to pin: the version was whatever the working tree was. Outside it, the library is
+an input like the other three, and an input a page makes claims about has to be named.
 
 WHERE THEY COME FROM, AND WHY NOT FROM mkdocs.yml
 
@@ -42,6 +49,7 @@ _LEVELS: tuple[tuple[str, str, str], ...] = (
     ("conformance_level", "conformance", "IDFKIT_CONFORMANCE_LEVEL"),
     ("governance_level", "governance", "IDFKIT_GOVERNANCE_LEVEL"),
     ("docs_level", "docs", "IDFKIT_DOCS_LEVEL"),
+    ("library_level", "library", "IDFKIT_LIBRARY_LEVEL"),
 )
 
 

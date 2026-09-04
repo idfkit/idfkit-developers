@@ -1,0 +1,38 @@
+# CODEOWNERS for idfkit-developers, the unified documentation site.
+#
+# WHY THE WHOLE REPOSITORY, AND NOT A LIST OF PATHS.
+#
+# In the Python library this file named owners for `docs/`, `mkdocs.yml` and
+# `.github/workflows/docs.yml` specifically, because those were islands of shared
+# material inside a repository that otherwise belonged to one language. Here there
+# is no such distinction to draw: every file in this repository is the site or is
+# tooling that acts on the site, so the entry is the repository (001-FR-057,
+# 003-FR-004).
+#
+# 001-FR-091: the rule has no override. An unavailable reviewer blocks the merge.
+# Do not add a bypass, do not grant an exemption, and do not merge on the grounds
+# that the reviewer sets currently overlap. They overlap today, which is what makes
+# the rule cheap to obey now and is precisely why it is written down before they
+# diverge.
+#
+# The team slugs below must exist in the "idfkit" GitHub organisation and must have
+# write access to this repository, otherwise GitHub silently ignores the entry and
+# the rule does not bind. Pair this file with a branch protection rule on the
+# default branch that requires review from Code Owners.
+#
+# THIS FILE IS THE POINT OF THE MOVE. While the site lived inside the Python
+# library, a maintainer of the JavaScript library could be named here and still not
+# merge, because merging needs write access to the repository the file sits in.
+# Standing to review and standing to merge are different things, and only one of
+# them could be granted by a CODEOWNERS line. Here both maintainer teams hold the
+# same standing over the same repository, which is a property of where the site
+# lives rather than of what this file says.
+#
+# Matching follows GitHub's rules: the last matching pattern wins, so keep the most
+# specific entries at the bottom.
+
+# Everything. The site, its build, its checks, its scripts.
+*                                       @idfkit/python-maintainers @idfkit/javascript-maintainers
+
+# This file itself, so the review rule cannot be relaxed without the same review.
+/.github/CODEOWNERS                     @idfkit/python-maintainers @idfkit/javascript-maintainers

@@ -112,10 +112,18 @@ EXIT_OK = 0
 EXIT_FAILED = 1
 EXIT_REFUSED = 2
 
-# FR-059: the one tree that is a navigation section without being one of the four kinds. Adding a
-# second member here is a constitutional amendment rather than a configuration change, and the gate
-# refuses to run if one appears.
-DECLARED_EXCEPTIONS: tuple[str, ...] = ("agent-references/",)
+# Trees that are a navigation section without being one of the four kinds. EMPTY, and that is the
+# point: the site is the four kinds and nothing else.
+#
+# 001-FR-059 declared exactly one, `agent-references/`, for material addressed to automated tooling
+# and shipped inside the Python wheel. Feature 003 retired it. Those 16 topic pages are baked into
+# the idfkit wheel and are no longer published at all, because the skill loads the reference set
+# baked into the version installed in the reader's project while a page can only ever show the one
+# version this site pins. The single page that survived explains the skill and is filed under
+# Explanation like any other explanation.
+#
+# Adding a member here is a constitutional amendment, not a configuration change.
+DECLARED_EXCEPTIONS: tuple[str, ...] = ()
 
 # The site root. A landing page rather than content, so it carries no kind. It is not a fifth
 # section: any other top-level page entry is a finding.
@@ -177,8 +185,9 @@ NO_CONFIG = "no mkdocs.yml at {path}. The navigation is the only record of what 
 NO_NAV = "mkdocs.yml at {path} declares no `nav:`, so no page has a declared kind."
 NO_DOCS_DIR = "no documentation directory at {path}."
 TOO_MANY_EXCEPTIONS = (
-    "DECLARED_EXCEPTIONS holds {count} entries. FR-059 permits exactly one, the agent-references "
-    "tree. A second exception is a constitutional amendment, not an edit to this tuple."
+    "DECLARED_EXCEPTIONS holds {count} entries. The site has no declared exceptions: it is the "
+    "four Diataxis kinds and nothing else. An exception is a constitutional amendment, not an "
+    "edit to this tuple."
 )
 
 _ATX_HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
@@ -846,7 +855,7 @@ def _shared_snippet_warnings(includes: dict[str, list[Page]]) -> list[str]:
 
 
 def run(config_path: Path, docs_dir: Path | None) -> Report:
-    if len(DECLARED_EXCEPTIONS) != 1:
+    if len(DECLARED_EXCEPTIONS) != 0:
         raise Refusal(TOO_MANY_EXCEPTIONS.format(count=len(DECLARED_EXCEPTIONS)))
     if not config_path.is_file():
         raise Refusal(NO_CONFIG.format(path=config_path))
@@ -896,7 +905,7 @@ def render(report: Report, verbose: bool) -> str:
         f"Navigation: {report.config_path}",
         f"Pages:      {report.docs_dir}, {len(report.pages)} pages",
         f"Kinds:      {_kind_counts(report)}",
-        f"Exception:  {', '.join(DECLARED_EXCEPTIONS)} (FR-059, the only one)",
+        f"Exceptions: {', '.join(DECLARED_EXCEPTIONS) or 'none, the four kinds and nothing else'}",
     ]
 
     if verbose:

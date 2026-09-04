@@ -1,7 +1,32 @@
-# This repository publishes a site, not a package. There is no [project] table and no
-# [build-system]: nothing here is built as a distribution or uploaded anywhere. What it does
-# have is the library's tool configuration, so a maintainer who works in idfkit can clone this
-# and have `make check` mean what they expect (contracts/repository-layout.md).
+# This repository publishes a site, not a package. There is a [project] table, because uv needs
+# somewhere to write the site's dependencies, but `package = false` below keeps it a virtual
+# project: nothing here is built as a distribution or uploaded anywhere, and there is no
+# [build-system] and no src/. What this file does carry is the library's tool configuration, so a
+# maintainer who works in idfkit can clone this and have `make check` mean what they expect
+# (contracts/repository-layout.md).
+
+# The library is a DEPENDENCY of the site now, not the repository the site lives in.
+#
+# It is pinned with `==` to the exact version [tool.idfkit.library] declares, and the two are the
+# same fact written twice, which is a thing this project otherwise refuses to do. The duplication is
+# deliberate here because the two readers cannot share a channel: uv resolves dependencies before
+# any of our code runs, so it cannot ask the hook, and the hook must state a level even in the
+# portable build, where there is no pyproject.toml to read. `make check` runs `uv lock --locked`,
+# so a level advanced in one place and not the other fails the gate rather than shipping a page
+# whose reference and whose stated version disagree.
+[project]
+name = "idfkit-developers"
+version = "0.0.0"
+description = "The unified idfkit documentation site"
+requires-python = ">=3.12"
+dependencies = [
+    "idfkit==0.15.0",
+]
+
+[tool.uv]
+# Virtual project: resolve and lock dependencies, build nothing. Without this uv looks for a
+# package to build, does not find one, and is right not to.
+package = false
 
 [dependency-groups]
 dev = [
