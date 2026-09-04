@@ -59,37 +59,32 @@ equal that way, because all seven are presentation.
 
 ## The controls, which do not change any of this
 
-Five controls exist on both writers, and closing them was
-[feature 002](conformance.md). They let you ask for output shaped differently.
-They do not make the two writers agree, because none of them touches the seven
+Five controls were closed by [feature 002](conformance.md), so that no control
+sits on one writer with no answer on the other. Two of them are still spelled on
+one side only: Python's `ordering` has no TypeScript counterpart, because that
+writer keeps insertion order and offers no sort, and TypeScript's `versionFirst`
+has no Python counterpart. They let you ask for output shaped differently. They
+do not make the two writers agree, because none of them touches the seven
 defaults above.
 
-=== "Python"
-
-    ```python
-    --8<-- "docs/snippets/explanation/two_writers_one_model.py:controls"
-    ```
-
-=== "TypeScript"
-
-    ```ts
-    --8<-- "docs/snippets/js/explanation/two-writers-one-model/controls.ts:controls"
-    ```
+```python
+--8<-- "docs/snippets/explanation/two_writers_one_model.py:controls"
+```
 
 The most aggressive is compressed output: one object per line, no comments, no
 blank separators, no header.
 
-=== "Python"
+```python
+--8<-- "docs/snippets/explanation/two_writers_one_model.py:compressed"
+```
 
-    ```python
-    --8<-- "docs/snippets/explanation/two_writers_one_model.py:compressed"
-    ```
-
-=== "TypeScript"
-
-    ```ts
-    --8<-- "docs/snippets/js/explanation/two-writers-one-model/controls.ts:compressed"
-    ```
+The TypeScript half of both examples is written and type-checked in
+`idfkit-js` at `docs-snippets/explanation/two-writers-one-model/controls.ts`. It
+appears here as a tab beside the Python one once `idfkit-js` cuts the docs
+release that carries it and `scripts/sync_js_artifacts.py` vendors it into
+`docs/snippets/js/`; that directory is vendored wholesale from the pinned
+`[tool.idfkit.docs]` level and must match it exactly, so the file cannot be
+added here by hand.
 
 Compressed output from the two libraries is still not byte-identical: it removes
 comments, indentation and blank lines, and it does not touch float rendering.
