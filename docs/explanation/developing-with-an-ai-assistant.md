@@ -92,26 +92,30 @@ skill = files("idfkit") / ".agents" / "skills" / "developing-with-idfkit"
 print((skill / "SKILL.md").read_text())
 ```
 
-## Reference index
+## What the sixteen references cover
 
-| Task | Reference |
-| ---- | --------- |
-| Build, load, query, or modify a model | [Document & Objects](document-and-objects.md) |
-| Parse `.idf` / `.epJSON` files | [Parsing IDF/epJSON](parsing-idf-epjson.md) |
-| Write `.idf` / `.epJSON` files | [Writing Output](writing-output.md) |
-| Validate a model against the schema | [Schema & Validation](schema-and-validation.md) |
-| Find or update cross-references between objects | [Reference Tracking](reference-tracking.md) |
-| Compute surface area, zone volume, azimuth, WWR | [Geometry & Surfaces](geometry-and-surfaces.md) |
-| Build a building footprint and zone it | [Geometry Builders & Zoning](geometry-builders-and-zoning.md) |
-| Stand up an HVAC system quickly with `HVACTemplate:*` | [HVAC Templates](hvac-templates.md) |
-| Hand-author `AirLoopHVAC` / `PlantLoop` / `CondenserLoop` | [HVAC Loops](hvac-loops.md) |
-| Run EnergyPlus simulations (sync, async, batch) | [Simulation Execution](simulation-execution.md) |
-| Parse SQL / CSV / ESO / MTR / ERR simulation output | [Result Parsing](result-parsing.md) |
-| Find a weather station, download EPW/DDY, inject design days | [Weather Data](weather-data.md) |
-| Evaluate `Schedule:*` objects to time series | [Schedule Evaluation](schedule-evaluation.md) |
-| Compute R-value, U-value, SHGC, gas mixture properties | [Thermal Properties](thermal-properties.md) |
-| Render building geometry to 3D or SVG | [Visualization](visualization.md) |
-| Migrate a model forward across EnergyPlus versions | [Version Migration](version-migration.md) |
+The file name in the bundle is the second column, under
+`idfkit/.agents/skills/developing-with-idfkit/references/`. They are not linked, because they
+are not pages: they are files inside the wheel you already have installed.
+
+| Task | File |
+| ---- | ---- |
+| Build, load, query, or modify a model | `document-and-objects.md` |
+| Parse `.idf` / `.epJSON` files | `parsing-idf-epjson.md` |
+| Write `.idf` / `.epJSON` files | `writing-output.md` |
+| Validate a model against the schema | `schema-and-validation.md` |
+| Find or update cross-references between objects | `reference-tracking.md` |
+| Compute surface area, zone volume, azimuth, WWR | `geometry-and-surfaces.md` |
+| Build a building footprint and zone it | `geometry-builders-and-zoning.md` |
+| Stand up an HVAC system quickly with `HVACTemplate:*` | `hvac-templates.md` |
+| Hand-author `AirLoopHVAC` / `PlantLoop` / `CondenserLoop` | `hvac-loops.md` |
+| Run EnergyPlus simulations (sync, async, batch) | `simulation-execution.md` |
+| Parse SQL / CSV / ESO / MTR / ERR simulation output | `result-parsing.md` |
+| Find a weather station, download EPW/DDY, inject design days | `weather-data.md` |
+| Evaluate `Schedule:*` objects to time series | `schedule-evaluation.md` |
+| Compute R-value, U-value, SHGC, gas mixture properties | `thermal-properties.md` |
+| Render building geometry to 3D or SVG | `visualization.md` |
+| Migrate a model forward across EnergyPlus versions | `version-migration.md` |
 
 ## Conventions used in every reference
 

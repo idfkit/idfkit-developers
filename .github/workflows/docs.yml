@@ -263,7 +263,13 @@ jobs:
         # arrangement is now simply the arrangement: `idfkit` is a pinned dependency in
         # pyproject.toml, uv.lock resolves it at the version [tool.idfkit.library] names, and the
         # export below carries it like any other.
-        run: uv export --frozen --no-hashes --only-group dev -o "$RUNNER_TEMP/docs-toolchain.txt"
+        #
+        # No --only-group: that restricts the export to the dev group, and `idfkit` is a project
+        # dependency, not a dev one. Exporting only the dev group produced a scratch environment
+        # with the whole documentation toolchain and no library in it, and the build failed on
+        # `import idfkit` after everything else had succeeded. --no-emit-project drops only this
+        # repository itself, which is a virtual project with nothing to install.
+        run: uv export --frozen --no-hashes --no-emit-project -o "$RUNNER_TEMP/docs-toolchain.txt"
 
       - name: Copy the documentation tree to the scratch directory
         # docs/ carried five committed symlinks whose targets lived outside it, and `cp -RL`
