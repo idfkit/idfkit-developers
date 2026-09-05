@@ -78,7 +78,7 @@ level = "governance-2026.12"
 # TypeScript reference is generated from, published together so the two always describe the same
 # commit. Read by scripts/sync_js_artifacts.py and docs/hooks/typedoc_shim.py.
 [tool.idfkit.docs]
-level = "docs-2026.1"
+level = "docs-2026.2"
 
 # Library level the Python half of the site renders from, as an exact version on the package
 # index. New in feature 003. Two things read it, and they must agree: mkdocstrings generates the

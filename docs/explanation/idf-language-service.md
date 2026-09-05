@@ -42,13 +42,13 @@ editor.
 Every answer is a function from text and an offset to a value:
 
 ```ts
---8<-- "docs/snippets/explanation/idf_language_service.ts:cursor"
+--8<-- "docs/snippets/js/explanation/idf-language-service/the_five_answers.ts:cursor"
 ```
 
 What may be written here, with the state that says why there is nothing:
 
 ```ts
---8<-- "docs/snippets/explanation/idf_language_service.ts:completions"
+--8<-- "docs/snippets/js/explanation/idf-language-service/the_five_answers.ts:completions"
 ```
 
 An empty list and a missing schema are different results rather than the same
@@ -59,14 +59,14 @@ that the tool is broken in the first case and is silently wrong in the second.
 What this means, and where the name under the cursor is declared:
 
 ```ts
---8<-- "docs/snippets/explanation/idf_language_service.ts:meaning"
+--8<-- "docs/snippets/js/explanation/idf-language-service/the_five_answers.ts:meaning"
 ```
 
 And the findings both the reader and the validator already produce, each with
 the characters it concerns:
 
 ```ts
---8<-- "docs/snippets/explanation/idf_language_service.ts:findings"
+--8<-- "docs/snippets/js/explanation/idf-language-service/the_five_answers.ts:findings"
 ```
 
 Neither the reader nor the validator changed to make that true. They produce
@@ -159,20 +159,20 @@ language server's translation layer is one worked example. Its conversion from
 the service's offsets to the protocol's positions is three lines:
 
 ```ts
---8<-- "docs/snippets/explanation/idf_language_service_translation.ts:range"
+--8<-- "docs/snippets/js/explanation/idf-language-service/translating_to_a_protocol.ts:range"
 ```
 
 and the rest is lookup tables mapping the service's words onto the protocol's
 numbers:
 
 ```ts
---8<-- "docs/snippets/explanation/idf_language_service_translation.ts:tables"
+--8<-- "docs/snippets/js/explanation/idf-language-service/translating_to_a_protocol.ts:tables"
 ```
 
 A completion is then the offer, verbatim, in the protocol's envelope:
 
 ```ts
---8<-- "docs/snippets/explanation/idf_language_service_translation.ts:completion"
+--8<-- "docs/snippets/js/explanation/idf-language-service/translating_to_a_protocol.ts:completion"
 ```
 
 `replaces` comes from the service rather than from this file, and that is not
@@ -185,7 +185,7 @@ Diagnostics, hovers and go-to-definition are the same shape, and highlighting
 is the case that shows what the boundary is for:
 
 ```ts
---8<-- "docs/snippets/explanation/idf_language_service_translation.ts:highlight"
+--8<-- "docs/snippets/js/explanation/idf-language-service/translating_to_a_protocol.ts:highlight"
 ```
 
 Nothing there looks for a newline. A field value in this format may be written
