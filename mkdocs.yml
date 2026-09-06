@@ -53,6 +53,7 @@ nav:
     - How to migrate from eppy: migration.md
     - Reading and editing models:
       - Collect diagnostics instead of throwing: how-to/collect-diagnostics.md
+      - Save a file without reformatting it: how-to/preserve-formatting.md
       - Edit extensible groups: how-to/edit-extensible-groups.md
       - Compare two EnergyPlus versions: how-to/compare-versions.md
     - In the browser:
