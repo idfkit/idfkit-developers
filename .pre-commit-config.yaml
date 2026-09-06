@@ -29,8 +29,20 @@ repos:
         exclude: ^(docs/typedoc/|docs/snippets/js/|docs/weather/browse/)
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.14.9"
+    # Kept level with the ruff this project declares as a dev dependency. They drifted two minor
+    # versions apart, and a hook running an older linter than the project's own reports findings
+    # `uv run ruff` does not: v0.14.9 flagged S310 on `scripts/sync_js_artifacts.py`, where the URL
+    # scheme is a literal on the line above the call, and newer ruff reads that correctly. The
+    # symptom was `make check` failing on a file nobody had touched.
+    rev: "v0.16.6"
     hooks:
       - id: ruff-check
         args: [ --exit-non-zero-on-fix ]
       - id: ruff-format
+        # Python only, which is what this hook formatted before the bump. From v0.15 ruff-format
+        # also formats Python inside Markdown fences, and turning that on here would rewrite 46
+        # published pages: it collapses the aligned trailing comments the examples use to explain
+        # themselves, and rewraps calls that were wrapped for reading. Whether the site's examples
+        # should be machine-formatted is an editorial decision about the documentation, and it is
+        # not one a version bump should make silently.
+        types_or: [python, pyi]
