@@ -15,10 +15,11 @@ one vocabulary, one site.
 
 <div class="badges" markdown>
 
-[![Release](https://img.shields.io/github/v/release/idfkit/idfkit)](https://img.shields.io/github/v/release/idfkit/idfkit)
-[![Build status](https://img.shields.io/github/actions/workflow/status/idfkit/idfkit/main.yml?branch=main)](https://github.com/idfkit/idfkit/actions/workflows/main.yml?query=branch%3Amain)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/idfkit/idfkit)](https://img.shields.io/github/commit-activity/m/idfkit/idfkit)
-[![License](https://img.shields.io/github/license/idfkit/idfkit)](https://img.shields.io/github/license/idfkit/idfkit)
+[![Python release](https://img.shields.io/github/v/release/idfkit/idfkit?label=python%20release)](https://github.com/idfkit/idfkit/releases)
+[![Python build](https://img.shields.io/github/actions/workflow/status/idfkit/idfkit/main.yml?branch=main&label=python%20build)](https://github.com/idfkit/idfkit/actions/workflows/main.yml?query=branch%3Amain)
+[![TypeScript release](https://img.shields.io/github/v/release/idfkit/idfkit-js?filter=v*&label=typescript%20release)](https://github.com/idfkit/idfkit-js/releases)
+[![TypeScript build](https://img.shields.io/github/actions/workflow/status/idfkit/idfkit-js/main.yml?branch=main&label=typescript%20build)](https://github.com/idfkit/idfkit-js/actions/workflows/main.yml?query=branch%3Amain)
+[![License](https://img.shields.io/github/license/idfkit/idfkit)](https://github.com/idfkit/idfkit/blob/main/LICENSE)
 
 </div>
 
