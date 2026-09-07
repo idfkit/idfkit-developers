@@ -1,5 +1,10 @@
 # idfkit-developers
 
+[![Python release](https://img.shields.io/github/v/release/idfkit/idfkit?label=python%20release)](https://github.com/idfkit/idfkit/releases)
+[![TypeScript release](https://img.shields.io/github/v/release/idfkit/idfkit-js?filter=v*&label=typescript%20release)](https://github.com/idfkit/idfkit-js/releases)
+[![Docs build](https://img.shields.io/github/actions/workflow/status/idfkit/idfkit-developers/docs.yml?branch=main&label=docs)](https://github.com/idfkit/idfkit-developers/actions/workflows/docs.yml?query=branch%3Amain)
+[![License](https://img.shields.io/github/license/idfkit/idfkit-developers)](https://github.com/idfkit/idfkit-developers/blob/main/LICENSE)
+
 The source of <https://developers.idfkit.com>, the documentation site for idfkit in Python and
 in JavaScript.
 
