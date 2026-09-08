@@ -78,6 +78,7 @@ nav:
       - weather/index.md
       - Search for weather stations: weather/station-search.md
       - Download weather files: weather/downloads.md
+      - Read a weather file: weather/reading.md
       - Apply design days: weather/design-days.md
       - Geocode addresses: weather/geocoding.md
       - Warm the weather cache for an offline run: how-to/warm-the-weather-cache.md
