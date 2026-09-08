@@ -112,7 +112,8 @@ Combine `geocode()` with `nearest()` for address-based search:
 
 !!! tip "Climate-zone-aware search"
     Each `WeatherStation` carries its ASHRAE HOF climate zone, design
-    dry-bulb temperatures, HDD18, and CDD10. See
+    dry-bulb temperatures, HDD18, and CDD10. Filter on the zone with the
+    index's own key rather than on the label text: see
     [Filter by Climate Zone](#filter-by-climate-zone) below.
 
 ## Filter by Country
@@ -151,11 +152,36 @@ design conditions from a neighbouring WMO station; otherwise it is
 
 ## Filter by Climate Zone
 
-Filter stations by ASHRAE climate zone using a plain list comprehension:
+Ask the index for a zone by its code.
 
-```python
---8<-- "docs/snippets/weather/station-search/filter_by_climate_zone.py:example"
-```
+=== "Python"
+
+    ```python
+    --8<-- "docs/snippets/weather/station-search/filter_by_climate_zone.py:example"
+    ```
+
+=== "TypeScript"
+
+    ```ts
+    --8<-- "docs/snippets/js/weather/station-search/filter_by_climate_zone.ts:example"
+    ```
+
+!!! warning "The label is not a code, and matching its first token invents two zones"
+
+    2,162 of the 69,638 bundled records are labelled
+    `7A - ASHRAE Climate Zone could not be determined` or `8A - ...`. Neither 7A
+    nor 8A is an ASHRAE zone: zones 7 and 8 carry no moisture suffix. Reading the
+    code off the front of the label therefore produces twenty-one zones where
+    there are nineteen, and files 3.1% of the index under two that do not exist.
+
+    The zone key matches a parsed code with those records excluded, so it returns
+    nothing for `7A`. They stay reachable through the separate key for records
+    whose zone was not determined, and every station is returned by exactly one of
+    the two.
+
+    A related trap, for anyone writing the parse by hand: the suffix is `[ABC]`,
+    not `[AB]`. Dropping C loses 3C, 4C and 5C, which is 1,653 marine-zone
+    stations, leaves sixteen zones where there are nineteen, and raises nothing.
 
 ## Listing Countries
 
