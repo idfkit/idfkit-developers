@@ -20,7 +20,7 @@ version = "0.0.0"
 description = "The unified idfkit documentation site"
 requires-python = ">=3.12"
 dependencies = [
-    "idfkit==1.0.0-rc.3",
+    "idfkit==1.0.0-rc.4",
 ]
 
 [tool.uv]
@@ -65,20 +65,20 @@ dev = [
 # Conformance corpus level the site states, as an immutable tag in idfkit-conformance. The corpus
 # itself is the libraries' business; the site reports which level the pages describe.
 [tool.idfkit.conformance]
-level = "conformance-2026.8"
+level = "conformance-2026.12"
 
 # Governance artifact level the parity and naming pages are rendered from, as an immutable tag in
 # idfkit-conformance. Read by docs/hooks/parity_macro.py, scripts/render_parity_page.py and
 # scripts/render_naming_map.py through the duplicated scripts/_governance_source.py.
 [tool.idfkit.governance]
-level = "governance-2026.14"
+level = "governance-2026.17"
 
 # Documentation artifact level the TypeScript half of the site renders from, as an immutable tag
 # in idfkit-js. It carries the TypeScript examples the pages include and the TypeDoc JSON the
 # TypeScript reference is generated from, published together so the two always describe the same
 # commit. Read by scripts/sync_js_artifacts.py and docs/hooks/typedoc_shim.py.
 [tool.idfkit.docs]
-level = "docs-2026.3"
+level = "docs-2026.4"
 
 # Library level the Python half of the site renders from, as an exact version on the package
 # index. New in feature 003. Two things read it, and they must agree: mkdocstrings generates the
@@ -86,7 +86,7 @@ level = "docs-2026.3"
 # four weather-browser files out of the same one. Pinning it is what keeps the reference and the
 # assets on a page describing the same version of the library.
 [tool.idfkit.library]
-level = "1.0.0-rc.3"
+level = "1.0.0-rc.4"
 
 [tool.pyright]
 pythonVersion = "3.12"
