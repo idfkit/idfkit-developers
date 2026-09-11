@@ -79,22 +79,22 @@ Ids get added and deprecated. They do not get renamed.
 <!-- BEGIN GENERATED FROM parity.toml. Edit the ledger, not this page. -->
 
 Generated from
-[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.12/governance/parity.toml)
-at `governance-2026.12`, the governance tag this release pins. Correct the ledger and
+[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.18/governance/parity.toml)
+at `governance-2026.18`, the governance tag this release pins. Correct the ledger and
 regenerate; a correction made on this page would be overwritten, and it would never
 reach either library's CI gate.
 
 ## Every capability at a glance { #at-a-glance }
 
-34 capabilities, counted by availability and then listed in full. Follow a capability to
+35 capabilities, counted by availability and then listed in full. Follow a capability to
 read what differs where the two libraries differ, and whether an absence is temporary or
 permanent.
 
 | Availability | Python | JavaScript |
 | ------------ | ------ | ---------- |
-| complete | 30 | 15 |
+| complete | 31 | 17 |
 | partial | 1 | 2 |
-| absent, not yet | 0 | 13 |
+| absent, not yet | 0 | 12 |
 | absent, never | 3 | 4 |
 
 | Capability | Tier | Python | JavaScript |
@@ -113,7 +113,7 @@ permanent.
 | [Retrieving weather and design-day files](#weather-download) | 1 | complete | partial |
 | [Declaring the conformance level a release passes](#conformance-declaration) | 1 | complete | complete |
 | [Geocoding a place name](#geocoding) | 1 | complete | complete |
-| [Formatting-preserving round-trip](#lossless-round-trip) | 2 | complete | absent (not yet) |
+| [Formatting-preserving round-trip](#lossless-round-trip) | 2 | complete | complete |
 | [Reading geometry from a model](#geometry-extraction) | 2 | complete | absent (not yet) |
 | [Building and transforming geometry](#geometry-authoring) | 2 | complete | absent (not yet) |
 | [Intersecting and matching surfaces](#surface-matching) | 2 | complete | absent (not yet) |
@@ -133,6 +133,7 @@ permanent.
 | [eppy compatibility surface](#eppy-compatibility) | permanent | complete | absent (never) |
 | [Caching retrieved weather files on disk](#weather-file-cache) | permanent | complete | absent (never) |
 | [Language service for IDF text](#idf-language-service) | permanent | absent (never) | complete |
+| [Reading an EPW weather file](#weather-file-reading) | 2 | complete | complete |
 
 ## Tier 1: the shared core { #tier-1 }
 
@@ -404,16 +405,15 @@ code supports.
 
 ### Formatting-preserving round-trip { #lossless-round-trip }
 
-**Python** complete &middot; **JavaScript** absent (not yet) &middot; Tier 2 &middot; ledger id `lossless-round-trip`
-
-!!! warning "Not in JavaScript yet"
-
-    A temporary gap, not a boundary. The port is tracked in
-    [idfkit-js#12](https://github.com/idfkit/idfkit-js/issues/12).
+**Python** complete &middot; **JavaScript** complete &middot; Tier 2 &middot; ledger id `lossless-round-trip`
 
 ??? note "Vocabulary this capability owns in the naming register"
 
     - preserve formatting on a round-trip
+    - the original source text
+    - label a field the author left without a comment
+    - the objects a preserving write will rewrite
+    - the retained source structure
 
 ### Reading geometry from a model { #geometry-extraction }
 
@@ -551,6 +551,17 @@ code supports.
 
     - apply ASHRAE sizing conditions
     - the design day manager
+
+### Reading an EPW weather file { #weather-file-reading }
+
+**Python** complete &middot; **JavaScript** complete &middot; Tier 2 &middot; ledger id `weather-file-reading`
+
+??? note "Vocabulary this capability owns in the naming register"
+
+    - read a weather file from text
+    - read a weather file from a source
+    - the weather file a reader returns
+    - monthly aggregates of a weather file
 
 ## Tier 3: tooling and Node-bound capabilities { #tier-3 }
 

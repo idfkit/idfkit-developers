@@ -80,8 +80,8 @@ ledger, where permanent single-language capabilities are recorded as such.
 <!-- BEGIN GENERATED FROM naming.toml. Edit the register, not this page. -->
 
 Generated from
-[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.12/governance/naming.toml)
-at `governance-2026.12`, the governance tag this release pins. It governs `idfkit` and
+[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.18/governance/naming.toml)
+at `governance-2026.18`, the governance tag this release pins. It governs `idfkit` and
 `@idfkit/core` and `@idfkit/weather` and `@idfkit/language`, and it is read at a pinned
 governance-YYYY.N tag of idfkit-conformance, never the default branch. Correct the
 register and regenerate; a correction made on this page would be overwritten, and it
@@ -338,6 +338,16 @@ row marked divergent or excluded links to the entry that says why, and a cell re
 | write weather files to disk | *absent* | `saveWeatherFiles` | [divergent](#write-weather-files-to-disk) |
 | the written weather file paths | *absent* | `SavedWeatherFiles` | [divergent](#the-written-weather-file-paths) |
 
+### Reading a weather file (007-weather-file-readers) { #map-reading-a-weather-file-007-weather-file-readers }
+
+| Concept | Python | TypeScript | Kind |
+| ------- | ------ | ---------- | ---- |
+| filter stations by metadata | `StationIndex.filter` | `StationIndex.filter` | aligned |
+| read a weather file from text | `parse_epw` | `parseEpw` | aligned |
+| read a weather file from a source | `load_epw` | `loadEpw` | aligned |
+| the weather file a reader returns | `WeatherFile` | `WeatherFile` | aligned |
+| monthly aggregates of a weather file | `monthly_means` | `monthlyMeans` | aligned |
+
 ### The weather options-object types { #map-the-weather-options-object-types }
 
 | Concept | Python | TypeScript | Kind |
@@ -564,8 +574,13 @@ row marked divergent or excluded links to the entry that says why, and a cell re
 | the path a document was read from | `IDFDocument.filepath` | *absent* | [divergent](#the-path-a-document-was-read-from) |
 | strict field access | `IDFDocument.strict` | *absent* | [divergent](#strict-field-access) |
 | a document's schema | `IDFDocument.schema` | `IdfDocument.schema` | aligned |
-| the concrete syntax tree | `IDFDocument.cst` | *absent* | [divergent](#the-concrete-syntax-tree) |
-| the original source text | `IDFDocument.raw_text` | *absent* | [divergent](#the-original-source-text) |
+| label a field the author left without a comment | `field_comments` | `fieldComments` | aligned |
+| the objects a preserving write will rewrite | `IDFDocument.changed_objects` | `IdfDocument.changedObjects` | aligned |
+| where an object's characters sit in the retained source | `IDFDocument.region_of` | `IdfDocument.regionOf` | aligned |
+| one object rendered as a preserving write would render it | `IDFDocument.render_object` | `IdfDocument.renderObject` | aligned |
+| a half-open range of the source text | `SourceSpan` | `Region` | aligned |
+| the retained source structure | `IDFDocument.cst` | *absent* | [divergent](#the-retained-source-structure) |
+| the original source text | `IDFDocument.raw_text` | `IdfDocument.rawText` | aligned |
 | every collection in a document | `IDFDocument.collections` | *absent* | [divergent](#every-collection-in-a-document) |
 | a document's reference graph | `IDFDocument.references` | `IdfDocument.references` | aligned |
 | the object types present in a document | `IDFDocument.keys` | `types` | [divergent](#the-object-types-present-in-a-document) |
@@ -983,13 +998,84 @@ Public on both sides and advertised on neither. Python reaches it at
 the same shape as `idfkit.exceptions.ParseDiagnostic`. Registered so that the two
 spellings cannot drift apart, not as a promise that either is prominent.
 
+**filter stations by metadata**
+
+Registered by 007-weather-file-readers, which found it absent. `search stations` was
+already here and this was not, although the two are the same kind of method on the same
+class, so the omission reads as a gap rather than a decision. Both signatures take the
+same keys and always have.
+
+A method rather than a top-level export, so it is outside the naming gate's reach and is
+covered by its exported head, `the station index`. That is exactly why it is registered
+explicitly: the gate will never fail on it, so review is the only control, and an entry
+is what review reads.
+
+**The climate zone keys.** 007 adds two keys to the options object both signatures take:
+one naming an ASHRAE climate zone, and one asking for the records whose zone could not
+be determined. They land in both languages in the same change, so this entry never
+passes through a divergent state.
+
+The second key exists rather than being a magic value of the first because of what the
+shipped index holds. Of 69,638 records, 1,262 are labelled `7A - ASHRAE Climate Zone
+could not be determined` and 900 are labelled `8A - ...`. Neither 7A nor 8A is an ASHRAE
+zone, since zones 7 and 8 carry no suffix. Keying the filter on the label's first token
+invents two zones that do not exist holding 3.1% of the index, so the key is matched
+against a parsed code with the undetermined records excluded, and asking for them is a
+separate question with a separate key rather than a reserved string in the first key's
+domain.
+
+**read a weather file from text**
+
+Registered ahead of both implementations. Neither library has an EPW reader today; this
+is a new concept in both rather than a port, because Python's weather module is
+retrieval, geocoding, the index, spatial search and design days, and its design-day half
+parses DDY by calling the ordinary IDF loader rather than a reader of its own.
+
+Lives on the portable surface in both languages. In TypeScript that means
+`@idfkit/weather` and NOT `@idfkit/weather/node`: that entry point exists for the two
+things a browser cannot do, being the bundled index and writing to disk, and reading a
+string is neither.
+
+**read a weather file from a source**
+
+Registered ahead of both implementations. The filesystem edge over `parse_epw` /
+`parseEpw`, adding no behaviour of its own. In TypeScript it lives in
+`@idfkit/weather/node`, which the shared install name does not currently expose as a
+subpath; that is an existing property of the facade's export map and not a claim made
+here.
+
+**the weather file a reader returns**
+
+Registered ahead of both implementations. The eight header records plus the hourly table
+as columns.
+
+Distinct from `the retrieved weather files` (`WeatherFiles`, plural), which is what
+retrieval hands back: the EPW, DDY and STAT members of one archive. This is what reading
+ONE of those members produces. The two names are one character apart and that is a
+hazard, so it is named here rather than discovered in review: retrieval yields
+WeatherFiles, and reading the EPW inside it yields a WeatherFile.
+
+**monthly aggregates of a weather file**
+
+Registered ahead of both implementations. Twelve values for one column, each carrying
+the count of hours it included, with absent hours excluded from both the sum and the
+divisor.
+
+The count is part of the returned value rather than derivable: without it a caller
+cannot tell a mean over 744 hours from a mean over three, and both look like numbers.
+
 **preserve formatting on a round-trip**
 
 An option, not a function: `load_idf(path, preserve_formatting=True)` builds a concrete
 syntax tree that `write_idf` reproduces, and `load_epjson` retains the raw JSON text the
-same way. Registered before the TypeScript side is written; the parity ledger records
-the absence as Tier 2 under `lossless-round-trip`. Registering the option name now costs
-nothing and is breaking later.
+same way. TypeScript retains the syntax layer and an index from statement to object
+instead, and `writeIdf` walks the two together; `parseEpJson` retains the text the same
+way Python does.
+
+Registered at `governance-2026.12`, before either side of the TypeScript half existed,
+on the reasoning that registering an option name costs nothing then and is breaking
+later. It cost nothing: this feature made the registered name true rather than choosing
+one.
 
 **a zone's floor area**
 
@@ -1263,6 +1349,134 @@ The schema the document was parsed against. Python's is `EpJSONSchema | None`, b
 document can be built without one; TypeScript's is a required `Schema`, because its
 constructor takes one. Same name, same meaning, and the optionality difference follows
 from `create a new document`.
+
+**label a field the author left without a comment**
+
+A writer control, `"preserve"` or `"generate"`, meaningful only on the preserving path
+because that is the only path that knows what the author wrote.
+
+`"preserve"` leaves a bare field bare. A field written without a comment was written
+that way on purpose, and absence is as much a thing the author wrote as the words are.
+`"generate"` labels it, for a caller who wants the file annotated.
+
+Neither setting touches the author's own comment LINES. A comment between two objects is
+carried by the text between them, and a comment on its own line inside an object is
+emitted with the field below it, so asking for labels adds them and never costs a line.
+That is the property this option exists to make safe: without it, wanting labels would
+mean taking the whole ordinary writer and losing everything it cannot regenerate.
+
+An enumeration rather than a boolean, on the same reasoning as `ordering`: a third
+behaviour is plausible, reusing the author's comment and appending the unit, and a flag
+could not say which.
+
+**the objects a preserving write will rewrite**
+
+Every object a preserving write will write afresh rather than reproduce from the
+characters it was read from. Empty for a document read with preservation and not edited
+since; every object for a document read without it, because there is nothing to
+reproduce.
+
+`the original source text` answers WHETHER a write will preserve. This answers HOW MUCH
+of the file it will change, which is the question a save button has to put to a user out
+loud, and it is the one a consumer cannot derive: a rename clears the record on every
+object that referred to the renamed one, so counting from an edit log reports one where
+the answer is nine. Deriving it means reimplementing the rule about what a change
+touches, which is a second opinion about the same question and drifts the day the rule
+moves.
+
+A generator beside `objects()` rather than a count, so a consumer that wants to LIST
+what it is about to reformat can, and a count is the length of what it yields.
+
+Python could already answer this per object: `IDFObject.source_text` is None for an
+object that has been changed, and the writer branches on exactly that. That is the
+retained TEXT, though, and its use as a flag is incidental to what it is; a consumer
+reading it has to know that having text means unchanged, which is a sentinel that reads
+backwards. This asks the question directly, in both languages, and leaves `source_text`
+as the text it is.
+
+The anchoring behind the record stays internal in both. A consumer wanting the layer
+calls `scanIdf`.
+
+**where an object's characters sit in the retained source**
+
+The half-open offset range in `the original source text` that an object was read from,
+or nothing for an object added since the read.
+
+This exists because `the objects a preserving write will rewrite` is otherwise unusable
+by the consumer it was written for. An editor turning an edit into the smallest possible
+change needs three things: WHICH objects will be rewritten, WHAT text each becomes, and
+WHERE the old one was. The first two are public in both languages; the third was
+reachable only through the anchoring, which is internal in both on purpose. Without it a
+consumer writes the whole file and diffs it, which is the work the first name exists to
+avoid, so publishing that name and withholding this one left the capability half-built.
+
+Offsets into the retained text, not a line and column. A line and column is a rendering
+of the same fact and a consumer that wants one can compute it from text it already
+holds, while the reverse costs a scan. TypeScript's `Region` is already public and
+already means exactly this, and carries the line-and-column conversion beside it.
+
+The Python name for the range is `SourceSpan` rather than `Region`, which in a building
+energy library reads as a piece of a surface. TypeScript keeps `Region`, where it has
+meant a span of the syntax layer since feature 005 and where renaming it now would break
+a published surface to fix a collision that language does not have.
+
+Nothing here publishes the anchoring itself. Both languages answer the question and keep
+the structure that answers it internal, which is the same line `the retained source
+structure` draws.
+
+**one object rendered as a preserving write would render it**
+
+The text a preserving write would put in the range `where an object's characters sit in
+the retained source` returns. The third leg, and without it the other two do not carry
+weight.
+
+Turning an edit into the smallest possible change to a file takes three things: WHICH
+objects will be rewritten, WHERE the old one was, and WHAT text each becomes. The first
+two were registered before this one and neither is usable alone. The ordinary per-object
+writer is not the third: a preserving write hands it the author's own per-field
+annotations, which are internal in both languages, so a consumer calling it with
+arguments built by hand gets the author's units and notes back as generated labels.
+Measured on one field of one object: `!- North Axis {deg}` came back `!- North Axis`. A
+unit lost from an engineering model by an editor asked to save a file.
+
+Registered because the alternative was a documented hazard. The accessor shipped with
+the gap stated on it, and a doc comment is not a load-bearing place for a correctness
+constraint; the same argument was accepted about what `the objects a preserving write
+will rewrite` does not answer. Both language service and web editor readers reached the
+same conclusion independently, that the range alone changes nothing they would build.
+
+Takes the same write options as the whole-document write and resolves them the same way,
+so the two agree by construction rather than by a consumer reproducing the defaulting.
+Answers nothing for an object the retained source does not hold, which is the same set
+the range accessor declines.
+
+No trailing line break. The range it fills ends at the terminator or at the comment on
+that line, and the break that follows is the first character of what separates one
+object from the next, which a preserving write leaves in place.
+
+**a half-open range of the source text**
+
+What `where an object's characters sit in the retained source` returns: `start` and
+`end` as offsets into the retained text, `end` exclusive.
+
+A frozen record in both languages rather than a tuple or a pair of arguments, so that a
+consumer reading `span.start` cannot transpose it, and so that a later addition beside
+the two offsets is not a breaking change.
+
+TypeScript's already existed and is already exported; this entry records it rather than
+introduces it. The differing spelling is argued under the accessor's entry.
+
+**the original source text**
+
+The text the document was read from, kept only when the read asked for it. Present in
+both formats: for the text format it is the syntax layer's own text, and for the object
+notation it is the whole of what preservation has to work with, which is why that
+format's terms are all-or-nothing.
+
+Divergent until `governance-2026.13`, and only because the second language had nothing
+to put in the column. It is the minimum a consumer needs to answer whether a write will
+preserve without reaching into the layer, which is why it is the one piece of the
+retained material that is public on both sides.
 
 **a document's reference graph**
 
@@ -2535,30 +2749,30 @@ first parse diagnostic rather than collect them. The two are not the same switch
 neither is renamed here, because each is the correct word for its own setting; the
 register's job is to say so out loud.
 
-### The concrete syntax tree
+### The retained source structure
 
 | Python | TypeScript |
 | ------ | ---------- |
 | `IDFDocument.cst` | *absent* |
 
-Present only when the document was read with `preserve_formatting=True`, and it is what
-lets `write_idf` reproduce the original text byte for byte.
+Both languages retain the material a preserving write consumes, in different shapes.
+Python holds a concrete syntax tree, a flat list of text runs each optionally anchored
+to one object. TypeScript holds the syntax layer feature 005 built for this reader, plus
+an index from statement to object, and keeps it internal: `scanIdf` already exports the
+layer to a caller who wants one, so exposing a second path to it through the document
+would publish a structure nothing reads. The capability is complete in both under
+`lossless-round-trip`; only the internal representation differs.
 
-TypeScript has no counterpart because it has no lossless round-trip yet: `writeIdf`'s
-own doc comment states the caveat plainly, that `3.0` comes back as `3` because
-JavaScript has one number type and the distinction is lost at parse time. The parity
-ledger records the absence under `lossless-round-trip` as Tier 2, and `preserve
-formatting on a round-trip` above registers the option name ahead of it.
+The reason used to be that TypeScript had no lossless round-trip. That stopped being
+true when the preserving writer landed, and a divergence reason that describes an
+absence which has ended is worse than no reason at all: it reads as a gap nobody closed.
+This one states the difference that is actually there, which is a difference in
+representation behind an aligned capability.
 
-### The original source text
-
-| Python | TypeScript |
-| ------ | ---------- |
-| `IDFDocument.raw_text` | *absent* |
-
-The other half of the formatting-preserving round-trip, beside `cst`: the source as it
-was read, kept only when `preserve_formatting=True`. Absent from TypeScript for the same
-reason and recorded under the same parity entry.
+The concept was spelled "the concrete syntax tree" until `governance-2026.13`. It was
+renamed because the old spelling named Python's implementation of the idea rather than
+the idea, so the TypeScript column could only ever be empty: there is no TypeScript
+concrete syntax tree and there is not meant to be one.
 
 ### Every collection in a document
 
@@ -3190,9 +3404,9 @@ and it is what lets a caller read a file whose version is not yet known.
 
 Python tokenises inside `IDFParser.parse` with a regex and exposes no lexer. Exporting
 one would be a second public parse path over the same text, which FR-005 prohibits, and
-it would publish an internal representation that the concrete syntax tree, registered
-above as `preserve formatting on a round-trip`, already covers for the one case a caller
-has a reason to see.
+it would publish an internal representation that the retained source structure,
+registered above as `preserve formatting on a round-trip`, already covers for the one
+case a caller has a reason to see.
 
 Excluded is terminal. A Python counterpart appearing later fails the gate.
 
