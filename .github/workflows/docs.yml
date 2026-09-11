@@ -50,6 +50,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  consumer-register:
+    # This repository is a consumer of idfkit, recorded as `idfkit-developers` in
+    # governance/consumers.toml in idfkit-conformance (feature 004). The called workflow checks that
+    # the register still describes this repository: its entry exists, both places the library level
+    # is written (the pinned dependency and [tool.idfkit.library]) resolve and agree (FR-007), and
+    # nothing here declares the library somewhere the register does not point (FR-006). It never
+    # compares the level with what PyPI publishes; a consumer may be behind, and the sweep says so.
+    #
+    # The tag is written twice, on `uses:` and as the input, because a called workflow cannot see its
+    # own ref. The called workflow refuses to run unless the two are identical, so they stay one
+    # fact. It must match [tool.idfkit.governance] level in pyproject.toml; advance all three together.
+    uses: idfkit/idfkit-conformance/.github/workflows/check-consumer.yml@governance-2026.18
+    with:
+      governance_level: governance-2026.18
+
   pins:
     name: pins
     runs-on: ubuntu-latest
@@ -168,6 +183,19 @@ jobs:
           # Full history and tags: the parity macro reads the ledger with `git show <tag>:...`
           # rather than from the working tree, so the tag has to resolve inside the checkout.
           fetch-depth: 0
+
+      - name: The generated governance pages match the tag they state
+        # parity.md, naming-map.md and consumers.md are generated from the governance artifacts
+        # at the pinned tag and never edited by hand. Nothing checked that in CI, and both of the
+        # older pages were found stale at their own pin (feature 004, T117). `make check` runs the
+        # same three checks locally; CI does not run `make check`, so they run here, beside the
+        # checkout they need. Read at the tag: IDFKIT_GOVERNANCE_DIR is not set.
+        env:
+          IDFKIT_CONFORMANCE_DIR: ${{ github.workspace }}/conformance
+        run: |
+          uv run python scripts/render_parity_page.py --check
+          uv run python scripts/render_naming_map.py --check
+          uv run python scripts/render_consumers_page.py --check
 
       - name: Install Cairo
         # mkdocs-material's `social` plugin renders preview cards through cairosvg, which needs the

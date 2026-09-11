@@ -14,9 +14,28 @@ name: deploy-docs
 # also never pass: it looked for the artefact under ${GITHUB_REPOSITORY}, and the archive lives
 # in idfkit, beside archive-retired-site.yml, which stayed there because it answers for the
 # retired host rather than for the site.
+#
+# IT DEPLOYS ON EVERY MERGE TO main, AND BY HAND.
+#
+# It used to run only by hand, so what developers.idfkit.com served was whatever someone last
+# remembered to publish. The first run of scripts/check_surfaces.py (feature 004) found the live
+# site stating idfkit 1.0.0-rc.3 while this repository declared 1.0.0-rc.4: a page telling
+# readers it describes a level the repository had already moved off (004-FR-030, SC-011). A merge
+# to main is a reviewed change whose checks passed, so publishing it is what makes the served
+# level follow the declared one. workflow_dispatch stays for re-publishing without a change.
+#
+# One deploy at a time, and never cancelled: force_orphan replaces gh-pages whole, and a deploy
+# interrupted between building and pushing would leave the previous build in place, which is
+# safe, while two racing each other could leave the older one last.
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: false
 
 permissions:
   contents: write

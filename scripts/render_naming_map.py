@@ -885,6 +885,13 @@ def resolve_register_path(explicit: str | None) -> Path:
     if governance_dir:
         candidate = Path(governance_dir).expanduser().resolve()
         return candidate if candidate.is_file() else candidate / "naming.toml"
+    # The checkout CI provides through setup-parity-ledger. The parity renderer's docstring has
+    # always said the two pages share one lookup order; this is the half that was missing, and
+    # without it the page could only be checked on a machine with a sibling clone. Unlike
+    # IDFKIT_GOVERNANCE_DIR it is not an override: the file is still read at the pinned tag.
+    conformance_dir = os.environ.get("IDFKIT_CONFORMANCE_DIR")
+    if conformance_dir:
+        return Path(conformance_dir).expanduser().resolve() / "governance" / "naming.toml"
     return REPO_ROOT.parent / "idfkit-conformance" / "governance" / "naming.toml"
 
 

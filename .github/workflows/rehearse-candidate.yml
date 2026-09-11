@@ -1,0 +1,49 @@
+name: rehearse-candidate
+
+# Build this site against an unpublished idfkit, before it is released (feature 004, User Story 2).
+#
+# Dispatched by a maintainer with a commit, branch or tag of idfkit/idfkit, or fanned out to every
+# consumer at once by idfkit's rehearse-all.yml. The called workflow builds a wheel from that ref,
+# installs it over this repository's synced environment WITHOUT touching pyproject.toml or uv.lock,
+# runs the site's type check (pyright over scripts/, docs/hooks and docs/snippets) and then its
+# tests, and scans for names that survived a rename with a different meaning. Each command runs at
+# the declared level first, so a red result is attributed to the candidate only when it is new.
+#
+# This matters more here than anywhere else in the workspace. Other consumers call the API; this
+# repository publishes pages about it, and a snippet that stops type-checking is a page that has
+# started to lie. The rehearsal is how that is found before the release rather than by the bump.
+#
+# On demand only, never on pull requests: a failure found in the LIBRARY must not block a page edit
+# (FR-013). No candidate is a failure, never a pass against the published level (FR-012).
+#
+# The tag is written twice, on `uses:` and as the input, because a called workflow cannot see its
+# own ref. Advance both with [tool.idfkit.governance] level in pyproject.toml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      # Declared even though this site resolves one library. Both libraries' rehearse-all.yml
+      # dispatch every consumer with `-f library=...`, and GitHub rejects a dispatch carrying an
+      # input the workflow does not declare. One option, so it can only ever be the right one.
+      library:
+        description: The library the candidate is of. This site resolves only Python.
+        required: true
+        type: choice
+        options: [python]
+        default: python
+      candidate_ref:
+        description: A commit, branch or tag of idfkit/idfkit to rehearse against. Required.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rehearse:
+    uses: idfkit/idfkit-conformance/.github/workflows/rehearse.yml@governance-2026.18
+    with:
+      governance_level: governance-2026.18
+      consumer: idfkit-developers
+      library: ${{ inputs.library }}
+      candidate_ref: ${{ inputs.candidate_ref }}

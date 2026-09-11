@@ -42,8 +42,15 @@ check-governance-reader: ## Verify the duplicated governance reader has not drif
 	@echo "🚀 Checking the duplicated governance reader against idfkit"
 	@uv run python -m pytest tests/test_governance_source_matches.py -q
 
+.PHONY: check-generated-pages
+check-generated-pages: ## Verify the parity, naming and consumer pages match the governance tag they state
+	@echo "🚀 Checking the three generated governance pages against the pinned governance level"
+	@uv run python scripts/render_parity_page.py --check
+	@uv run python scripts/render_naming_map.py --check
+	@uv run python scripts/render_consumers_page.py --check
+
 .PHONY: check
-check: check-page-kinds check-capabilities check-engine-assets check-vendored check-governance-reader ## Run code quality tools.
+check: check-page-kinds check-capabilities check-engine-assets check-vendored check-governance-reader check-generated-pages ## Run code quality tools.
 	@echo "🚀 Checking lock file consistency with 'pyproject.toml'"
 	@uv lock --locked
 	@echo "🚀 Linting code: Running pre-commit"
