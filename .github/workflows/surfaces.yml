@@ -1,0 +1,77 @@
+name: surfaces
+
+# Every surface a reader lands on teaches a level somebody declared (feature 004, User Story 5).
+#
+# Runs scripts/check_surfaces.py over the `[[surface]]` rows of governance/consumers.toml in
+# idfkit/idfkit-conformance, read at the governance tag this repository pins, and over every install
+# instruction in the README of every repository the register lists and on the marketing page.
+#
+# ITS FIRST RESULT WAS RED, ON PURPOSE. py.idfkit.com and js.idfkit.com are retired in the
+# constitution ("MUST redirect to it permanently rather than continuing to publish") and both answer
+# 200 with their own sites and a canonical link pointing at themselves. That red run is the
+# deliverable: a retirement written down and never verified stays undone for as long as nobody
+# thinks to load the page. The fix is feature 003's, tracked in idfkit/idfkit-developers#15, and it
+# is NOT made here (004-FR-043). Do not quiet this job by marking the hosts serving in the register,
+# by allowing a temporary redirect, or by making it advisory.
+#
+# Half B, the install instructions, passes today by doing nothing for the second language: the
+# shared name `idfkit` has no published version on npm, and FR-028 forbids demanding an instruction
+# for something a reader cannot install. It starts failing the day the facade publishes, which is
+# the right day.
+#
+# On a schedule and on demand, never on pull requests. It reaches the network, and a host being down
+# for an hour must not block a page edit. An unreachable host exits 2, which is red, and never green.
+#
+# A TOKEN THAT CAN READ PRIVATE REPOSITORIES is needed for Half B to read the README of the three
+# private consumers (idfkit-app, idfkit-lsp, idfkit-mcp-deployment). Without SURFACES_READ_TOKEN
+# those READMEs are reported unreachable, which fails the run with exit 2 rather than skipping them.
+
+on:
+  schedule:
+    - cron: "41 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pins:
+    name: pins
+    runs-on: ubuntu-latest
+    outputs:
+      governance: ${{ steps.pin.outputs.governance }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the pinned governance level
+        id: pin
+        run: |
+          python3 -c 'import tomllib,pathlib;print("governance="+tomllib.loads(pathlib.Path("pyproject.toml").read_text())["tool"]["idfkit"]["governance"]["level"])' >> "$GITHUB_OUTPUT"
+
+  surfaces:
+    name: every surface answers for itself
+    needs: pins
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: "3.12"
+
+      - name: Check out the conformance repository at the pinned governance level
+        uses: actions/checkout@v4
+        with:
+          repository: idfkit/idfkit-conformance
+          ref: ${{ needs.pins.outputs.governance }}
+          path: conformance
+          # The register is read with `git show <tag>:governance/consumers.toml`, so the tag has to
+          # resolve inside the checkout.
+          fetch-depth: 0
+
+      - name: Check every surface
+        env:
+          GH_TOKEN: ${{ secrets.SURFACES_READ_TOKEN || github.token }}
+        run: uv run python scripts/check_surfaces.py --conformance-dir conformance
