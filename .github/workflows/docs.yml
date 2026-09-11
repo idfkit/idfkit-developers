@@ -50,6 +50,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  consumer-register:
+    # This repository is a consumer of idfkit, recorded as `idfkit-developers` in
+    # governance/consumers.toml in idfkit-conformance (feature 004). The called workflow checks that
+    # the register still describes this repository: its entry exists, both places the library level
+    # is written (the pinned dependency and [tool.idfkit.library]) resolve and agree (FR-007), and
+    # nothing here declares the library somewhere the register does not point (FR-006). It never
+    # compares the level with what PyPI publishes; a consumer may be behind, and the sweep says so.
+    #
+    # The tag is written twice, on `uses:` and as the input, because a called workflow cannot see its
+    # own ref. The called workflow refuses to run unless the two are identical, so they stay one
+    # fact. It must match [tool.idfkit.governance] level in pyproject.toml; advance all three together.
+    uses: idfkit/idfkit-conformance/.github/workflows/check-consumer.yml@governance-2026.18
+    with:
+      governance_level: governance-2026.18
+
   pins:
     name: pins
     runs-on: ubuntu-latest
