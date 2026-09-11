@@ -35,11 +35,13 @@ it, and why this hook computes no path out of its own location.
 from __future__ import annotations
 
 import os
+import re
 
 # tomllib unconditionally, with no tomli fallback. The fallback existed because this hook lived in
 # a library that supports 3.10; this repository's floor is 3.12, declared in .python-version and in
 # ruff's target-version, so the fallback branch was unreachable code claiming otherwise.
 import tomllib
+from importlib import metadata
 from pathlib import Path
 from typing import Any
 
@@ -80,4 +82,39 @@ def on_config(config: Any) -> Any:
         raise SystemExit(
             "the site cannot state which levels it was built from. Declare each of:\n  " + "\n  ".join(missing)
         )
+    _refuse_a_second_library_level(config.extra["library_level"])
     return config
+
+
+def _spelling(version: str) -> str:
+    """One spelling per release: [tool.idfkit.library] writes `1.0.0-rc.4`, the wheel `1.0.0rc4`."""
+    text = version.strip().lower().removeprefix("v")
+    return re.sub(r"[.\-]?(a|b|rc)[.\-]?(\d+)", r"\1\2", text)
+
+
+def _refuse_a_second_library_level(declared: str) -> None:
+    """Refuse to build when the page would state one library level and render another (004-FR-007).
+
+    The library level is written twice, in `[tool.idfkit.library] level` and in the pinned
+    dependency, and this hook states the first on every page while mkdocstrings renders the
+    reference from whatever the second installed. If they differ the site describes one release and
+    documents another, with nothing on the page to say so. `uv lock --locked` does not catch it,
+    because uv ignores `[tool.*]` tables (measured in feature 004, T035), so the build refuses here,
+    where both builds pass: the repository one reads the table, the portable one the environment.
+
+    The unreleased-library override (IDFKIT_LIBRARY_DIR, 003-FR-023) builds against a working tree
+    on purpose, and announces that the result is not evidence about the declared level. Under it
+    this comparison would only restate that, so it stands aside.
+    """
+    if os.environ.get("IDFKIT_LIBRARY_DIR"):
+        return
+    try:
+        installed = metadata.version("idfkit")
+    except metadata.PackageNotFoundError:
+        raise SystemExit("idfkit is not installed, so the Python reference cannot be generated at any level") from None
+    if _spelling(installed) != _spelling(declared):
+        raise SystemExit(
+            f"the site states idfkit {declared} and the installed idfkit is {installed}. The two places the "
+            "library level is written disagree (004-FR-007): [tool.idfkit.library] level and the pinned "
+            "dependency. Move both together, as bump-idfkit.yml does."
+        )
