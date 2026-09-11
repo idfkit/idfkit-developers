@@ -14,7 +14,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-import render_naming_map  # noqa: E402
+import render_naming_map
 
 
 def test_the_conformance_checkout_ci_provides_is_used(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -23,7 +23,9 @@ def test_the_conformance_checkout_ci_provides_is_used(monkeypatch: pytest.Monkey
     assert render_naming_map.resolve_register_path(None) == tmp_path.resolve() / "governance" / "naming.toml"
 
 
-def test_the_override_still_wins_and_an_explicit_path_wins_over_both(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_the_override_still_wins_and_an_explicit_path_wins_over_both(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     monkeypatch.setenv("IDFKIT_CONFORMANCE_DIR", str(tmp_path / "ci"))
     monkeypatch.setenv("IDFKIT_GOVERNANCE_DIR", str(tmp_path / "wt"))
     assert render_naming_map.resolve_register_path(None) == (tmp_path / "wt").resolve() / "naming.toml"
