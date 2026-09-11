@@ -164,6 +164,7 @@ nav:
     # direct link until now, which made a generated page that nothing navigates to.
     - Capability parity: explanation/parity.md
     - The naming map: explanation/naming-map.md
+    - Who consumes the libraries: explanation/consumers.md
     - How conformance is established: explanation/conformance.md
     - Type-safe development: concepts/type-safety.md
     - Static types generated from the schema: explanation/generated-types.md
