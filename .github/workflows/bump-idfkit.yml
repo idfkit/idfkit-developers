@@ -188,16 +188,40 @@ jobs:
             echo "STATEMENTS"
           } >> "$GITHUB_OUTPUT"
 
+      # A lag closes only when the adoption reaches the library's CURRENT level, the newest release
+      # on the index of any kind. Adopting something newer than before but older than current
+      # leaves the consumer still behind, and closing the lag then would make the register say
+      # nothing is wrong when something is (004-FR-023, T119). Both comparisons use the tagged
+      # governance tools, so "newest" and "the same version" mean here what they mean in the sweep.
       - name: Does the register hold a lag this adoption closes
         id: lag
         if: steps.bump.outputs.changed == 'true'
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+          import sys
           import tomllib
+          import urllib.request
+
+          sys.path.insert(0, "governance/tools")
+          from adoption import version_key
+          from consumers import normalize
+
           register = tomllib.load(open("governance/governance/consumers.toml", "rb"))
           consumer = next(c for c in register["consumer"] if c["id"] == "idfkit-developers")
           lag = next((r.get("lag") for r in consumer.get("libraries", []) if r.get("library") == "python"), None)
-          print(f"held={'true' if lag else 'false'}")
+
+          with urllib.request.urlopen("https://pypi.org/pypi/idfkit/json", timeout=30) as response:
+              releases = [v for v, files in json.load(response)["releases"].items() if files]
+          current = max(releases, key=version_key)
+          reaches = normalize(os.environ["VERSION"]) == normalize(current)
+          print(f"held={'true' if lag and reaches else 'false'}")
+          print(f"current={current}", file=sys.stderr)
+          if lag and not reaches:
+              print(f"The register holds a lag, and {os.environ['VERSION']} is not the current level {current}, so it stays open.", file=sys.stderr)
           PY
 
       - name: Open the pull request
