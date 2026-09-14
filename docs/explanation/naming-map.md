@@ -80,8 +80,8 @@ ledger, where permanent single-language capabilities are recorded as such.
 <!-- BEGIN GENERATED FROM naming.toml. Edit the register, not this page. -->
 
 Generated from
-[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.18/governance/naming.toml)
-at `governance-2026.18`, the governance tag this release pins. It governs `idfkit` and
+[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.20/governance/naming.toml)
+at `governance-2026.20`, the governance tag this release pins. It governs `idfkit` and
 `@idfkit/core` and `@idfkit/weather` and `@idfkit/language`, and it is read at a pinned
 governance-YYYY.N tag of idfkit-conformance, never the default branch. Correct the
 register and regenerate; a correction made on this page would be overwritten, and it
@@ -3824,8 +3824,8 @@ one language under schedule pressure.
 
 | Capability | npm package | Subpath | Mirrors | Tier | Built |
 | ---------- | ----------- | ------- | ------- | ---- | ----- |
-| schedules | `@idfkit/schedules` | `idfkit/schedules` | `idfkit.schedules` | 2 | not yet |
-| geometry, geometry builders, surface matching, zoning | `@idfkit/geometry` | `idfkit/geometry` | `idfkit.geometry`, `idfkit.geometry_builders`, `idfkit.surface_matching`, `idfkit.zoning` | 2 | not yet |
+| schedules | `@idfkit/schedules` | `@idfkit/idfkit/schedules` | `idfkit.schedules` | 2 | not yet |
+| geometry, geometry builders, surface matching, zoning | `@idfkit/geometry` | `@idfkit/idfkit/geometry` | `idfkit.geometry`, `idfkit.geometry_builders`, `idfkit.surface_matching`, `idfkit.zoning` | 2 | not yet |
 
 ## What the gate refuses
 

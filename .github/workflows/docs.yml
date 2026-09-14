@@ -61,9 +61,9 @@ jobs:
     # The tag is written twice, on `uses:` and as the input, because a called workflow cannot see its
     # own ref. The called workflow refuses to run unless the two are identical, so they stay one
     # fact. It must match [tool.idfkit.governance] level in pyproject.toml; advance all three together.
-    uses: idfkit/idfkit-conformance/.github/workflows/check-consumer.yml@governance-2026.18
+    uses: idfkit/idfkit-conformance/.github/workflows/check-consumer.yml@governance-2026.20
     with:
-      governance_level: governance-2026.18
+      governance_level: governance-2026.20
 
   pins:
     name: pins
