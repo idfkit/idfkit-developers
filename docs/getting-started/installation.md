@@ -1,7 +1,7 @@
 # How to install idfkit
 
-idfkit is one library under one name in two ecosystems: `idfkit` on PyPI and
-`idfkit` on npm. This guide installs it, adds the optional pieces, and points
+idfkit is one library in two ecosystems: `idfkit` on PyPI and `@idfkit/idfkit`
+on npm. This guide installs it, adds the optional pieces, and points
 EnergyPlus at your simulations.
 
 The two ecosystems package the same surface differently, and the difference
@@ -16,7 +16,7 @@ packages, so weather is a second install and stays off disk until you make it.
     published at 0.1.0. That release predates the renames these pages document,
     so installing it gets you an API this site does not describe. It still
     exports `IDFDocument` rather than `IdfDocument`, and `IdfDocument.collection()`
-    is public there and withdrawn here. The shared `idfkit` name is not published
+    is public there and withdrawn here. The shared `@idfkit/idfkit` name is not published
     at all. Read the TypeScript tabs as the destination, and do not pin to 0.1.0
     expecting the names on these pages.
 
@@ -34,7 +34,7 @@ packages, so weather is a second install and stays off disk until you make it.
 
     ```bash
     # Not yet published. This is the intended install.
-    npm install idfkit
+    npm install @idfkit/idfkit
     ```
 
 That gives you, in both languages:
@@ -52,17 +52,17 @@ with subcommands [`check`](../concepts/version-compatibility.md) (lint),
 install and ships no CLI; it parses, edits, and writes, in Node, a browser, a
 worker, or an edge runtime.
 
-On npm the name `idfkit` is a facade over three packages, each of which stays
-published under its own name: `@idfkit/core` behind `idfkit` and `idfkit/node`,
-`@idfkit/schemas` behind `idfkit/schemas`, and `@idfkit/weather` behind
-`idfkit/weather`. The first two are ordinary dependencies and come with the
+On npm the name `@idfkit/idfkit` is a facade over three packages, each of which
+stays published under its own name: `@idfkit/core` behind `@idfkit/idfkit` and
+`@idfkit/idfkit/node`, `@idfkit/schemas` behind `@idfkit/idfkit/schemas`, and
+`@idfkit/weather` behind `@idfkit/idfkit/weather`. The first two are ordinary dependencies and come with the
 install. The third does not.
 
 ## Weather is a separate install in JavaScript
 
 `pip install idfkit` installs weather support and the 1.7 MB station index
-unconditionally. `npm install idfkit` installs neither. `@idfkit/weather` is
-declared as an optional peer dependency of `idfkit`, so npm leaves it out by
+unconditionally. `npm install @idfkit/idfkit` installs neither. `@idfkit/weather`
+is declared as an optional peer dependency of `@idfkit/idfkit`, so npm leaves it out by
 default and nobody who never asks for weather pays for the index.
 
 === "Python"
@@ -76,13 +76,13 @@ default and nobody who never asks for weather pays for the index.
 
     ```bash
     # Not yet published. This is the intended install.
-    npm install idfkit @idfkit/weather
+    npm install @idfkit/idfkit @idfkit/weather
     ```
 
-Import `idfkit/weather` without installing `@idfkit/weather` and the failure
+Import `@idfkit/idfkit/weather` without installing `@idfkit/weather` and the failure
 names the package to install rather than reporting an unresolved module. A
 project that never touches that subpath is unaffected, and a package of your own
-that depends on `idfkit` and needs weather should declare `@idfkit/weather`
+that depends on `@idfkit/idfkit` and needs weather should declare `@idfkit/weather`
 itself.
 
 See [How to download weather files](../weather/downloads.md) for what the two

@@ -57,7 +57,7 @@ otherwise loosely typed.
 ## It costs nothing, installed or not
 
 The maps are big. EnergyPlus 26.1 is 2.7 MB of declarations and 9.4 is another
-2.5 MB, against a measured 1.32 MB for the whole default install of the `idfkit`
+2.5 MB, against a measured 1.32 MB for the whole default install of the `@idfkit/idfkit`
 name in JavaScript. That is why they are separate packages rather than a subpath
 of core: install neither and you have a complete, working library and zero bytes
 of either map on disk.

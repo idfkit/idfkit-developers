@@ -49,7 +49,7 @@ one vocabulary, one site.
 !!! warning "Status"
 
     The Python library is released on PyPI: `pip install idfkit`. The
-    TypeScript library is not yet published under the shared `idfkit` install
+    TypeScript library is not yet published under the shared `@idfkit/idfkit` install
     name and its API is not stable, so the names on these pages can still
     change under it. Follow the TypeScript tabs by all means; pin nothing to
     them yet.

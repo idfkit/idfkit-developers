@@ -97,8 +97,12 @@ PERMANENT = frozenset({301, 308})
 TEMPORARY = frozenset({302, 303, 307})
 MAX_HOPS = 5
 
-#: What the unification publishes for each language: one install name. Both are `idfkit`.
-PUBLISHED_NAME = {"python": "idfkit", "javascript": "idfkit"}
+#: What the unification publishes for each language: one install name. `idfkit` on PyPI and
+#: `@idfkit/idfkit` on npm, whose similarity filter refused the unscoped name (2026-09-14).
+PUBLISHED_NAME = {"python": "idfkit", "javascript": "@idfkit/idfkit"}
+#: The unscoped npm name the registry refused. Still read as an instruction for this library, so a
+#: page that goes on teaching `npm install idfkit` is caught rather than silently skipped.
+REFUSED_NPM_NAME = "idfkit"
 SCOPED = frozenset({"@idfkit/core", "@idfkit/schemas", "@idfkit/weather", "@idfkit/language"})
 
 
@@ -613,7 +617,11 @@ def _package_name(token: str, language: str) -> str:
 def _governed(package: str, language: str) -> bool:
     if language == "python":
         return package == "idfkit"
-    return package == "idfkit" or package in SCOPED or package.startswith("@idfkit/types-")
+    return (
+        package in (PUBLISHED_NAME["javascript"], REFUSED_NPM_NAME)
+        or package in SCOPED
+        or package.startswith("@idfkit/types-")
+    )
 
 
 def _plain_lines(text: str, is_html: bool) -> list[str]:
