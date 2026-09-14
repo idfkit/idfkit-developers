@@ -34,7 +34,7 @@ because reading already scans the text and a source-preserving writer will read
 the layer too.
 
 The **five answers** ship as `@idfkit/language`, an opt-in package installed by
-name and reached as `idfkit/language`. Installing the library under its shared
+name and reached as `@idfkit/idfkit/language`. Installing the library under its shared
 name places none of it on disk, deliberately: everything in the core package is
 carried by everyone who reads a model, and most of them are not building an
 editor.

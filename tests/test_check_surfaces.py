@@ -100,7 +100,7 @@ class FakeRegistry:
         self.exports = exports
 
     def npm(self, package: str) -> dict[str, Any]:
-        if package == "idfkit":
+        if package == "@idfkit/idfkit":
             return {"versions": self.facade_versions, "dist-tags": {"latest": "1.0.0"} if self.facade_versions else {}}
         return {"versions": {"0.2.0": {}}, "dist-tags": {"latest": "0.2.0"}}
 
@@ -265,7 +265,7 @@ def test_half_b_demands_nothing_while_the_shared_name_is_unpublished() -> None:
 
 
 def test_half_b_activates_the_moment_the_facade_publishes() -> None:
-    # T084: the same page, the same instruction, a registry where `idfkit` has a version.
+    # T084: the same page, the same instruction, a registry where `@idfkit/idfkit` has a version.
     [js] = [
         i
         for i in extract_instructions("idfkit/idfkit.com:index.html", MARKETING, is_html=True)
@@ -278,8 +278,15 @@ def test_half_b_activates_the_moment_the_facade_publishes() -> None:
 
 
 def test_an_instruction_naming_the_shared_name_passes_once_published() -> None:
-    [js] = extract_instructions("r:README.md", "npm install idfkit\n")
+    [js] = extract_instructions("r:README.md", "npm install @idfkit/idfkit\n")
     assert [f for f in check_instruction(js, FakeRegistry({"1.0.0": {}})) if f.kind == "failure"] == []
+
+
+def test_an_instruction_naming_the_refused_unscoped_name_fails_once_published() -> None:
+    # npm refused `idfkit` (2026-09-14), so a page still teaching it names a package nobody can publish.
+    [js] = extract_instructions("r:README.md", "npm install idfkit\n")
+    [failure] = [f for f in check_instruction(js, FakeRegistry({"1.0.0": {}})) if f.kind == "failure"]
+    assert "`@idfkit/idfkit`" in failure.message
 
 
 def test_a_symbol_the_package_does_not_export_fails() -> None:
@@ -329,7 +336,7 @@ def test_a_consumers_entry_point_is_never_flagged_and_migrating_it_changes_nothi
         return [(f.subject, f.kind) for f in findings]
 
     scoped = verdict(json.dumps({"dependencies": {"@idfkit/core": "0.3.0"}}))
-    migrated = verdict(json.dumps({"dependencies": {"idfkit": "1.0.0"}}))
+    migrated = verdict(json.dumps({"dependencies": {"@idfkit/idfkit": "1.0.0"}}))
     assert scoped == migrated
     assert not any("idfkit-app" in subject for subject, _ in scoped)
 

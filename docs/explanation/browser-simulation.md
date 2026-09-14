@@ -27,7 +27,7 @@ are versioned by the EnergyPlus release they carry.
 It is a different package from everything else on this site, built in a
 different repository, and it is not reachable through the shared install name.
 That is deliberate and it is not going to change: 51 MB pinned to one
-EnergyPlus release is not something `npm install idfkit` may quietly acquire
+EnergyPlus release is not something `npm install @idfkit/idfkit` may quietly acquire
 (FR-070).
 
 ## Why bother

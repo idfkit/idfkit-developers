@@ -18,7 +18,7 @@ step, no schema files to fetch. Both carry every supported EnergyPlus schema,
 Python installs from PyPI with `pip install idfkit`, and [How to install
 idfkit](../getting-started/installation.md) covers the extras and the supported
 interpreters. The TypeScript packages are not yet published under the shared
-`idfkit` install name; until they are, work from a checkout of the [idfkit-js
+`@idfkit/idfkit` install name; until they are, work from a checkout of the [idfkit-js
 repository](https://github.com/idfkit/idfkit-js) on Node 20 or newer.
 
 Keep the code in one file as you go, `build_model.py` or `build-model.ts`, and

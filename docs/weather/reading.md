@@ -15,7 +15,7 @@ why this page has one set of instructions rather than two.
 
 !!! info "In JavaScript, weather is a separate install"
     `pip install idfkit` installs weather support and its station index
-    unconditionally. `npm install idfkit` installs neither. Add `@idfkit/weather`
+    unconditionally. `npm install @idfkit/idfkit` installs neither. Add `@idfkit/weather`
     by name. The reader lives on the portable surface of that package, not on
     `@idfkit/weather/node`: it takes a string and touches no disk, so it runs in
     a browser tab, a worker or an edge runtime as readily as in Node.

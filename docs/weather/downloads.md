@@ -13,10 +13,10 @@ a path to EnergyPlus.
 
 !!! info "In JavaScript, weather is a separate install"
     `pip install idfkit` installs weather support and its station index
-    unconditionally. `npm install idfkit` installs neither. `@idfkit/weather` is
-    an optional peer dependency of the shared `idfkit` package, so the installer
+    unconditionally. `npm install @idfkit/idfkit` installs neither. `@idfkit/weather` is
+    an optional peer dependency of the shared `@idfkit/idfkit` package, so the installer
     leaves it out by default and the 1.7 MB station index stays off disk for
-    everyone who never asks for weather. Importing `idfkit/weather` without it
+    everyone who never asks for weather. Importing `@idfkit/idfkit/weather` without it
     fails with a message naming the package to install. See [How to install
     idfkit](../getting-started/installation.md#weather-is-a-separate-install-in-javascript),
     which also covers the fact that the npm packages are not published yet.

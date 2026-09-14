@@ -16,7 +16,7 @@ payoff of
 
 ## Install and serve the engine assets
 
-The engine is installed by its own name. `npm install idfkit` does not reach it
+The engine is installed by its own name. `npm install @idfkit/idfkit` does not reach it
 and is not going to: the assets are about 51 MB of WebAssembly and they pin one
 EnergyPlus release, so nothing that the shared name installs may depend on them
 (FR-070).
