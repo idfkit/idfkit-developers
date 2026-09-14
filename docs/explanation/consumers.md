@@ -46,7 +46,7 @@ of the other language. For the parity side of the same governance, see
 
 <!-- BEGIN GENERATED FROM consumers.toml. Edit the register, not this page. -->
 
-Generated from [`governance/consumers.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.18/governance/consumers.toml) at `governance-2026.18`, the governance tag this
+Generated from [`governance/consumers.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.20/governance/consumers.toml) at `governance-2026.20`, the governance tag this
 release pins. Correct the register and regenerate; a correction made on this page would be
 overwritten, and it would never reach a consumer's self-check.
 
@@ -79,7 +79,7 @@ states it. A lag of "none" means nothing is wrong: it is the normal state.
 | `envelop` | JavaScript | the scoped packages | declared directly | `package.json` at `dependencies["@idfkit/core"]`<br>`package.json` at `dependencies["@idfkit/schemas"]`<br>`package.json` at `dependencies["@idfkit/language"]`<br>`package.json` at `dependencies["@idfkit/weather"]` | not yet, [tracked](https://github.com/idfkit/idfkit-app/issues/226) |
 | `idfkit-shoebox` | JavaScript | the scoped packages | declared directly | `package.json` at `dependencies["@idfkit/core"]`<br>`package.json` at `dependencies["@idfkit/schemas"]`<br>`package.json` at `dependencies["@idfkit/weather"]` | none |
 | `idfkit-mcp-deployment` | Python | `idfkit` | in a container image | `cdk.json` at `context.idfkit_mcp_ref` (idfkit-mcp via `idfkit-mcp`) | none |
-| `idfkit-plugin` | Python | `idfkit` | fetched when an editor starts | `.mcp.json` at `mcpServers.idfkit.args[0]` (idfkit-mcp via `idfkit-mcp`)<br>`.lsp.json` at `idfkit.args[1]` (idfkit-lsp via `idfkit-lsp`), range | not yet, [tracked](https://github.com/idfkit/idfkit-plugin/issues/17) |
+| `idfkit-plugin` | Python | `idfkit` | fetched when an editor starts | `.mcp.json` at `mcpServers.idfkit.args[0]` (idfkit-mcp via `idfkit-mcp`)<br>`.lsp.json` at `idfkit.args[1]` (idfkit-lsp via `idfkit-lsp`) | none |
 
 ## Recorded, and governed by nothing here { #ungoverned }
 

@@ -73,7 +73,7 @@ level = "conformance-2026.12"
 # through the duplicated scripts/_governance_source.py. 2026.18 is the first tag carrying
 # governance/consumers.toml (feature 004); the consumer-register job in docs.yml pins the same tag.
 [tool.idfkit.governance]
-level = "governance-2026.18"
+level = "governance-2026.20"
 
 # Documentation artifact level the TypeScript half of the site renders from, as an immutable tag
 # in idfkit-js. It carries the TypeScript examples the pages include and the TypeDoc JSON the

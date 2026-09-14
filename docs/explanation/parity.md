@@ -79,8 +79,8 @@ Ids get added and deprecated. They do not get renamed.
 <!-- BEGIN GENERATED FROM parity.toml. Edit the ledger, not this page. -->
 
 Generated from
-[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.18/governance/parity.toml)
-at `governance-2026.18`, the governance tag this release pins. Correct the ledger and
+[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.20/governance/parity.toml)
+at `governance-2026.20`, the governance tag this release pins. Correct the ledger and
 regenerate; a correction made on this page would be overwritten, and it would never
 reach either library's CI gate.
 
@@ -291,7 +291,7 @@ possibility.
 
     Installation differs, and the difference is deliberate. `pip install idfkit` installs weather and
     its station index unconditionally, because Python extras gate dependencies rather than files, so a
-    Python reader has weather whether or not they wanted it. `npm install idfkit` installs neither:
+    Python reader has weather whether or not they wanted it. `npm install @idfkit/idfkit` installs neither:
     weather is an opt-in peer there, added with `npm install @idfkit/weather`. Both libraries ship
     their own index once installed and neither retrieves one to get started (FR-043, FR-075,
     research R11). A JavaScript reader who follows a weather page without installing that package
