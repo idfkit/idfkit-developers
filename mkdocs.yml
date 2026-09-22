@@ -153,6 +153,7 @@ nav:
       - TypeScript packages:
         - "@idfkit/core": reference/typescript/core.md
         - "@idfkit/core/node": reference/typescript/core-node.md
+        - "@idfkit/geometry": reference/typescript/geometry.md
         - "@idfkit/schemas": reference/typescript/schemas.md
         - "@idfkit/weather": reference/typescript/weather.md
         - "@idfkit/weather/node": reference/typescript/weather-node.md

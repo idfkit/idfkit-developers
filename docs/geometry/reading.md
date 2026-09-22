@@ -119,6 +119,20 @@ search the document a second time to get it.
 Extraction raises only for a document it was not handed at all. Judging a model
 is [validation's](../how-to/collect-diagnostics.md) job; this reports.
 
+!!! warning "A coordinate that is not a number is not yet one of the four"
+    Measured against both libraries, on a model whose vertex field holds
+    `autosize` where a number belongs. Python raises `ValueError: could not
+    convert string to float`, which contradicts the paragraph above. TypeScript
+    does not raise and does something worse: it reports the surface as resolved
+    with `NaN` coordinates, and because the resolution mixes axes, one bad
+    coordinate leaves `scene.bounds` `NaN` in two axes for the whole model, so a
+    consumer framing a view gets nothing and is told nothing.
+
+    Neither is the documented answer, which is an entry in `unresolved`. The
+    four reasons above do not include one for this, and adding a fifth is a
+    registered concept in both languages rather than a local fix, so it is
+    recorded here until it is decided.
+
 ## What was not read
 
 Not every way of stating geometry is read yet. The simplified surface family
@@ -175,6 +189,16 @@ nothing again.
 Prefer the scene unless you specifically want the model changed. Everything
 above is available from a document you are not allowed to edit; this is not.
 
+!!! warning "It cannot make a mixed model consistent"
+    `translate_to_world` rewrites only the five detailed vertex types, and it
+    zeroes `Building.north_axis` when it is done. An object stated in the
+    simplified surface family, and `Daylighting:ReferencePoint`, carries its own
+    coordinate-system field, is not read, and is not rewritten. In a model that
+    holds both, those objects keep the coordinates the author wrote while the
+    declaration they were written against is removed from underneath them. The
+    scene reports such types in `unattempted` instead of editing the document,
+    and is the right tool there.
+
 Until idfkit 1.0.0-rc.6 this function carried a resolution rule of its own and
 disagreed with both the engine and the renderer. It now resolves through the
 scene, so the two cannot drift apart again. Models it draws differently than
@@ -185,3 +209,5 @@ before are listed in the library's changelog.
 - [What parity means](../explanation/parity.md) for how availability is
   recorded and where this capability stands
 - [Geometry API reference](../api/geometry.md) for the Python surface in full
+- [`@idfkit/geometry`](../reference/typescript/geometry.md) for the TypeScript
+  surface in full
