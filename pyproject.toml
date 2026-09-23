@@ -20,7 +20,7 @@ version = "0.0.0"
 description = "The unified idfkit documentation site"
 requires-python = ">=3.12"
 dependencies = [
-    "idfkit==1.0.0-rc.4",
+    "idfkit==1.0.0-rc.6",
 ]
 
 [tool.uv]
@@ -88,7 +88,7 @@ level = "docs-2026.5"
 # four weather-browser files out of the same one. Pinning it is what keeps the reference and the
 # assets on a page describing the same version of the library.
 [tool.idfkit.library]
-level = "1.0.0-rc.4"
+level = "1.0.0-rc.6"
 
 [tool.pyright]
 pythonVersion = "3.12"
