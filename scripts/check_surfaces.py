@@ -103,7 +103,17 @@ PUBLISHED_NAME = {"python": "idfkit", "javascript": "@idfkit/idfkit"}
 #: The unscoped npm name the registry refused. Still read as an instruction for this library, so a
 #: page that goes on teaching `npm install idfkit` is caught rather than silently skipped.
 REFUSED_NPM_NAME = "idfkit"
-SCOPED = frozenset({"@idfkit/core", "@idfkit/schemas", "@idfkit/weather", "@idfkit/language"})
+#: The scoped packages the register governs. A name absent here is not read as an instruction for
+#: this library at all, so a page teaching it is skipped rather than held to the declared level.
+SCOPED = frozenset(
+    {
+        "@idfkit/core",
+        "@idfkit/schemas",
+        "@idfkit/weather",
+        "@idfkit/language",
+        "@idfkit/geometry",
+    }
+)
 
 
 # ---------------------------------------------------------------------------
