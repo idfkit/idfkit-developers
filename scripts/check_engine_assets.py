@@ -56,7 +56,13 @@ EAGER_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("static import", re.compile(r"^\s*import\s[^;\n]*['\"][^'\"]*@idfkit/engine", re.M)),
 )
 
-TEXT_SUFFIXES = frozenset({".html", ".js", ".css", ".mjs"})
+#: Text the site generates, exempt from the size rule above because their size is a fact about how
+#: much documentation there is rather than evidence of a stray binary. `.json` is here for the
+#: search index, which mkdocs writes from every page's text and which crossed LARGE_BINARY_BYTES
+#: when the scene module gained a reference page: 8.4 MB of prose, reported as a stray binary in
+#: the same output that reported zero WebAssembly files. Engine bytes cannot hide here, because
+#: BINARY_SUFFIXES catches `.wasm` and `.wat` at any size and the size rule is only a backstop.
+TEXT_SUFFIXES = frozenset({".html", ".js", ".css", ".mjs", ".json"})
 
 
 def hosted_binaries(site: Path) -> list[str]:
