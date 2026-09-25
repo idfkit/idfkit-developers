@@ -56,6 +56,7 @@ nav:
       - Save a file without reformatting it: how-to/preserve-formatting.md
       - Edit extensible groups: how-to/edit-extensible-groups.md
       - Compare two EnergyPlus versions: how-to/compare-versions.md
+      - Read a model's geometry: geometry/reading.md
     - In the browser:
       - Parse in the browser: how-to/parse-in-the-browser.md
       - Run a simulation in the browser: how-to/run-a-simulation-in-the-browser.md
@@ -152,6 +153,7 @@ nav:
       - TypeScript packages:
         - "@idfkit/core": reference/typescript/core.md
         - "@idfkit/core/node": reference/typescript/core-node.md
+        - "@idfkit/geometry": reference/typescript/geometry.md
         - "@idfkit/schemas": reference/typescript/schemas.md
         - "@idfkit/weather": reference/typescript/weather.md
         - "@idfkit/weather/node": reference/typescript/weather-node.md

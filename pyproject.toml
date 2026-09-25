@@ -65,7 +65,7 @@ dev = [
 # Conformance corpus level the site states, as an immutable tag in idfkit-conformance. The corpus
 # itself is the libraries' business; the site reports which level the pages describe.
 [tool.idfkit.conformance]
-level = "conformance-2026.12"
+level = "conformance-2026.15"
 
 # Governance artifact level the parity, naming and consumer pages are rendered from, as an immutable
 # tag in idfkit-conformance. Read by docs/hooks/parity_macro.py, scripts/render_parity_page.py,
@@ -73,14 +73,14 @@ level = "conformance-2026.12"
 # through the duplicated scripts/_governance_source.py. 2026.18 is the first tag carrying
 # governance/consumers.toml (feature 004); the consumer-register job in docs.yml pins the same tag.
 [tool.idfkit.governance]
-level = "governance-2026.20"
+level = "governance-2026.22"
 
 # Documentation artifact level the TypeScript half of the site renders from, as an immutable tag
 # in idfkit-js. It carries the TypeScript examples the pages include and the TypeDoc JSON the
 # TypeScript reference is generated from, published together so the two always describe the same
 # commit. Read by scripts/sync_js_artifacts.py and docs/hooks/typedoc_shim.py.
 [tool.idfkit.docs]
-level = "docs-2026.5"
+level = "docs-2026.6"
 
 # Library level the Python half of the site renders from, as an exact version on the package
 # index. New in feature 003. Two things read it, and they must agree: mkdocstrings generates the
