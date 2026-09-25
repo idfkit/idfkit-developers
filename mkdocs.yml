@@ -115,6 +115,7 @@ nav:
         - Schema: api/schema.md
         - Validation: api/validation.md
         - Geometry: api/geometry.md
+        - Scene: api/scene.md
         - Geometry Builders: api/geometry_builders.md
         - Surface Matching: api/surface_matching.md
         - Zoning: api/zoning.md
