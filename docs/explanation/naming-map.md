@@ -80,12 +80,12 @@ ledger, where permanent single-language capabilities are recorded as such.
 <!-- BEGIN GENERATED FROM naming.toml. Edit the register, not this page. -->
 
 Generated from
-[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.20/governance/naming.toml)
-at `governance-2026.20`, the governance tag this release pins. It governs `idfkit` and
-`@idfkit/core` and `@idfkit/weather` and `@idfkit/language`, and it is read at a pinned
-governance-YYYY.N tag of idfkit-conformance, never the default branch. Correct the
-register and regenerate; a correction made on this page would be overwritten, and it
-would never reach either library's naming gate.
+[`governance/naming.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.22/governance/naming.toml)
+at `governance-2026.22`, the governance tag this release pins. It governs `idfkit` and
+`@idfkit/core` and `@idfkit/geometry` and `@idfkit/weather` and `@idfkit/language`, and
+it is read at a pinned governance-YYYY.N tag of idfkit-conformance, never the default
+branch. Correct the register and regenerate; a correction made on this page would be
+overwritten, and it would never reach either library's naming gate.
 
 ## Guessing a name before you look it up
 
@@ -366,6 +366,18 @@ row marked divergent or excluded links to the entry that says why, and a cell re
 | ------- | ------ | ---------- | ---- |
 | a zone's floor area | `calculate_zone_floor_area` | `calculateZoneFloorArea` | aligned |
 | a zone's volume | `calculate_zone_volume` | `calculateZoneVolume` | aligned |
+
+### The scene description, registered before either language implements it { #map-the-scene-description-registered-before-either-language-implements-it }
+
+| Concept | Python | TypeScript | Kind |
+| ------- | ------ | ---------- | ---- |
+| a model's resolved geometry | `get_scene` | `getScene` | aligned |
+| the resolved scene | `Scene` | `Scene` | aligned |
+| a resolved surface | `ResolvedSurface` | `ResolvedSurface` | aligned |
+| the rules resolution applied | `AppliedRules` | `AppliedRules` | aligned |
+| the scene's extent | `SceneBounds` | `SceneBounds` | aligned |
+| a surface that could not be resolved | `UnresolvedObject` | `UnresolvedObject` | aligned |
+| a geometry type the reader did not attempt | `UnattemptedType` | `UnattemptedType` | aligned |
 
 ### Geometry authoring (registered ahead of the port) { #map-geometry-authoring-registered-ahead-of-the-port }
 
@@ -830,6 +842,18 @@ it rewrites relative surface coordinates in place and updates `GlobalGeometryRul
 is registered with the extraction group because every calculation below depends on
 knowing which coordinate system it is reading.
 
+The first language's implementation of this name is wrong and is corrected by the change
+that lands the scene description above. Measured against the engine's own surface vertex
+report over 17 models and 532 surfaces, it agrees on 5 of the 17, worst case 201.98 m.
+It applies the building rotation to each surface within its own zone frame, which leaves
+the zone layout unrotated so that the building is not rotated as a rigid body, and it
+collects a zone's surfaces through the reference graph, which fenestration never matches
+because a window references its parent wall rather than the zone.
+
+Recorded here rather than only in the library, because a reader meets this name at its
+definition and because the register presents this function and the read-only surface
+above as one capability.
+
 **a surface's tilt**
 
 Registered before it is written. Degrees, using the EnergyPlus convention.
@@ -1085,6 +1109,88 @@ like the rest of that group.
 **a zone's volume**
 
 Registered before it is written, with the geometry extraction group above.
+
+**a model's resolved geometry**
+
+Registered before it is written. Takes a document, returns the scene, modifies nothing.
+Follows the `get_*` to `get*` pairing of the geometry extraction group above, which the
+`a zone's surfaces` entry also cites.
+
+One argument and no options. A filter over the result is a list operation the caller
+already has, and a viewing option would put a viewing decision in a package that does
+not draw.
+
+**the resolved scene**
+
+Registered before it is written. Carries the resolved surfaces in document order, the
+extent, the rules resolution applied, the objects it could not resolve, and the object
+types it did not attempt.
+
+The last two are not diagnostics. A model whose geometry is stated in a form the reader
+does not handle must be distinguishable from a model with no geometry, and the
+difference between them is the difference between telling a reader their file is
+unsupported and telling them it is broken.
+
+**a resolved surface**
+
+Registered before it is written. One surface in the scene: its polygon in the resolved
+frame, its area, its outward normal, the address of the object it came from, the facts a
+reader classifies it by, and for fenestration the surface it sits on.
+
+Carries the canonical object type alongside the name, because a name is not unique
+across types and a consumer that must search the document by name to discover what its
+user selected has been handed a picture rather than a view of the model.
+
+Classification values drawn from an enumerated schema field are reported in the schema's
+spelling rather than the author's. EnergyPlus matches them without regard to case and
+models exercise that freely: across the example set of EnergyPlus 26.1.0 the four
+surface types appear under twelve spellings and the five fenestration types under nine,
+`GLASSDOOR` and `GlassDoor` among them. A value outside the enumeration passes through
+unchanged, because a category invented for it would tell the reader something the model
+does not say.
+
+Carries no colour, palette or visibility. The first language's viewing surface is
+registered separately as excluded, and that exclusion is terminal.
+
+**the rules resolution applied**
+
+Registered before it is written. The coordinate system, the vertex entry direction, the
+starting vertex position and the building rotation, each recorded as declared by the
+model or defaulted.
+
+The building rotation is recorded although it has already been applied to the vertices.
+That is what makes the choice reversible: the scene's numbers are the numbers the engine
+computes, so the oracle means what it says, and a consumer wanting to draw the building
+unrotated under a compass can undo it exactly rather than reimplementing the clause most
+easily got wrong.
+
+**the scene's extent**
+
+Registered before it is written. The smallest box enclosing every resolved vertex,
+absent rather than degenerate when nothing resolved, so that a consumer does not frame
+an empty box at the origin.
+
+**a surface that could not be resolved**
+
+Registered before it is written. An object extraction attempted and could not place,
+with its type, its name and an enumerated reason.
+
+The reason is an enumeration rather than a message, so that a consumer can group on it
+and a reworded string does not change behaviour. The alternative this replaces is the
+first language's current habit of skipping such an object silently in three places,
+which is fine in a notebook and wrong everywhere else: a building drawn with a wall
+missing still looks like a building.
+
+**a geometry type the reader did not attempt**
+
+Registered before it is written. An object type present in the model that the reader
+does not read, with its count.
+
+This is the mechanism by which a deferral stays honest. The first slice of this port
+reads the detailed surface forms and not the simplified family; five of the example
+models state their geometry only in the simplified forms and hold no detailed surface at
+all. Without this entry those five report as empty, which tells a reader their file is
+broken rather than that this reader does not read it yet.
 
 **set the window to wall ratio**
 
@@ -3825,7 +3931,7 @@ one language under schedule pressure.
 | Capability | npm package | Subpath | Mirrors | Tier | Built |
 | ---------- | ----------- | ------- | ------- | ---- | ----- |
 | schedules | `@idfkit/schedules` | `@idfkit/idfkit/schedules` | `idfkit.schedules` | 2 | not yet |
-| geometry, geometry builders, surface matching, zoning | `@idfkit/geometry` | `@idfkit/idfkit/geometry` | `idfkit.geometry`, `idfkit.geometry_builders`, `idfkit.surface_matching`, `idfkit.zoning` | 2 | not yet |
+| geometry, geometry builders, surface matching, zoning | `@idfkit/geometry` | `@idfkit/idfkit/geometry` | `idfkit.geometry`, `idfkit.geometry_builders`, `idfkit.surface_matching`, `idfkit.zoning` | 2 | yes |
 
 ## What the gate refuses
 

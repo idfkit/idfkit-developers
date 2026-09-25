@@ -46,7 +46,7 @@ of the other language. For the parity side of the same governance, see
 
 <!-- BEGIN GENERATED FROM consumers.toml. Edit the register, not this page. -->
 
-Generated from [`governance/consumers.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.20/governance/consumers.toml) at `governance-2026.20`, the governance tag this
+Generated from [`governance/consumers.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.22/governance/consumers.toml) at `governance-2026.22`, the governance tag this
 release pins. Correct the register and regenerate; a correction made on this page would be
 overwritten, and it would never reach a consumer's self-check.
 

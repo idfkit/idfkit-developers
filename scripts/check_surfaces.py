@@ -105,15 +105,13 @@ PUBLISHED_NAME = {"python": "idfkit", "javascript": "@idfkit/idfkit"}
 REFUSED_NPM_NAME = "idfkit"
 #: The scoped packages the register governs. A name absent here is not read as an instruction for
 #: this library at all, so a page teaching it is skipped rather than held to the declared level.
-SCOPED = frozenset(
-    {
-        "@idfkit/core",
-        "@idfkit/schemas",
-        "@idfkit/weather",
-        "@idfkit/language",
-        "@idfkit/geometry",
-    }
-)
+SCOPED = frozenset({
+    "@idfkit/core",
+    "@idfkit/schemas",
+    "@idfkit/weather",
+    "@idfkit/language",
+    "@idfkit/geometry",
+})
 
 
 # ---------------------------------------------------------------------------

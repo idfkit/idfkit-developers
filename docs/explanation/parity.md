@@ -79,8 +79,8 @@ Ids get added and deprecated. They do not get renamed.
 <!-- BEGIN GENERATED FROM parity.toml. Edit the ledger, not this page. -->
 
 Generated from
-[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.20/governance/parity.toml)
-at `governance-2026.20`, the governance tag this release pins. Correct the ledger and
+[`governance/parity.toml`](https://github.com/idfkit/idfkit-conformance/blob/governance-2026.22/governance/parity.toml)
+at `governance-2026.22`, the governance tag this release pins. Correct the ledger and
 regenerate; a correction made on this page would be overwritten, and it would never
 reach either library's CI gate.
 
@@ -92,10 +92,10 @@ permanent.
 
 | Availability | Python | JavaScript |
 | ------------ | ------ | ---------- |
-| complete | 31 | 17 |
-| partial | 1 | 2 |
-| absent, not yet | 0 | 12 |
-| absent, never | 3 | 4 |
+| complete | 31 | 16 |
+| partial | 1 | 3 |
+| absent, not yet | 0 | 11 |
+| absent, never | 3 | 5 |
 
 | Capability | Tier | Python | JavaScript |
 | ---------- | ---- | ------ | ---------- |
@@ -114,7 +114,7 @@ permanent.
 | [Declaring the conformance level a release passes](#conformance-declaration) | 1 | complete | complete |
 | [Geocoding a place name](#geocoding) | 1 | complete | complete |
 | [Formatting-preserving round-trip](#lossless-round-trip) | 2 | complete | complete |
-| [Reading geometry from a model](#geometry-extraction) | 2 | complete | absent (not yet) |
+| [Reading geometry from a model](#geometry-extraction) | 2 | complete | partial |
 | [Building and transforming geometry](#geometry-authoring) | 2 | complete | absent (not yet) |
 | [Intersecting and matching surfaces](#surface-matching) | 2 | complete | absent (not yet) |
 | [Generating zoned blocks from a footprint](#zoning) | 2 | complete | absent (not yet) |
@@ -129,7 +129,7 @@ permanent.
 | [Running a locally installed EnergyPlus and reading its results](#local-simulation) | permanent | complete | absent (never) |
 | [Running EnergyPlus in the browser](#browser-simulation) | permanent | absent (never) | complete |
 | [Rendering a model to a vector image](#svg-visualisation) | permanent | complete | absent (never) |
-| [Rendering a three-dimensional scene](#scene-rendering) | permanent | absent (never) | complete |
+| [Rendering a three-dimensional scene](#scene-rendering) | permanent | absent (never) | absent (never) |
 | [eppy compatibility surface](#eppy-compatibility) | permanent | complete | absent (never) |
 | [Caching retrieved weather files on disk](#weather-file-cache) | permanent | complete | absent (never) |
 | [Language service for IDF text](#idf-language-service) | permanent | absent (never) | complete |
@@ -417,12 +417,20 @@ code supports.
 
 ### Reading geometry from a model { #geometry-extraction }
 
-**Python** complete &middot; **JavaScript** absent (not yet) &middot; Tier 2 &middot; ledger id `geometry-extraction`
+**Python** complete &middot; **JavaScript** partial &middot; Tier 2 &middot; ledger id `geometry-extraction`
 
-!!! warning "Not in JavaScript yet"
+!!! info "What differs, and why"
 
-    A temporary gap, not a boundary. The port is tracked in
-    [idfkit-js#13](https://github.com/idfkit/idfkit-js/issues/13).
+    TypeScript carries the vector, the polygon and the resolved scene. `getScene` places every detailed
+    surface a model states and reports what it could not place and what it did not attempt, so a reader
+    who wants a model's geometry has it in both languages.
+
+    What it does not carry is the per-object calculation surface Python spells as free functions over an
+    IDF object: a zone's origin and its rotation, a surface's area, tilt and azimuth read from the
+    object rather than from a polygon, a zone's floor area, ceiling area, height and volume, and the
+    two-dimensional polygon predicates. Python's `translate_to_world` has no counterpart either, and
+    will not have the same one: it resolves by mutating the document, where `getScene` resolves into a
+    value and leaves the model alone.
 
 ??? note "Vocabulary this capability owns in the naming register"
 
@@ -437,6 +445,13 @@ code supports.
     - a surface's azimuth
     - a zone's floor area
     - a zone's volume
+    - a model's resolved geometry
+    - the resolved scene
+    - a resolved surface
+    - the rules resolution applied
+    - the scene's extent
+    - a surface that could not be resolved
+    - a geometry type the reader did not attempt
 
 ### Building and transforming geometry { #geometry-authoring }
 
@@ -683,18 +698,28 @@ two different mechanisms serving two different runtimes.
 
 ### Rendering a three-dimensional scene { #scene-rendering }
 
-**Python** absent (never) &middot; **JavaScript** complete &middot; Permanently single-language &middot; ledger id `scene-rendering`
+**Python** absent (never) &middot; **JavaScript** absent (never) &middot; Permanently single-language &middot; ledger id `scene-rendering`
 
-!!! abstract "JavaScript only, permanently"
+!!! abstract "Permanently absent"
 
-    Delivered by @idfkit/viewer, installed by its own name like the simulation engine, and NOT reachable
-    through the shared install name: no subpath, no dependency, no export-map entry, and no reserved
-    name in the naming register. A reader reaches it by installing it explicitly, and the documentation
-    says so rather than implying the facade carries it.
+    To be delivered by @idfkit/viewer, installed by its own name like the simulation engine, and NOT
+    reachable through the shared install name: no subpath, no dependency, no export-map entry, and no
+    reserved name in the naming register. A reader would reach it by installing it explicitly, and the
+    documentation says so rather than implying the facade carries it.
 
-    Python has no counterpart and is not getting one. A real-time interactive scene needs a rendering
-    context that a Python process does not have, and Python's static vector output is a different
-    mechanism serving a different workflow: see [`svg-visualisation`](#svg-visualisation). Neither is a gap in the other.
+    @idfkit/viewer DOES NOT EXIST. This row read `typescript = "complete"` until the change that landed
+    geometry extraction, and no such package is in `idfkit-js/packages`, published or unpublished. The
+    distinction matters more here than the word "unreachable" carries on its own: a reader meeting only
+    this row would otherwise conclude that a renderer is a `npm install` away, and a specification
+    waiting on one would be waiting on a claim rather than on a package. Nothing in feature 009 depends
+    on this row's value, and nothing waiting on a renderer may.
+
+    The single `absence_kind` covers two absences of different character, and the file has one field for
+    it. Python's absence is terminal: a real-time interactive scene needs a rendering context that a
+    Python process does not have, and Python's static vector output is a different mechanism serving a
+    different workflow, [`svg-visualisation`](#svg-visualisation). Neither is a gap in the other. TypeScript's absence is
+    merely present-tense, and the `never` this row carries is the one its tier already states: this
+    capability is not part of the shared surface in either language, whoever builds it and whenever.
 
 ### eppy compatibility surface { #eppy-compatibility }
 
