@@ -246,6 +246,11 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           branch: bump-idfkit-${{ steps.bump.outputs.version }}
+          # Only what this workflow writes. Every other checkout (the register under governance/) lives in
+          # the same tree, and without this list it is committed as a gitlink.
+          add-paths: |
+            pyproject.toml
+            uv.lock
           commit-message: "chore: build the site against idfkit ${{ steps.bump.outputs.version }}"
           title: "Build the site against idfkit ${{ steps.bump.outputs.version }}"
           draft: ${{ steps.statements.outputs.surfaced == 'true' }}
