@@ -41,7 +41,7 @@ That gives you, in both languages:
 
 - Loading and writing IDF and epJSON files
 - O(1) object lookups and reference tracking
-- Schema validation for all 17 supported EnergyPlus versions
+- Schema validation for all 18 supported EnergyPlus versions
 - Object and field introspection
 
 Beyond that the two diverge, because they run in different places. Python adds

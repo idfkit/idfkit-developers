@@ -13,14 +13,14 @@ architecture, so the browser bundle stores the same information differently.
 ## Most of a schema is the previous schema
 
 Object-type definitions barely change between EnergyPlus releases. `Zone` has
-not changed since 8.9. Across the 17 versions the bundle indexes 14,092
+not changed since 8.9. Across the 18 versions the bundle indexes 14,092
 type entries and finds only 2,568 distinct definitions behind them: 82% of what
-17 separate schemas would carry is a repeat of something already shipped.
+18 separate schemas would carry is a repeat of something already shipped.
 
 So the bundle stores each unique definition once, keyed by a hash of its
 content, and gives every version a manifest mapping type name to hash.
 
-|                                          | All 17 versions, gzipped |
+|                                          | All 18 versions, gzipped |
 | ---------------------------------------- | ------------------------ |
 | Raw epJSON schemas, as Python ships them | 11,915 KB                |
 | Slimmed (documentation metadata dropped) | 2,922 KB                 |

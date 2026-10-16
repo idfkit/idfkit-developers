@@ -84,7 +84,7 @@ uv run --group benchmark python benchmarks/bench_eso.py --eso path/to/eplusout.e
 
 | Tool | Versions | Schema format |
 |---|---|---|
-| **idfkit** | 8.9 -- 26.1 | epJSON schema (bundled, gzip-compressed) |
+| **idfkit** | 8.9 -- 26.2 | epJSON schema (bundled, gzip-compressed) |
 | **eppy** | 1.1 -- 9.2 (bundled IDD); any version with external IDD | IDD file |
 | **opyplus** | 8.0 -- 9.6, 22.1 -- 24.1 | IDD file (bundled) |
 | **idd-idf-utilities** | any version up to ~23.2 (IDD parser breaks on 24.1+) | IDD file (external) |

@@ -35,7 +35,7 @@ records the capability as [complete in TypeScript and partial in
 Python](parity.md#generated-object-types). Two things differ.
 
 **Coverage.** The Python stub set is generated one EnergyPlus version at a time
-and currently ships for 26.1.0 only, so a model loaded at 9.4 gets 26.1 field
+and currently ships for 26.2.0 only, so a model loaded at 9.4 gets 26.2 field
 names and choice lists in the editor. The TypeScript maps are emitted per
 version and chosen by the caller, so an older model is typed as that older model
 or left untyped, never mistyped.

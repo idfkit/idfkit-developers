@@ -43,7 +43,7 @@ language you work in.
   field name becomes a compile error, in TypeScript.
 - [Why accessors and not a `Proxy`](accessors-not-proxies.md): why
   `zone.ceiling_height` is a real property, in TypeScript.
-- [Content-addressed schemas](content-addressed-schemas.md): how 17 versions of
+- [Content-addressed schemas](content-addressed-schemas.md): how 18 versions of
   the schema fit in about 1 MB for the browser.
 
 ## How work gets done and where it happens

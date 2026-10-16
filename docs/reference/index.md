@@ -12,7 +12,7 @@ Pages that describe one language only say so.
 
 ## Versions and schema data
 
-- [Supported EnergyPlus versions](versions.md): the 17 releases both libraries
+- [Supported EnergyPlus versions](versions.md): the 18 releases both libraries
   bundle, how the version written in a file is matched to one of them, and
   which releases have generated static types.
 - [Slim schema format](slim-schema-format.md): the reduced schema form

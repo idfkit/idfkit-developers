@@ -1,6 +1,6 @@
 # How to compare two EnergyPlus versions
 
-Both libraries carry every schema from 8.9.0 to 26.1.0, so "what changed
+Both libraries carry every schema from 8.9.0 to 26.2.0, so "what changed
 between 9.4 and 26.1" is a question you can answer locally, without downloading
 anything and without opening two 10 MB schema documents side by side.
 
