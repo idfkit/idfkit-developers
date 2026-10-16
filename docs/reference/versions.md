@@ -1,7 +1,7 @@
 # Supported EnergyPlus versions
 
-Both libraries bundle schemas for the same 17 EnergyPlus releases, 8.9.0
-through 26.1.0. 8.9.0 is the first release to publish an epJSON schema. Every
+Both libraries bundle schemas for the same 18 EnergyPlus releases, 8.9.0
+through 26.2.0. 8.9.0 is the first release to publish an epJSON schema. Every
 release ships inside the package: there is no per-version install and no build
 step to select one.
 
@@ -14,7 +14,7 @@ step to select one.
 | 9.3        | `9.3.0`    | 25.1       | `25.1.0`   |
 | 9.4        | `9.4.0`    | 25.2       | `25.2.0`   |
 | 9.5        | `9.5.0`    | 26.1       | `26.1.0`   |
-| 9.6        | `9.6.0`    |            |            |
+| 9.6        | `9.6.0`    | 26.2       | `26.2.0`   |
 | 22.1       | `22.1.0`   |            |            |
 | 22.2       | `22.2.0`   |            |            |
 
@@ -32,8 +32,8 @@ Both libraries expose the list, oldest first, and the newest entry on its own.
     ```python
     from idfkit import ENERGYPLUS_VERSIONS, LATEST_VERSION, version_string
 
-    len(ENERGYPLUS_VERSIONS)        # 17
-    version_string(LATEST_VERSION)  # '26.1.0'
+    len(ENERGYPLUS_VERSIONS)        # 18
+    version_string(LATEST_VERSION)  # '26.2.0'
     ```
 
     Versions are `(major, minor, patch)` tuples. The rest of the module is at
@@ -120,12 +120,12 @@ Sort on the numeric components, never on the version string. String order puts
 
 ## Static types cover fewer releases than schemas
 
-Schemas ship for all 17 releases. Generated static types do not, and what they
+Schemas ship for all 18 releases. Generated static types do not, and what they
 cover differs by language.
 
 | Language   | Releases with generated types | Delivery                                               |
 | ---------- | ----------------------------- | ------------------------------------------------------ |
-| Python     | 26.1.0                        | stubs bundled in `idfkit`, no install step             |
+| Python     | 26.2.0                        | stubs bundled in `idfkit`, no install step             |
 | TypeScript | 26.1.0 and 9.4.0              | `@idfkit/types-v26-1` and `@idfkit/types-v9-4`, opt-in |
 
 ```bash

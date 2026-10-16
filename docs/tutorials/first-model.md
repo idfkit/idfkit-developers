@@ -13,7 +13,7 @@ one column down the page.
 
 You need one of the two libraries and nothing else: no EnergyPlus, no build
 step, no schema files to fetch. Both carry every supported EnergyPlus schema,
-8.9.0 through 26.1.0, so nothing is downloaded while you work.
+8.9.0 through 26.2.0, so nothing is downloaded while you work.
 
 Python installs from PyPI with `pip install idfkit`, and [How to install
 idfkit](../getting-started/installation.md) covers the extras and the supported

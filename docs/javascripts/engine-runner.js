@@ -41,7 +41,7 @@
   const ENGINE = 'https://cdn.jsdelivr.net/npm/@idfkit/engine@0.3.0/+esm';
   const CORE = 'https://cdn.jsdelivr.net/npm/@idfkit/core@0.1.0/+esm';
   const SCHEMAS = 'https://cdn.jsdelivr.net/npm/@idfkit/schemas@0.1.0/+esm';
-  const ASSETS = 'https://cdn.jsdelivr.net/npm/@idfkit/engine-assets@26.1';
+  const ASSETS = 'https://cdn.jsdelivr.net/npm/@idfkit/engine-assets@26.2';
 
   const SPECIFIERS = new Map([
     ['@idfkit/engine', ENGINE],
@@ -82,7 +82,7 @@
       const example = await import(/* webpackIgnore: true */ objectUrl);
 
       const { SchemaBundle, httpSource } = await import(/* webpackIgnore: true */ CORE);
-      const schema = await new SchemaBundle(httpSource(root.dataset.engineSchemas)).load('26.1.0');
+      const schema = await new SchemaBundle(httpSource(root.dataset.engineSchemas)).load('26.2.0');
 
       const epw = await fetch(root.dataset.engineWeather).then((r) => r.text());
       await example.run(schema, epw, ASSETS, say);

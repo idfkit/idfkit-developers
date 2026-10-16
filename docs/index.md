@@ -37,7 +37,7 @@ one vocabulary, one site.
 
 <span class="chip">:material-language-python: Python</span>
 <span class="chip">:material-language-typescript: TypeScript</span>
-<span class="chip">:material-history: v8.9 to v26.1, 17 versions</span>
+<span class="chip">:material-history: v8.9 to v26.2, 18 versions</span>
 <span class="chip">:material-speedometer: O(1) lookups</span>
 <span class="chip">:material-graph-outline: Reference tracking</span>
 <span class="chip">:material-file-swap-outline: IDF + epJSON</span>

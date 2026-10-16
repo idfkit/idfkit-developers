@@ -1,6 +1,6 @@
 # How to work across EnergyPlus versions
 
-idfkit supports 17 EnergyPlus releases, and their schemas disagree: object types
+idfkit supports 18 EnergyPlus releases, and their schemas disagree: object types
 come and go, and enumerated choice values are renamed under you. A viewer, a
 converter, or anything else that opens files it did not write cannot hard-code
 `26.1.0`, and code that runs against more than one release cannot assume the
@@ -365,7 +365,7 @@ for (obj_type, field), removed in diff.removed_choices.items():
 
 - [How to migrate models between EnergyPlus versions](../simulation/migrating-versions.md)
   for upgrading an existing model rather than checking one
-- [Supported versions](../reference/versions.md) for the 17 releases and how a
+- [Supported versions](../reference/versions.md) for the 18 releases and how a
   file's version is matched to a schema
 - [Content-addressed schemas](../explanation/content-addressed-schemas.md) for
   why holding several versions at once is cheap

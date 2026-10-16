@@ -22,17 +22,17 @@ EnergyPlus release, so nothing that the shared name installs may depend on them
 (FR-070).
 
 ```bash
-npm install @idfkit/engine @idfkit/engine-assets@26.1
+npm install @idfkit/engine @idfkit/engine-assets@26.2
 npx idfkit-engine-assets public/energyplus   # copy the WASM engine to your own origin
 ```
 
 `@idfkit/core` and `@idfkit/schemas` are separate and are what edits the model;
 add them if you have not already.
 
-!!! info "This engine executes EnergyPlus 26.1"
+!!! info "This engine executes EnergyPlus 26.2"
 
     `@idfkit/engine-assets` is versioned by the EnergyPlus release it carries,
-    so `@idfkit/engine-assets@26.1` runs **EnergyPlus 26.1** and nothing else. A
+    so `@idfkit/engine-assets@26.2` runs **EnergyPlus 26.2** and nothing else. A
     model written for another release has to be migrated before it will run
     here.
 
@@ -102,7 +102,7 @@ verbatim, so what you press is what you read.
 <div class="engine-runner"
      data-engine-example="../../snippets/js/how-to/run-a-simulation-in-the-browser/live_runner.js"
      data-engine-schemas="https://cdn.jsdelivr.net/npm/@idfkit/schemas@0.1.0/data/"
-     data-engine-weather="https://cdn.jsdelivr.net/npm/@idfkit/engine-assets@26.1/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw">
+     data-engine-weather="https://cdn.jsdelivr.net/npm/@idfkit/engine-assets@26.2/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw">
   <button class="md-button" type="button" data-engine-run>
     Run EnergyPlus in this tab
   </button>
