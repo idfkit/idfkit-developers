@@ -32,6 +32,14 @@ Fast simulation using only design day conditions:
 --8<-- "docs/snippets/simulation/running/design_day_only.py:example"
 ```
 
+A design-day-only run needs no weather file: the design days carry their own conditions. Some models still require one.
+
+1. A model with `GroundHeatTransfer:Slab` or `GroundHeatTransfer:Basement` objects whose preprocessor `GroundHeatTransfer:Control` enables is refused without a weather file, because those preprocessors derive ground temperatures from it.
+2. A model with `SizingPeriod:WeatherFileDays` or `SizingPeriod:WeatherFileConditionType` fails in EnergyPlus without a weather file, and the result reports the failure.
+3. A model with `Site:WaterMainsTemperature` using `CorrelationFromWeatherFile` runs, but EnergyPlus reports a severe error and uses a fixed mains temperature of 10 °C.
+
+A sizing-only model, whose `SimulationControl` requests no run period from the weather file, must be run as a design-day-only run.
+
 ### Annual Simulation
 
 Full-year simulation:
