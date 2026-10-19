@@ -24,7 +24,7 @@ Then point `httpSource` at it:
 ```
 
 `httpSource` fetches the gzipped files and inflates them with
-`DecompressionStream`, so the payload stays around 1 MB for all 18 versions. It
+`DecompressionStream`, so the payload stays about 1.2 MB for all 18 versions. It
 sniffs the gzip magic bytes first, so it works whether your host leaves
 `Content-Encoding` unset or maps the `.gz` extension to
 `Content-Encoding: gzip` (as Vite's dev server and nginx's `gzip_static` do),

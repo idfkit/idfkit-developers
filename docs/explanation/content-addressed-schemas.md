@@ -4,8 +4,8 @@
 the network. Python installs the same schemas from a wheel, one gzipped file per
 version, where their size is nobody's problem.*
 
-The raw epJSON schemas are about 10 MB each and there are 17 of them, roughly
-11.9 MB gzipped for the set. On a page load that number decides your
+The raw epJSON schemas are about 10 MB each and there are 18 of them, roughly
+12.3 MB gzipped for the set. On a page load that number decides your
 architecture, so the browser bundle stores the same information differently.
 
 {{ parity("schema-access") }}
@@ -13,8 +13,8 @@ architecture, so the browser bundle stores the same information differently.
 ## Most of a schema is the previous schema
 
 Object-type definitions barely change between EnergyPlus releases. `Zone` has
-not changed since 8.9. Across the 18 versions the bundle indexes 14,092
-type entries and finds only 2,568 distinct definitions behind them: 82% of what
+not changed since 8.9. Across the 18 versions the bundle indexes 14,972
+type entries and finds only 2,788 distinct definitions behind them: 81% of what
 18 separate schemas would carry is a repeat of something already shipped.
 
 So the bundle stores each unique definition once, keyed by a hash of its
@@ -22,9 +22,13 @@ content, and gives every version a manifest mapping type name to hash.
 
 |                                          | All 18 versions, gzipped |
 | ---------------------------------------- | ------------------------ |
-| Raw epJSON schemas, as Python ships them | 11,915 KB                |
-| Slimmed (documentation metadata dropped) | 2,922 KB                 |
-| Content-addressed                        | about 1,000 KB           |
+| Raw epJSON schemas, as Python ships them | 12,277 KB                |
+| Slimmed (documentation metadata dropped) | 3,028 KB                 |
+| Content-addressed                        | 1,189 KB                 |
+
+The content-addressed figure is what a parse loads: the index, the 18 manifests
+and the definitions. The prose pool, which only describing a type needs, adds
+173 KB.
 
 The two reductions are independent. Slimming keeps only what a parse needs and
 discards the documentation weight, which otherwise sits on the critical path of
