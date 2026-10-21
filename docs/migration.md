@@ -58,13 +58,15 @@ when one exists.
 | Save copy | `idf.savecopy(path)` | `doc.savecopy(path)` | `doc.savecopy(path)` |
 | Output type | `idf.outputtype = "compressed"` | `doc.save(output_type="compressed")` | -- |
 | Run simulation | `idf.run(weather)` | `simulate(doc, weather)` | `doc.run(weather)` |
-| Batch update | `json_functions.updateidf(idf, d)` | `doc.update(d)` | `doc.update(d)`[^update] |
+| Batch update | `json_functions.updateidf(idf, d)` | `obj.field = value`, per field | `doc.update(d)`[^update] |
 | HTML tables | `readhtml.titletable(html)` | `result.html.titletable()` | -- |
 | Window-wall ratio | `idf.set_wwr(0.4)` | `set_wwr(doc, 0.4)` | -- |
 | Match surfaces | `idf.intersect_match()` | `intersect_match(doc)` | -- |
 
 [^update]:
-    `doc.update(d)` runs, but a type checker cannot see it on `IDFDocument`.
+    `doc.update(d)` is part of the eppy compatibility surface; the native
+    form assigns fields on the object (see [Batch updates](#batch-updates)).
+    It runs, but a type checker cannot see it on `IDFDocument`.
     The document inherits a generated `TypedDict` so that `doc["Zone"]` resolves
     to a typed collection without an overload stack, and pyright synthesises
     `update` for every class in a `TypedDict` hierarchy, outranking any
@@ -230,10 +232,20 @@ Or use the standalone writer for more control:
 --8<-- "docs/snippets/migration/batch_updates.py:example"
 ```
 
-**idfkit** has this as a method on the document:
+**idfkit** keeps the same call as part of its eppy compatibility surface. It
+is `IDFDocument.update`, which takes `Type.Name.field` keys, and it exists so
+that eppy code runs unchanged:
 
 ```python
 --8<-- "docs/snippets/migration/batch_updates_2.py:example"
+```
+
+The native form fetches the object once and assigns its fields directly. Each
+assignment is checked against the schema, and a type checker sees the field
+names of the object type:
+
+```python
+--8<-- "docs/snippets/migration/batch_updates_3.py:example"
 ```
 
 ## Geometry
