@@ -15,27 +15,51 @@ name: deploy-docs
 # in idfkit, beside archive-retired-site.yml, which stayed there because it answers for the
 # retired host rather than for the site.
 #
-# IT DEPLOYS ON EVERY MERGE TO main, AND BY HAND.
+# IT DEPLOYS A RELEASE OF THIS REPOSITORY, NEVER A MERGE.
 #
-# It used to run only by hand, so what developers.idfkit.com served was whatever someone last
-# remembered to publish. The first run of scripts/check_surfaces.py (feature 004) found the live
-# site stating idfkit 1.0.0-rc.3 while this repository declared 1.0.0-rc.4: a page telling
-# readers it describes a level the repository had already moved off (004-FR-030, SC-011). A merge
-# to main is a reviewed change whose checks passed, so publishing it is what makes the served
-# level follow the declared one. workflow_dispatch stays for re-publishing without a change.
+# Publishing is a decision, taken when a run of reviewed edits is ready to be read together, rather
+# than a side effect of each merge. So the site publishes a `site-YYYY.N` release, cut from main, and
+# never main as it happens to stand (scripts/site_release.py names the tag). This does NOT make
+# main a safe place for a page that must not be read yet: any release publishes all of main, so such
+# a page stays a draft until what it depends on has shipped. Three triggers, one tag each:
+#
+#   release             a maintainer published a release: `make release`.
+#   workflow_call       release-on-level-change.yml cut one because a merge moved a pinned level.
+#                       It calls this workflow rather than relying on the release event, because a
+#                       release created with GITHUB_TOKEN triggers no workflow at all.
+#   workflow_dispatch   re-publish without a change. Takes a tag; default the latest release.
+#
+# WHY NOT BY HAND ALONE. This workflow used to run only by hand, so what developers.idfkit.com
+# served was whatever someone last remembered to publish. The first run of
+# scripts/check_surfaces.py (feature 004) found the live site stating idfkit 1.0.0-rc.3 while this
+# repository declared 1.0.0-rc.4: a page telling readers it describes a level the repository had
+# already moved off (004-FR-030, SC-011). Release-gating does not bring that back, because a merge
+# that moves a level releases itself (release-on-level-change.yml), and surfaces.yml checks daily
+# that the served level is the declared one.
+#
+# A tag that is not on main is refused. Publishing a branch would put pages on the site that no
+# review of main ever saw.
 #
 # One deploy at a time, and never cancelled: force_orphan replaces gh-pages whole, and a deploy
 # interrupted between building and pushing would leave the previous build in place, which is
-# safe, while two racing each other could leave the older one last.
+# safe, while two racing each other could leave the older one last. The concurrency group is on
+# the job rather than the workflow, so that it also holds when the workflow is called.
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      tag:
+        description: The site-YYYY.N release to publish.
+        required: true
+        type: string
   workflow_dispatch:
-
-concurrency:
-  group: deploy-docs
-  cancel-in-progress: false
+    inputs:
+      tag:
+        description: The site-YYYY.N release to publish. Leave empty for the latest release.
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -43,9 +67,43 @@ permissions:
 jobs:
   deploy-docs:
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-docs
+      cancel-in-progress: false
     steps:
-      - name: Check out
+      - name: Resolve the release to publish
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="$REQUESTED"
+          if [ -z "$tag" ]; then
+            tag="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)"
+          fi
+          if ! [[ "$tag" =~ ^site-[0-9]{4}\.[0-9]+$ ]]; then
+            echo "::error::'$tag' is not a site-YYYY.N release. The site publishes releases of this repository, nothing else."
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the release
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+
+      - name: The release is on main
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git fetch --quiet origin main
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "::error::$TAG is not on main. Cut site releases from main: make release."
+            exit 1
+          fi
 
       - name: The unreleased-library override is not set
         # 003-FR-023, the same assertion docs.yml makes. A published site built against a working

@@ -23,6 +23,7 @@ make docs        # serve at http://127.0.0.1:8000
 make docs-test   # one strict build, as CI does
 make check       # the quality gate
 make test        # pytest over tests/
+make release     # publish main to developers.idfkit.com as the next site-YYYY.N release
 ```
 
 Before committing: `make check && make docs-test`.
@@ -56,6 +57,17 @@ No `src/`. Nothing here is built as a distribution.
    land in the other in the same feature; a test compares them.
 6. **`docs/weather/browse/` is never committed.** It comes out of the installed library at build
    time.
+
+## Publishing
+
+**Merging to `main` does not publish.** `deploy-docs.yml` deploys a `site-YYYY.N` release of this
+repository, never a merge, so a run of edits goes out together when someone decides it should.
+Publish with `make release`, which tags `main` and lets the release event deploy it.
+
+A merge that moves any `[tool.idfkit.*] level` releases and deploys itself
+(`release-on-level-change.yml`), because `surfaces.yml` holds the live site to the library level on
+`main`. Every release publishes all of `main`, so **do not merge a page that must not be read yet**,
+such as one describing an unreleased library: leave it a draft until the bump it depends on lands.
 
 ## The four pinned levels
 
