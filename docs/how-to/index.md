@@ -27,6 +27,8 @@ exists in only one of them, the guide says so on its first screen.
   lists, and anything else that repeats
 - [How to compare two EnergyPlus versions](compare-versions.md): what changed
   between two releases, and whether a model survives the move
+- [How to type a model for its EnergyPlus version](type-a-model-for-its-version.md):
+  editor completion and type errors that match the file's release (Python)
 
 ## In the browser
 
