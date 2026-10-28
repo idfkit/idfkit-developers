@@ -16,7 +16,7 @@ Output is TTY-aware: coloured table on a terminal, TSV when piped, JSON with `--
 
 | Flag | Purpose |
 |------|---------|
-| `QUERY` | Free-text search across station name, city, and WMO |
+| `QUERY` | Free-text search across station name, city, and WMO; accepts `"City, ST"` and ignores accents |
 | `--wmo WMO` | Exact WMO station number lookup (e.g. `725300`) |
 | `--filename NAME` | Exact EPW filename or stem lookup |
 | `--near ADDRESS` | Geocode an address (Nominatim), then rank by distance |
