@@ -116,9 +116,9 @@ Rebuilds the bundled index from the regional KML files on climate.onebuilding.or
 | Code | Meaning |
 |------|---------|
 | `0` | Success (match found and printed/downloaded, or refresh completed) |
-| `1` | No stations matched the given filters |
+| `1` | No stations matched the given filters, including a `--near` address or `--nearby` IP that resolves to no place |
 | `2` | Usage error: invalid flag combination, non-TTY ambiguity |
-| `3` | Network failure: geocoding, download, or refresh could not reach upstream |
+| `3` | Network failure: geocoding, download, or refresh could not reach upstream, answered with an HTTP error, or returned an unreadable body |
 
 ## Full flag reference
 

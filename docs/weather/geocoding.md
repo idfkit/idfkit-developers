@@ -66,11 +66,18 @@ The geocoder accepts various address formats:
 
 ### Common Errors
 
-| Situation | Behavior |
-|-----------|----------|
-| Address not found | Raises `GeocodingError` |
-| Network error | Raises `GeocodingError` |
-| Rate limiting | Avoided — calls are serialized to ≤1 request/second |
+Every failure raises `GeocodingError`. Branch on its `kind`, never on the
+message, whose wording may change:
+
+| Situation | `kind` | Retry? |
+|-----------|--------|--------|
+| Address not found | `"not-found"` | No — a different query might match |
+| Network error, timeout, dropped connection | `"unreachable"` | Yes |
+| HTTP error from the service (`status` holds the code) | `"http"` | A `429` or `5xx` may clear |
+| A body that is not the service's JSON (captive portal, proxy) | `"invalid-response"` | After fixing the network |
+| Rate limiting | — | Avoided — calls are serialized to ≤1 request/second |
+
+The TypeScript `GeocodingError` carries the same `kind` values and `status`.
 
 ## Rate Limiting
 
@@ -145,8 +152,9 @@ are both configurable:
 ### Error Handling
 
 `detect_location()` raises [`GeocodingError`][idfkit.weather.geocode.GeocodingError]
-on any failure — network outage, ipapi.co rate limit, or an
-unlocatable IP (e.g. some VPNs):
+on any failure, with the same `kind` as `geocode()`: `"not-found"` for an
+unlocatable IP (e.g. some VPNs), `"http"` with `status` `429` for an ipapi.co
+rate limit, and `"unreachable"` for a network outage:
 
 ```python
 --8<-- "docs/snippets/weather/geocoding/detect_location_error_handling.py:example"
