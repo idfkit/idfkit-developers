@@ -73,6 +73,13 @@ docs-test: ## Test if documentation can be built without warnings or errors
 docs: ## Build and serve the documentation
 	@uv run mkdocs serve
 
+.PHONY: release
+release: ## Publish main to developers.idfkit.com as the next site-YYYY.N release
+	@git fetch --quiet --tags origin
+	@tag="$$(uv run python scripts/site_release.py next-tag)"; \
+	echo "🚀 Releasing main as $$tag"; \
+	gh release create "$$tag" --target main --title "$$tag" --generate-notes
+
 .PHONY: help
 help:
 	@uv run python -c "import re; \
