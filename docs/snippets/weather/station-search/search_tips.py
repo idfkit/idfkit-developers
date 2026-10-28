@@ -13,6 +13,10 @@ results = index.search("JFK")
 # WMO number
 results = index.search("725300")
 
-# Country + city
-results = index.search("London UK")
+# City + state or country code, as you would write an address
+results = index.search("Denver, CO")
+results = index.search("London, GBR")
+
+# Accents are optional either way
+results = index.search("Montréal")
 # --8<-- [end:example]

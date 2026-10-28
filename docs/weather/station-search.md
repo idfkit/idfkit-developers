@@ -51,6 +51,22 @@ Fuzzy text search across station names, cities, and WMO numbers:
       show_source: false
 
 
+### How a query is matched
+
+Matching is case- and accent-insensitive: `"Montréal"` finds Montreal and
+`"Tromsø"` finds Tromso. The query is split into words on whitespace, commas,
+semicolons, dots and hyphens, the same separators station names use, so
+`"St. Louis"` and `"Winston-Salem"` read like the names they target.
+
+A word equal to a station's state or country code narrows the match rather
+than having to appear in the station's name, so `"Denver, CO"` ranks Denver,
+Colorado first and `"London, GBR"` ranks the British Londons above the others.
+Any other word shorter than three letters has to be a whole word of the name,
+so the `"co"` in `"Golden, CO"` does not match Mbanza Congo or Columbus.
+
+The Python and TypeScript `StationIndex.search` follow the same rules and return
+the same stations with the same scores.
+
 ### Search Tips
 
 ```python
