@@ -50,6 +50,8 @@ language you work in.
 
 - [A synchronous core with async edges](sync-core-async-edge.md): why `parseIdf`
   takes a string and never a path, in TypeScript.
+- [Threads and free-threaded Python](threads-and-free-threading.md): what is
+  safe to share between threads, and what threads buy, in Python.
 - [Simulation architecture](../concepts/simulation-architecture.md): why
   simulations run in subprocesses on a copy of your model, in Python.
 - [Weather data pipeline](../concepts/weather-pipeline.md): how station search,

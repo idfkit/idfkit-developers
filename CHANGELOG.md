@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A how-to guide, *How to process many models in parallel*, and an explanation page, *Threads and
+  free-threaded Python*, covering which pool to use on each interpreter, what the Python library
+  makes safe to share between threads, and the measured scaling on free-threaded CPython 3.14.
+  The install guide gained a section on free-threaded Python.
 - The documentation site, moved from `idfkit/docs/` with its history intact, together with the
   seven scripts and the workflows that act on it.
 - A fourth pinned level, `[tool.idfkit.library]`, naming the exact `idfkit` version the Python
