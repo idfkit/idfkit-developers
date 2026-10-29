@@ -56,6 +56,7 @@ nav:
       - Save a file without reformatting it: how-to/preserve-formatting.md
       - Edit extensible groups: how-to/edit-extensible-groups.md
       - Compare two EnergyPlus versions: how-to/compare-versions.md
+      - Process many models in parallel: how-to/process-models-in-parallel.md
       - Read a model's geometry: geometry/reading.md
     - In the browser:
       - Parse in the browser: how-to/parse-in-the-browser.md
@@ -174,6 +175,7 @@ nav:
     - Why accessors and not a Proxy: explanation/accessors-not-proxies.md
     - Content-addressed schemas: explanation/content-addressed-schemas.md
     - A synchronous core with async edges: explanation/sync-core-async-edge.md
+    - Threads and free-threaded Python: explanation/threads-and-free-threading.md
     - Browser simulation: explanation/browser-simulation.md
     - A language service for IDF text: explanation/idf-language-service.md
     - What is not finished: explanation/what-is-not-finished.md

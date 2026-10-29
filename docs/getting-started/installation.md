@@ -133,6 +133,23 @@ pip install idfkit[s3]
 pip install idfkit[all]
 ```
 
+### Free-threaded Python
+
+idfkit installs on free-threaded CPython 3.14 (`python3.14t`) like on any other
+interpreter, and importing it leaves the GIL off:
+
+```bash
+uv python install 3.14t
+uv venv --python 3.14t
+uv pip install idfkit
+```
+
+Of the extras, only pandas before 3.0 turns the GIL back on when imported. With
+`idfkit[dataframes]`, install `pandas>=3` to keep it off. pandas 3 needs Python
+3.11 or later. See
+[Threads and free-threaded Python](../explanation/threads-and-free-threading.md)
+for what this buys.
+
 ## Generated types in TypeScript
 
 The base install is typed, but object types and field names are only as specific

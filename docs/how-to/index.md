@@ -27,6 +27,8 @@ exists in only one of them, the guide says so on its first screen.
   lists, and anything else that repeats
 - [How to compare two EnergyPlus versions](compare-versions.md): what changed
   between two releases, and whether a model survives the move
+- [How to process many models in parallel](process-models-in-parallel.md):
+  threads or processes, and how to share a model without corrupting it
 
 ## In the browser
 
