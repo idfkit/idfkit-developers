@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- The visual identity of idfkit at `identity-2026.1`: a fifth pinned level,
+- The visual identity of idfkit at `identity-2026.2`: a fifth pinned level,
   `[tool.idfkit.identity]`, the `material` derivation and the host files vendored under
   `docs/identity/`, the palette, stylesheets, mark and favicon read from them, the ownership line
   and the family links in the footer, the host's head tags on every page, and
