@@ -10,7 +10,7 @@ edit_uri: edit/main/docs/
 repo_name: idfkit/idfkit
 # The ownership line every idfkit host carries (008-FR-020), in the wording of the identity
 # roster. docs/overrides/partials/copyright.html renders it above the family links.
-copyright: An idfkit project. MIT License.
+copyright: An idfkit project.
 
 # The site is the four Diataxis kinds and nothing else.
 #
