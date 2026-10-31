@@ -2,16 +2,11 @@
 
 `docs/identity/` is vendored from idfkit-brand at `[tool.idfkit.identity] level` and served as the
 tag wrote it: `mkdocs.yml` links its stylesheets, pastes its palette, and points `theme.logo` and
-`theme.favicon` at its files. Three of its files cannot reach the page that way, because what they
+`theme.favicon` at its files. Two of its files cannot reach the page that way, because what they
 carry has to be inside the page's own markup or inside another plugin's configuration. This hook
 reads each one at build time and puts the result in `config.extra`, so that nothing under
 `docs/overrides/` or in `mkdocs.yml` restates a colour, a font or a path the derivation owns.
 
-    identity_logo    `material/logo.svg`, the mark drawn in `currentColor`. Material renders
-                     `theme.logo` as an `<img>`, and inside an image `currentColor` resolves to
-                     black, which is invisible on the navy header. `partials/logo.html` emits
-                     the markup inline instead, so the mark takes the header's foreground colour
-                     in both schemes.
     identity_head    `hosts/<host>/head.html`: the favicon set, both theme colours and the
                      social image. Its paths are relative to the host's root, and this site serves
                      the directory at `identity/hosts/<host>/` (the derivation contract lets a
@@ -70,10 +65,9 @@ def _rewrite_head(head: str, site_url: str, served: str) -> str:
 
 
 def on_config(config: Any) -> Any:
-    """Read the three fragments out of the vendored tree and hand them to the templates."""
+    """Read the two fragments out of the vendored tree and hand them to the templates."""
     identity = Path(config.docs_dir) / "identity"
     host, served = _served_directory(config.site_url or "")
-    config.extra["identity_logo"] = _read(identity / "material" / "logo.svg").strip()
     config.extra["identity_head"] = _rewrite_head(
         _read(identity / "hosts" / host / "head.html"), config.site_url, served
     ).strip()

@@ -299,9 +299,9 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-  # The mark and the tile, vendored. docs/overrides/partials/logo.html inlines the mark so that
-  # its currentColor takes the header's colour; theme.logo names the same file.
-  logo: identity/material/logo.svg
+  # The host's generated lockup and the tile, vendored. lockup.css (extra_css) paints the logo in the
+  # header's text colour and hides the site title the lockup replaces.
+  logo: identity/hosts/developers.idfkit.com/lockup.svg
   favicon: identity/material/favicon.svg
   icon:
     repo: fontawesome/brands/github
@@ -331,6 +331,7 @@ extra_javascript:
 extra_css:
   - identity/material/material.css
   - identity/material/fonts.css
+  - identity/hosts/developers.idfkit.com/lockup.css
   - stylesheets/extra.css
 
 markdown_extensions:
