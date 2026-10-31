@@ -6,18 +6,22 @@ and naming claims are read at a `governance-YYYY.N` tag, and both of those are i
 reader looking at the page. SC-023 says they should not be: someone comparing what the site says
 against what their installed copy does needs to know which copy the site is describing.
 
-So four values reach every template through `config.extra`:
+So five values reach every template through `config.extra`:
 
     conformance_level   the corpus level the Python library declares it passes (001-FR-024)
     governance_level    the tag the parity ledger and naming register were read at (001-FR-081)
     docs_level          the tag the TypeScript examples and reference came from (001-FR-062, -064)
     library_level       the exact idfkit version the Python reference was generated from, and the
                         weather browser's four files were copied out of (003-FR-025)
+    identity_level      the idfkit-brand tag the vendored docs/identity/ derivation was built at,
+                        which is the visual identity every page renders in (008-FR-020)
 
-`library_level` is the newest of the four and exists because of where this file now lives. While
-the site sat inside the Python library, the reference was generated from the checkout around it and
-there was nothing to pin: the version was whatever the working tree was. Outside it, the library is
-an input like the other three, and an input a page makes claims about has to be named.
+`library_level` exists because of where this file now lives. While the site sat inside the Python
+library, the reference was generated from the checkout around it and there was nothing to pin: the
+version was whatever the working tree was. Outside it, the library is an input like the other
+three, and an input a page makes claims about has to be named. `identity_level` is the newest: the
+colours, type and mark on every page are vendored from a tag of idfkit-brand, and the footer states
+which one.
 
 WHERE THEY COME FROM, AND WHY NOT FROM mkdocs.yml
 
@@ -51,6 +55,7 @@ _LEVELS: tuple[tuple[str, str, str], ...] = (
     ("governance_level", "governance", "IDFKIT_GOVERNANCE_LEVEL"),
     ("docs_level", "docs", "IDFKIT_DOCS_LEVEL"),
     ("library_level", "library", "IDFKIT_LIBRARY_LEVEL"),
+    ("identity_level", "identity", "IDFKIT_IDENTITY_LEVEL"),
 )
 
 

@@ -1,23 +1,29 @@
-{#- The levels this site was built from, on every page (001-FR-063, 001-SC-023).
+{#- The footer's three lines, on every page (008-FR-020, 001-FR-063, 001-SC-023).
 
-     Material renders this partial in the footer under the copyright line, so it reaches every
-     page without a per-page edit and without a plugin. The four values are put into
-     `config.extra` by docs/hooks/pinned_levels.py, which reads the one place each is declared;
-     nothing here restates a tag.
-
-     They are deliberately not presented as related to each other. A conformance level and a
-     governance level are separate series on one history, the docs level is a third, and the
-     library level is a fourth on a different scheme again (T167's finding: two of them were
-     already out of step and nothing said so). Showing them side by side with no arithmetic
-     between them is the honest rendering.
-
-     The library level joined them when the site moved out of the library (003-FR-025). It is the
-     one a reader is most likely to want, because it is the version the Python reference on the
-     page describes, so it comes first. -#}
+     1. The ownership line, from `copyright` in mkdocs.yml, which carries the roster's wording.
+     2. The family links, the seven hosts in the roster's order, with this one marked current. The
+        markup is that of docs/identity/material/footer.html with `aria-current` added; the
+        vendored file is not edited and this partial is where the consumer's copy lives.
+     3. The levels this site was built from. The five values are put into `config.extra` by
+        docs/hooks/pinned_levels.py, which reads the one place each is declared; nothing here
+        restates a tag. They are deliberately not presented as related to each other: the
+        conformance and governance levels are separate series on one history, the docs level a
+        third, the library level a fourth on a different scheme, and the identity level a fifth.
+        The library level comes first because it is the one a reader is most likely to want: the
+        version the Python reference on the page describes. -#}
 <div class="md-copyright">
   {% if config.copyright %}
-    <div class="md-copyright__highlight">{{ config.copyright }}</div>
+    <div class="md-copyright__highlight idfkit-ownership">{{ config.copyright }}</div>
   {% endif %}
+  <nav aria-label="idfkit" class="idfkit-family">
+    <a href="https://idfkit.com">idfkit</a>
+    <a href="https://developers.idfkit.com" aria-current="page">Developers</a>
+    <a href="https://docs.idfkit.com">EnergyPlus docs</a>
+    <a href="https://app.idfkit.com">Envelop</a>
+    <a href="https://mcp.idfkit.com">MCP</a>
+    <a href="https://shoebox.idfkit.com">Shoebox</a>
+    <a href="https://github.com/idfkit">GitHub</a>
+  </nav>
   <div class="md-copyright__levels">
     Built at
     <a href="https://pypi.org/project/idfkit/{{ config.extra.library_level }}/"
@@ -31,7 +37,10 @@
       {{ config.extra.governance_level }}</a>,
     <a href="https://github.com/idfkit/idfkit-js/releases/tag/{{ config.extra.docs_level }}"
        title="The tag the TypeScript examples and reference on this site came from">
-      {{ config.extra.docs_level }}</a>.
+      {{ config.extra.docs_level }}</a>,
+    <a href="https://github.com/idfkit/idfkit-brand/releases/tag/{{ config.extra.identity_level }}"
+       title="The idfkit-brand tag the visual identity on this site is vendored from">
+      {{ config.extra.identity_level }}</a>.
     <a href="{{ 'explanation/conformance/' | url }}">What these mean</a>.
   </div>
   {% if not config.extra.generator == false %}

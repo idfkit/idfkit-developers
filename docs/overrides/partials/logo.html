@@ -1,0 +1,8 @@
+{#- The mark, inline (008-FR-020).
+
+     Material renders `theme.logo` as an `<img>`, and the vendored mark is drawn in `currentColor`,
+     which inside an image is black: invisible on the navy header. The markup is emitted inline
+     instead, read out of docs/identity/material/logo.svg at build time by docs/hooks/identity.py,
+     so the mark takes the header's own foreground colour in both schemes. Nothing here restates
+     the mark; `theme.logo` in mkdocs.yml names the same file. -#}
+{{ config.extra.identity_logo }}

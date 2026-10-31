@@ -1,9 +1,18 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/idfkit/idfkit-brand/releases/download/identity-2026.1/mark-on-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/idfkit/idfkit-brand/releases/download/identity-2026.1/mark-on-light.svg">
+    <img alt="idfkit" width="72" src="https://github.com/idfkit/idfkit-brand/releases/download/identity-2026.1/tile.svg">
+  </picture>
+</p>
+
 # idfkit-developers
 
-[![Python release](https://img.shields.io/github/v/release/idfkit/idfkit?label=python%20release)](https://github.com/idfkit/idfkit/releases)
-[![TypeScript release](https://img.shields.io/github/v/release/idfkit/idfkit-js?filter=v*&label=typescript%20release)](https://github.com/idfkit/idfkit-js/releases)
-[![Docs build](https://img.shields.io/github/actions/workflow/status/idfkit/idfkit-developers/docs.yml?branch=main&label=docs)](https://github.com/idfkit/idfkit-developers/actions/workflows/docs.yml?query=branch%3Amain)
-[![License](https://img.shields.io/github/license/idfkit/idfkit-developers)](https://github.com/idfkit/idfkit-developers/blob/main/LICENSE)
+The unified idfkit documentation site, for Python and JavaScript alike.
+
+[idfkit](https://idfkit.com) · [Developers](https://developers.idfkit.com) · [EnergyPlus docs](https://docs.idfkit.com) · [Envelop](https://app.idfkit.com) · [MCP](https://mcp.idfkit.com) · [Shoebox](https://shoebox.idfkit.com) · [GitHub](https://github.com/idfkit)
+
+[![Docs build](https://img.shields.io/github/actions/workflow/status/idfkit/idfkit-developers/docs.yml?branch=main&label=docs)](https://github.com/idfkit/idfkit-developers/actions/workflows/docs.yml?query=branch%3Amain) [![License](https://img.shields.io/github/license/idfkit/idfkit-developers)](https://github.com/idfkit/idfkit-developers/blob/main/LICENSE)
 
 The source of <https://developers.idfkit.com>, the documentation site for idfkit in Python and
 in JavaScript.
@@ -37,10 +46,10 @@ make check       # the quality gate: page kinds, capabilities, vendored artifact
 job in `.github/workflows/docs.yml` proves it on every run by building from a scratch directory
 outside the checkout.
 
-## The four pinned levels
+## The five pinned levels
 
 Everything the site renders that it did not write itself is pinned to an immutable identifier in
-`pyproject.toml`, and the build refuses to start when it cannot state all four.
+`pyproject.toml`, and the build refuses to start when it cannot state all five.
 
 | Level | Points at | Gives the site |
 | ----- | --------- | -------------- |
@@ -48,14 +57,20 @@ Everything the site renders that it did not write itself is pinned to an immutab
 | `docs` | a `docs-YYYY.N` tag in `idfkit-js` | the TypeScript reference, and every TypeScript example |
 | `governance` | a `governance-YYYY.N` tag in `idfkit-conformance` | the parity notices and the naming map |
 | `conformance` | a `conformance-YYYY.N` tag in `idfkit-conformance` | the corpus level the pages describe |
+| `identity` | an `identity-YYYY.N` tag in `idfkit-brand` | the colours, type and mark of every page, vendored under `docs/identity/` |
 
-A reader can see all four on the site. That is not decoration: a page that says how something
+A reader can see all five on the site. That is not decoration: a page that says how something
 works is a claim about a version, and a claim about a version that does not name it is not
 checkable.
 
 Levels advance by pull request, opened automatically when either library releases. The site's own
 checks then decide whether the pages survive the new version. A red result means a page gets
 fixed, never that a check gets relaxed.
+
+The two libraries the site documents release on their own schedules:
+
+[![Python release](https://img.shields.io/github/v/release/idfkit/idfkit?label=python%20release)](https://github.com/idfkit/idfkit/releases)
+[![TypeScript release](https://img.shields.io/github/v/release/idfkit/idfkit-js?filter=v*&label=typescript%20release)](https://github.com/idfkit/idfkit-js/releases)
 
 ## Where things are not
 

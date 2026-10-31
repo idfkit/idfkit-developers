@@ -35,6 +35,7 @@ def _levels(monkeypatch: pytest.MonkeyPatch, library: str) -> SimpleNamespace:
         ("IDFKIT_GOVERNANCE_LEVEL", "governance-2026.1"),
         ("IDFKIT_DOCS_LEVEL", "docs-2026.1"),
         ("IDFKIT_LIBRARY_LEVEL", library),
+        ("IDFKIT_IDENTITY_LEVEL", "identity-2026.1"),
     ):
         monkeypatch.setenv(variable, value)
     monkeypatch.delenv("IDFKIT_LIBRARY_DIR", raising=False)
@@ -57,3 +58,19 @@ def test_the_unreleased_library_override_stands_aside(monkeypatch: pytest.Monkey
     config = _levels(monkeypatch, "0.0.1")
     monkeypatch.setenv("IDFKIT_LIBRARY_DIR", "/somewhere/idfkit")
     assert _hook().on_config(config).extra["library_level"] == "0.0.1"
+
+
+def test_the_identity_level_reaches_the_templates(monkeypatch: pytest.MonkeyPatch) -> None:
+    installed = metadata.version("idfkit")
+    config = _hook().on_config(_levels(monkeypatch, installed))
+    assert config.extra["identity_level"] == "identity-2026.1"
+
+
+def test_an_undeclared_identity_level_refuses_to_build(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """The fifth level is held to the same rule as the other four (008-T042): no pyproject.toml and
+    no environment override means no build, naming the missing declaration."""
+    config = _levels(monkeypatch, metadata.version("idfkit"))
+    monkeypatch.delenv("IDFKIT_IDENTITY_LEVEL")
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(SystemExit, match=r"\[tool\.idfkit\.identity\] level, or \$IDFKIT_IDENTITY_LEVEL"):
+        _hook().on_config(config)

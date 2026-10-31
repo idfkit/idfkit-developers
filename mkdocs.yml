@@ -8,7 +8,9 @@ site_description: EnergyPlus IDF and epJSON tooling for Python and TypeScript. O
 site_author: Samuel Letellier-Duchesne
 edit_uri: edit/main/docs/
 repo_name: idfkit/idfkit
-copyright: Maintained by <a href="https://samuelduchesne.github.io">samuelduchesne</a>.
+# The ownership line every idfkit host carries (008-FR-020), in the wording of the identity
+# roster. docs/overrides/partials/copyright.html renders it above the family links.
+copyright: An idfkit project. MIT License.
 
 # The site is the four Diataxis kinds and nothing else.
 #
@@ -201,11 +203,18 @@ hooks:
   # no Node toolchain (FR-058), and it patches griffe-typedoc, which cannot decode current TypeDoc
   # output unpatched. Both are documented workarounds with a stated end condition.
   - docs/hooks/typedoc_shim.py
-  # Puts the three pinned levels into config.extra so every page can state them (FR-063).
+  # Puts the five pinned levels into config.extra so every page can state them (FR-063).
   - docs/hooks/pinned_levels.py
+  # Reads the three vendored identity fragments that have to be inlined (the mark, the host's
+  # head.html, the social plugin's card options) out of docs/identity/ at build time, so that
+  # neither this file nor an override restates a colour the derivation owns (008-FR-020).
+  - docs/hooks/identity.py
 
 plugins:
   - search
+  # cards_layout_options is not written here: it comes from docs/identity/material/social.yml,
+  # handed to the plugin by docs/hooks/identity.py. This file is identity-bearing and carries
+  # no colour literal (touchpoint-check.md, assertion 4).
   - social
   - meta
   - tags
@@ -245,9 +254,9 @@ plugins:
 theme:
   name: material
   custom_dir: docs/overrides
-  font:
-    text: Inter
-    code: JetBrains Mono
+  # No Google Fonts: the two faces are self-hosted by identity/material/fonts.css, and
+  # identity/material/material.css sets --md-text-font and --md-code-font from the tokens.
+  font: false
   features:
     - announce.dismiss
     - content.action.edit
@@ -273,26 +282,31 @@ theme:
     - search.share
     - search.suggest
     - toc.follow
+  # The palette block of docs/identity/material/palette.yml, pasted as the derivation says: both
+  # schemes custom, their colours read from identity/material/material.css.
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: custom
-      accent: deep orange
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: custom
-      accent: deep orange
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  # The mark and the tile, vendored. docs/overrides/partials/logo.html inlines the mark so that
+  # its currentColor takes the header's colour; theme.logo names the same file.
+  logo: identity/material/logo.svg
+  favicon: identity/material/favicon.svg
   icon:
     repo: fontawesome/brands/github
     edit: material/pencil
     view: material/eye
-    logo: material/fire
 
 extra:
   social:
@@ -312,7 +326,11 @@ extra_javascript:
   # browser-simulation how-to is pressed; the file's header says why that is a hard rule.
   - javascripts/engine-runner.js
 
+# The vendored derivation first, then the site's own layout rules, which declare no colour,
+# font or easing literal and read them through the derivation's properties.
 extra_css:
+  - identity/material/material.css
+  - identity/material/fonts.css
   - stylesheets/extra.css
 
 markdown_extensions:
