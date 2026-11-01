@@ -68,7 +68,7 @@ dev = [
 # this key as the one place the level is declared, and the check fails when the two disagree.
 # Read by docs/hooks/pinned_levels.py for the footer's provenance line.
 [tool.idfkit.identity]
-level = "identity-2026.3"
+level = "identity-2026.4"
 
 # Conformance corpus level the site states, as an immutable tag in idfkit-conformance. The corpus
 # itself is the libraries' business; the site reports which level the pages describe.
