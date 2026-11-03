@@ -50,6 +50,14 @@
   font-weight: var(--idfkit-font-weight-semibold);
 }
 
+/* ===== Buttons in the dark scheme =====
+   The theme paints a button in its primary colour. The standard sets that to the header's navy, which is also the
+   dark page's ground, so a button would not show. A button takes the accent instead, hover included. */
+[data-md-color-scheme="slate"] .md-typeset .md-button {
+  --md-primary-fg-color: var(--md-accent-fg-color);
+  --md-primary-bg-color: var(--md-accent-bg-color);
+}
+
 /* ===== Feature grid cards ===== */
 .md-typeset .grid.cards > ul > li {
   border-radius: var(--idfkit-radius-md);
