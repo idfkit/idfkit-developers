@@ -5,9 +5,16 @@
      tab memory. Must stay in the head, ahead of the body script that restores tabs. #}
   {% include "partials/tab-axes.html" %}
 
+  {#- The favicon set, both theme colours and the social image of this host (008-FR-020):
+      docs/identity/hosts/developers.idfkit.com/head.html, read by docs/hooks/identity.py with its
+      host-root paths rewritten to where this site serves the directory. They arrive
+      site-root-relative and are made page-relative here with base_url, as the theme does for its
+      own assets, so the preview at a subpath resolves them too. The fragment carries its own
+      twitter:card tag. #}
+  {{ config.extra.identity_head | replace('href="identity/', 'href="' ~ base_url ~ '/identity/') }}
+
 {% if page %}
   <!-- Twitter Card defaults -->
-  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ page.meta.get('title', page.title) }} - idfkit">
   <meta name="twitter:description" content="{{ page.meta.get('description', config.site_description) }}">
 

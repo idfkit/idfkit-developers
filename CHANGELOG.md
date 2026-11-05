@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The visual identity of idfkit at `identity-2026.5`: a fifth pinned level,
+  `[tool.idfkit.identity]`, the `material` derivation and the host files vendored under
+  `docs/identity/`, the palette, stylesheets, mark and favicon read from them, the ownership line
+  and the family links in the footer, the host's head tags on every page, and
+  `check-identity.yml`, which holds the vendored bytes and the declaration to the tag.
+- The README header of the `site` kind: the mark, the roster's sentence, the family links and
+  the build and licence badges.
 - The documentation site, moved from `idfkit/docs/` with its history intact, together with the
   seven scripts and the workflows that act on it.
 - A fourth pinned level, `[tool.idfkit.library]`, naming the exact `idfkit` version the Python
@@ -21,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `docs/stylesheets/extra.css` holds layout rules only; every colour, font and easing comes from
+  the vendored derivation.
+- The site serves its two typefaces itself from `docs/identity/material/fonts/` and no longer
+  loads them from Google Fonts.
 - `docs/tape/` is real committed content rather than a symlink to a directory beside the site.
 - The mkdocstrings Python handler resolves the library from the installed distribution rather
   than from `src/`.

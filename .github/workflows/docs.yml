@@ -73,6 +73,7 @@ jobs:
       conformance: ${{ steps.pin.outputs.conformance }}
       docs: ${{ steps.pin.outputs.docs }}
       library: ${{ steps.pin.outputs.library }}
+      identity: ${{ steps.pin.outputs.identity }}
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -89,12 +90,13 @@ jobs:
 
           tool = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))["tool"]["idfkit"]
           print("governance=" + tool["governance"]["level"])
-          # The other three are for the portable build, which has no pyproject.toml to read them
-          # from. The site refuses to build without all four rather than render a page that
+          # The other four are for the portable build, which has no pyproject.toml to read them
+          # from. The site refuses to build without all five rather than render a page that
           # cannot say which levels it came from.
           print("conformance=" + tool["conformance"]["level"])
           print("docs=" + tool["docs"]["level"])
           print("library=" + tool["library"]["level"])
+          print("identity=" + tool["identity"]["level"])
           PY
           )
           echo "$level"
@@ -420,6 +422,7 @@ jobs:
           IDFKIT_CONFORMANCE_LEVEL: ${{ needs.pins.outputs.conformance }}
           IDFKIT_DOCS_LEVEL: ${{ needs.pins.outputs.docs }}
           IDFKIT_LIBRARY_LEVEL: ${{ needs.pins.outputs.library }}
+          IDFKIT_IDENTITY_LEVEL: ${{ needs.pins.outputs.identity }}
         run: |
           cd "$SCRATCH"
           "$SCRATCH/.venv/bin/mkdocs" build --strict
