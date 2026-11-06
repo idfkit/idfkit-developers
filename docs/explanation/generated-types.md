@@ -34,15 +34,19 @@ Both libraries generate types from the epJSON schema, and the parity ledger
 records the capability as [complete in TypeScript and partial in
 Python](parity.md#generated-object-types). Two things differ.
 
-**Coverage.** The Python stub set is generated one EnergyPlus version at a time
-and currently ships for 26.2.0 only, so a model loaded at 9.4 gets 26.2 field
-names and choice lists in the editor. The TypeScript maps are emitted per
-version and chosen by the caller, so an older model is typed as that older model
-or left untyped, never mistyped.
+**Coverage.** Both cover every supported release. The TypeScript maps are
+emitted per version and installed per version. The Python stubs carry every
+release in one set: the latest is what a document is typed as, and each older
+release has its own document type, `IDFDocumentV9_4` and so on, which a model is
+given with `as_version` after a run-time check of its version.
 
-**Application.** Python's stubs apply implicitly to every document. TypeScript's
-are opt-in by construction: an unparameterised document stays untyped, which is
-what version-generic code needs.
+**Application.** Python's stubs apply implicitly to every document, as the
+latest release; a model of an older one is typed as such only when the caller
+says so, and a model whose release the code does not know is typed with
+`AnyIDFDocument`, which offers what every release has. TypeScript's are opt-in
+by construction: an unparameterised document stays untyped, which is what
+version-generic code needs. See
+[how to type a model for its EnergyPlus version](../how-to/type-a-model-for-its-version.md).
 
 The runtime story differs on reads. Both libraries refuse a misspelled field
 name when you write one: Python raises `InvalidFieldError` and TypeScript

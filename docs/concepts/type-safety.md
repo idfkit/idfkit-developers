@@ -79,8 +79,14 @@ Hovering over `SpaceHVACZoneReturnMixer` in your IDE shows the docstring
 including "Since: 24.2.0", making it clear which minimum EnergyPlus version
 is required.
 
+A document is typed for the latest supported release unless you say
+otherwise. To type a model of an older release as that release, so the editor
+completes its field names and reports the object types it lacks, see
+[how to type a model for its EnergyPlus version](../how-to/type-a-model-for-its-version.md).
+
 ## See Also
 
+- [Type a model for its EnergyPlus version](../how-to/type-a-model-for-its-version.md) — types for an older release
 - [Version Compatibility](version-compatibility.md) — static linting for cross-version issues
 - [API Reference: Document](../api/document.md) — full `IDFDocument` API
 - [Build your first model](../tutorials/first-model.md) — build a model from scratch
