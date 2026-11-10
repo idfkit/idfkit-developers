@@ -181,7 +181,7 @@ Downloads](https://energyplus.net/downloads).
 
 | | Python | TypeScript |
 |---|---|---|
-| Runtime | Python 3.10 or later | Node 20 or later, or any modern browser |
+| Runtime | Python 3.10 or later, including the free-threaded build of 3.14 (`python3.14t`) | Node 20 or later, or any modern browser |
 | EnergyPlus | 8.9 or later, for simulation | not used |
 
 ## Install from source to contribute
