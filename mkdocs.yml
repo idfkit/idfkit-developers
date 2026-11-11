@@ -124,6 +124,7 @@ nav:
         - Zoning: api/zoning.md
         - References: api/references.md
         - HVAC Topology: api/hvac.md
+        - Model Graph: api/graph.md
         - Thermal: api/thermal.md
         - Visualization: api/visualization.md
         - Exceptions: api/exceptions.md
