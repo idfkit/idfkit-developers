@@ -107,7 +107,13 @@ Or using the eppy-compatible method:
 --8<-- "docs/snippets/migration/accessing_fields_2.py:example"
 ```
 
-Both styles resolve to the same underlying data.
+Both styles resolve to the same underlying data at run time. A type checker
+is stricter on a typed object, such as one from `doc["Zone"]["Office"]`: its
+class declares the snake_case names only, so pyright reports `zone.X_Origin`
+and `zone.x_orign` alike, though the first one runs. Objects reached through
+the eppy API (`doc.idfobjects["ZONE"]`, `doc.newidfobject(...)`,
+`doc.getobject(...)`) are untyped and accept either spelling, so eppy code
+type-checks as it is while you move it to snake_case.
 
 ## Reference tracking (new in idfkit)
 
