@@ -1130,10 +1130,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-fetch-weather-files-before-fanning-out" class="md-nav__link">
+  <a href="#4-fetch-weather-files-once-before-fanning-out" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Fetch weather files before fanning out
+        4. Fetch weather files once, before fanning out
       
     </span>
   </a>
@@ -5116,10 +5116,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-fetch-weather-files-before-fanning-out" class="md-nav__link">
+  <a href="#4-fetch-weather-files-once-before-fanning-out" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Fetch weather files before fanning out
+        4. Fetch weather files once, before fanning out
       
     </span>
   </a>
@@ -5293,8 +5293,8 @@ job before writing a thread pool.</p>
 </tr>
 <tr>
 <td>Download weather files or geocode addresses</td>
-<td>One thread, or a pool over distinct stations</td>
-<td>Geocoding is rate-limited to one request a second, so threads do not speed it up, and downloads of one station must not overlap (step 4).</td>
+<td>A pool over distinct stations; geocoding on one thread</td>
+<td>Downloads are network-bound, so threads help on any build. Geocoding is rate-limited to one request a second, so threads do not speed it up.</td>
 </tr>
 <tr>
 <td>Thousands of simulations, or more than one machine</td>
@@ -5336,9 +5336,9 @@ a document, and the last column is what to do with it.</p>
 <td>Leave each job's model unedited until the batch returns.</td>
 </tr>
 <tr>
-<td>Weather downloads of the same station</td>
-<td><strong>No</strong></td>
-<td>Download each station once before the threads start.</td>
+<td>One weather cache directory</td>
+<td>Yes</td>
+<td>Nothing for safety; download each station once first to save bandwidth (step 4).</td>
 </tr>
 </tbody>
 </table>
@@ -5406,23 +5406,25 @@ the reads included: a thread that reads while another writes is as unsafe as two
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="nb">list</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">add_zone</span><span class="p">,</span> <span class="p">[</span><span class="s2">"North"</span><span class="p">,</span> <span class="s2">"South"</span><span class="p">,</span> <span class="s2">"East"</span><span class="p">,</span> <span class="s2">"West"</span><span class="p">]))</span>
 </span></code></pre></div>
-<h2 id="4-fetch-weather-files-before-fanning-out">4. Fetch weather files before fanning out<a class="headerlink" href="#4-fetch-weather-files-before-fanning-out" title="Permanent link">&para;</a></h2>
-<p><code>WeatherDownloader.download</code> writes the archive and the extracted files in place, so two
-threads or processes downloading the same station at once can read a truncated file. Download
-each station once, then hand the paths to the pool:</p>
+<h2 id="4-fetch-weather-files-once-before-fanning-out">4. Fetch weather files once, before fanning out<a class="headerlink" href="#4-fetch-weather-files-once-before-fanning-out" title="Permanent link">&para;</a></h2>
+<p>Threads and processes can share one weather cache directory. <code>WeatherDownloader.download</code>
+writes every file to a temporary name and renames it into place, so a concurrent caller sees
+either nothing or the complete file. Two callers that miss the same station at the same moment
+both download it, though. When many jobs share a few stations, download each station once and
+hand the paths to the pool:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">idfkit.weather</span><span class="w"> </span><span class="kn">import</span> <span class="n">WeatherDownloader</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">downloader</span> <span class="o">=</span> <span class="n">WeatherDownloader</span><span class="p">()</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Download each station once, on one thread, before the parallel part starts.</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Download each station once, before the parallel part starts: safe to skip, but it saves bandwidth.</span>
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">files</span> <span class="o">=</span> <span class="p">{</span><span class="n">station</span><span class="o">.</span><span class="n">wmo</span><span class="p">:</span> <span class="n">downloader</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">station</span><span class="p">)</span> <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stations</span><span class="p">}</span>
 </span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
 </span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">epw_paths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">station</span><span class="p">:</span> <span class="n">files</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">wmo</span><span class="p">]</span><span class="o">.</span><span class="n">epw</span><span class="p">,</span> <span class="n">stations</span><span class="p">))</span>
 </span></code></pre></div>
-<p><code>simulate_batch</code> and <code>async_simulate_batch</code> need no such care: each job copies its model when it
+<p><code>simulate_batch</code> and <code>async_simulate_batch</code> need no extra care: each job copies its model when it
 starts, and the simulation cache commits each entry with an atomic rename. A job that has not
 started yet copies whatever its model holds by then, so do not edit a job's model until the
 batch returns.</p>

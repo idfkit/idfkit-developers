@@ -5430,16 +5430,17 @@ to a fresh run.</p>
 </ul>
 <p>No manual cache invalidation is needed in normal workflows.</p>
 <h2 id="parallel-safety">Parallel Safety<a class="headerlink" href="#parallel-safety" title="Permanent link">&para;</a></h2>
-<p>The simulation cache is <strong>thread-safe</strong> and <strong>process-safe</strong>:</p>
+<p>Both caches are <strong>thread-safe</strong> and <strong>process-safe</strong>:</p>
 <ul>
-<li>Each entry is written to a temporary directory and renamed into place in one step</li>
+<li>A simulation entry is written to a temporary directory and renamed into place in one step</li>
+<li>A weather file (the archive, each extracted file, the cleaned DDY) is written to a temporary
+  file and renamed into place, so a concurrent reader sees either nothing or the complete file</li>
 <li>Safe for concurrent <code>simulate_batch()</code> with a shared cache</li>
 <li>Multiple processes can share the same cache directory</li>
 </ul>
-<p>The weather cache is not. <code>WeatherDownloader.download</code> writes the archive and the extracted
-files in place, so two threads or processes downloading the same station at the same moment can
-read a truncated file. Download each station once before the parallel work starts, as
-<a href="../../how-to/use-threads/#4-fetch-weather-files-before-fanning-out">How to use idfkit from several threads</a>
+<p>Two callers that miss the same weather station at the same moment both download it. To save the
+bandwidth, download each station once before the parallel work starts, as
+<a href="../../how-to/use-threads/#4-fetch-weather-files-once-before-fanning-out">How to use idfkit from several threads</a>
 shows.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">idfkit.simulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">simulate_batch</span><span class="p">,</span> <span class="n">SimulationCache</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
