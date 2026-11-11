@@ -38,8 +38,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The Scythe integration example set two fields that do not exist, so it raised
-  `InvalidFieldError` on its first run: `Thermal_Resistance` on a `Material`, which has no such
-  field, and `Watts_per_Zone_Floor_Area` on `Lights`, the name before EnergyPlus added Spaces. It
-  now sets `thermal_resistance` on the `Material:NoMass` insulation layer and
-  `watts_per_floor_area` on `Lights`, in snake_case throughout.
+- The Scythe integration example raised `InvalidFieldError` on an EnergyPlus 24.2 model, the
+  version its Docker image runs: it set `Thermal_Resistance` on a `Material`, which has no such
+  field, and `Watts_per_Zone_Floor_Area` on `Lights`, a name EnergyPlus replaced in 24.1. It now
+  sets `thermal_resistance` on the `Material:NoMass` insulation layer, and raises when the model
+  has none rather than leaving every run unchanged. It also sets `watts_per_floor_area` on
+  `Lights` together with the `Watts/Area` calculation method, without which EnergyPlus ignores
+  the value. The R-value input now starts at 0.001, the smallest `thermal_resistance`
+  EnergyPlus accepts.
