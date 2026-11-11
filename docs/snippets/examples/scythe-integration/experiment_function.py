@@ -39,13 +39,14 @@ def simulate_building(input_spec: BuildingSimInput, tempdir: Path) -> BuildingSi
     # Load the base IDF model (FileReference resolves to a local path)
     model = load_idf(input_spec.idf_file)
 
-    # Apply parametric overrides
-    for material in model["Material"]:
-        if "wall_insulation" in material.Name.lower():
-            material.Thermal_Resistance = input_spec.r_value
+    # Apply parametric overrides. The insulation layer is a Material:NoMass,
+    # which takes its R-value directly (Material is set by thickness and conductivity).
+    for material in model["Material:NoMass"]:
+        if "wall_insulation" in material.name.lower():
+            material.thermal_resistance = input_spec.r_value
 
     for lights in model["Lights"]:
-        lights.Watts_per_Zone_Floor_Area = input_spec.lpd
+        lights.watts_per_floor_area = input_spec.lpd
 
     for thermostat in model["ThermostatSetpoint:DualSetpoint"]:
         # Adjust cooling setpoint schedule

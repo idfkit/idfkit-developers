@@ -35,3 +35,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs/tape/` is real committed content rather than a symlink to a directory beside the site.
 - The mkdocstrings Python handler resolves the library from the installed distribution rather
   than from `src/`.
+
+### Fixed
+
+- The Scythe integration example set two fields that do not exist, so it raised
+  `InvalidFieldError` on its first run: `Thermal_Resistance` on a `Material`, which has no such
+  field, and `Watts_per_Zone_Floor_Area` on `Lights`, the name before EnergyPlus added Spaces. It
+  now sets `thermal_resistance` on the `Material:NoMass` insulation layer and
+  `watts_per_floor_area` on `Lights`, in snake_case throughout.
