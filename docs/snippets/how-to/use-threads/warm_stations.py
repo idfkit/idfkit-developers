@@ -10,7 +10,7 @@ from idfkit.weather import WeatherDownloader
 
 downloader = WeatherDownloader()
 
-# Download each station once, on one thread, before the parallel part starts.
+# Download each station once, before the parallel part starts: safe to skip, but it saves bandwidth.
 files = {station.wmo: downloader.download(station) for station in stations}
 
 with ThreadPoolExecutor() as pool:

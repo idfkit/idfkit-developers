@@ -26,7 +26,7 @@ job before writing a thread pool.
 | Serve many requests from one base model (a web API, a desktop app) | Threads sharing a read-only base model, one copy per request | Loading once and copying per request is far cheaper than loading per request. See [the web-service example](#a-web-service-that-shares-one-base-model). |
 | Load, validate, transform or write many models, CPU-bound, on a free-threaded build | A thread pool | Threads run in parallel without pickling models between processes. |
 | The same CPU-bound work on a regular build | A process pool | The GIL lets only one thread run Python at a time, so threads would not be faster. |
-| Download weather files or geocode addresses | One thread, or a pool over distinct stations | Geocoding is rate-limited to one request a second, so threads do not speed it up, and downloads of one station must not overlap (step 4). |
+| Download weather files or geocode addresses | A pool over distinct stations; geocoding on one thread | Downloads are network-bound, so threads help on any build. Geocoding is rate-limited to one request a second, so threads do not speed it up. |
 | Thousands of simulations, or more than one machine | A task queue or a distributed runner | One machine's cores are the limit. See [campaigns beyond one machine](#campaigns-beyond-one-machine). |
 
 ## 1. Decide what each thread may touch
@@ -40,7 +40,7 @@ a document, and the last column is what to do with it.
 | One document that no thread changes | Yes | Nothing, as long as it stays unchanged for as long as the threads read it. |
 | One document that some thread changes | **No** | Give each thread a `doc.copy()`, or guard every access with one lock. |
 | A batch of simulation jobs | Yes | Leave each job's model unedited until the batch returns. |
-| Weather downloads of the same station | **No** | Download each station once before the threads start. |
+| One weather cache directory | Yes | Nothing for safety; download each station once first to save bandwidth (step 4). |
 
 Reading includes writing a file (`write_idf`, `write_epjson`), validating, copying, following
 references (`get_referencing`), attribute reads, and evaluating schedules. Changing includes
@@ -83,17 +83,19 @@ the reads included: a thread that reads while another writes is as unsafe as two
 --8<-- "docs/snippets/how-to/use-threads/lock.py:example"
 ```
 
-## 4. Fetch weather files before fanning out
+## 4. Fetch weather files once, before fanning out
 
-`WeatherDownloader.download` writes the archive and the extracted files in place, so two
-threads or processes downloading the same station at once can read a truncated file. Download
-each station once, then hand the paths to the pool:
+Threads and processes can share one weather cache directory. `WeatherDownloader.download`
+writes every file to a temporary name and renames it into place, so a concurrent caller sees
+either nothing or the complete file. Two callers that miss the same station at the same moment
+both download it, though. When many jobs share a few stations, download each station once and
+hand the paths to the pool:
 
 ```python
 --8<-- "docs/snippets/how-to/use-threads/warm_stations.py:example"
 ```
 
-`simulate_batch` and `async_simulate_batch` need no such care: each job copies its model when it
+`simulate_batch` and `async_simulate_batch` need no extra care: each job copies its model when it
 starts, and the simulation cache commits each entry with an atomic rename. A job that has not
 started yet copies whatever its model holds by then, so do not edit a job's model until the
 batch returns.

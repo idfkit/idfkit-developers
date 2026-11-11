@@ -127,16 +127,17 @@ No manual cache invalidation is needed in normal workflows.
 
 ## Parallel Safety
 
-The simulation cache is **thread-safe** and **process-safe**:
+Both caches are **thread-safe** and **process-safe**:
 
-- Each entry is written to a temporary directory and renamed into place in one step
+- A simulation entry is written to a temporary directory and renamed into place in one step
+- A weather file (the archive, each extracted file, the cleaned DDY) is written to a temporary
+  file and renamed into place, so a concurrent reader sees either nothing or the complete file
 - Safe for concurrent `simulate_batch()` with a shared cache
 - Multiple processes can share the same cache directory
 
-The weather cache is not. `WeatherDownloader.download` writes the archive and the extracted
-files in place, so two threads or processes downloading the same station at the same moment can
-read a truncated file. Download each station once before the parallel work starts, as
-[How to use idfkit from several threads](../how-to/use-threads.md#4-fetch-weather-files-before-fanning-out)
+Two callers that miss the same weather station at the same moment both download it. To save the
+bandwidth, download each station once before the parallel work starts, as
+[How to use idfkit from several threads](../how-to/use-threads.md#4-fetch-weather-files-once-before-fanning-out)
 shows.
 
 ```python
