@@ -40,7 +40,7 @@ a document, and the last column is what to do with it.
 | One document that no thread changes | Yes | Nothing, as long as it stays unchanged for as long as the threads read it. |
 | One document that some thread changes | **No** | Give each thread a `doc.copy()`, or guard every access with one lock. |
 | A batch of simulation jobs | Yes | Leave each job's model unedited until the batch returns. |
-| One weather cache directory | Yes | Nothing for safety; download each station once first to save bandwidth (step 4). |
+| One weather cache directory | Yes | Do not call `clear_cache()` while others use it. Download each station once first to save bandwidth across processes (step 4). |
 
 Reading includes writing a file (`write_idf`, `write_epjson`), validating, copying, following
 references (`get_referencing`), attribute reads, and evaluating schedules. Changing includes
@@ -85,11 +85,12 @@ the reads included: a thread that reads while another writes is as unsafe as two
 
 ## 4. Fetch weather files once, before fanning out
 
-Threads and processes can share one weather cache directory. `WeatherDownloader.download`
-writes every file to a temporary name and renames it into place, so a concurrent caller sees
-either nothing or the complete file. Two callers that miss the same station at the same moment
-both download it, though. When many jobs share a few stations, download each station once and
-hand the paths to the pool:
+Threads and processes can share one weather cache directory, station index included. Every
+file in it is written under a temporary name and renamed into place, so a concurrent caller sees
+either nothing or the complete file. Threads of one process download a station once, but
+separate processes that miss the same station at the same moment each download it. When many
+jobs in several processes share a few stations, download each station once and hand the paths
+to the pool:
 
 ```python
 --8<-- "docs/snippets/how-to/use-threads/warm_stations.py:example"
