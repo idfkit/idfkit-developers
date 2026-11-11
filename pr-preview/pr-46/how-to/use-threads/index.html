@@ -5338,7 +5338,7 @@ a document, and the last column is what to do with it.</p>
 <tr>
 <td>One weather cache directory</td>
 <td>Yes</td>
-<td>Nothing for safety; download each station once first to save bandwidth (step 4).</td>
+<td>Do not call <code>clear_cache()</code> while others use it. Download each station once first to save bandwidth across processes (step 4).</td>
 </tr>
 </tbody>
 </table>
@@ -5407,11 +5407,12 @@ the reads included: a thread that reads while another writes is as unsafe as two
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="nb">list</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">add_zone</span><span class="p">,</span> <span class="p">[</span><span class="s2">"North"</span><span class="p">,</span> <span class="s2">"South"</span><span class="p">,</span> <span class="s2">"East"</span><span class="p">,</span> <span class="s2">"West"</span><span class="p">]))</span>
 </span></code></pre></div>
 <h2 id="4-fetch-weather-files-once-before-fanning-out">4. Fetch weather files once, before fanning out<a class="headerlink" href="#4-fetch-weather-files-once-before-fanning-out" title="Permanent link">&para;</a></h2>
-<p>Threads and processes can share one weather cache directory. <code>WeatherDownloader.download</code>
-writes every file to a temporary name and renames it into place, so a concurrent caller sees
-either nothing or the complete file. Two callers that miss the same station at the same moment
-both download it, though. When many jobs share a few stations, download each station once and
-hand the paths to the pool:</p>
+<p>Threads and processes can share one weather cache directory, station index included. Every
+file in it is written under a temporary name and renamed into place, so a concurrent caller sees
+either nothing or the complete file. Threads of one process download a station once, but
+separate processes that miss the same station at the same moment each download it. When many
+jobs in several processes share a few stations, download each station once and hand the paths
+to the pool:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">idfkit.weather</span><span class="w"> </span><span class="kn">import</span> <span class="n">WeatherDownloader</span>
