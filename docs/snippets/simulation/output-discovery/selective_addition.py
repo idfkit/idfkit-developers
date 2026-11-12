@@ -12,7 +12,8 @@ matches = variables.search("Heating")
 # Filter to specific ones
 selected = [v for v in matches if "Coil" in v.name]
 
-# Add to model (name is optional for Output:Variable)
+# Add to model. Output:Variable has no Name field, so pass no name:
+# a name raises InvalidFieldError. Its first field is key_value.
 for var in selected:
     model.add(
         "Output:Variable",

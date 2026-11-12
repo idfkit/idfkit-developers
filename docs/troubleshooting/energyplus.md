@@ -219,7 +219,7 @@ If `get_timeseries()` returns `None`:
 
 3. Verify the output was requested:
    ```python
-   # Add output request (name is optional for Output:Variable)
+   # Output:Variable has no Name field: pass no name (one raises InvalidFieldError)
    model.add(
        "Output:Variable",
        key_value="*",

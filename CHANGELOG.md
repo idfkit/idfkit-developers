@@ -28,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The pages describe what idfkit has done since 1.2.0. Typed objects now reject undeclared field
+  names at type-check time, including eppy-style capitalised spellings and field names from
+  EnergyPlus versions before 26.2. `add()` now refuses unknown keys and malformed extensible
+  groups, and a name on a type with no Name field. These are covered in the type-safety concept,
+  the generated-types and epJSON field-name explanations, the extensible-groups how-to, the
+  common-errors page, and the `Output:Variable` examples.
 - `docs/stylesheets/extra.css` holds layout rules only; every colour, font and easing comes from
   the vendored derivation.
 - The site serves its two typefaces itself from `docs/identity/material/fonts/` and no longer
