@@ -1,7 +1,7 @@
 .PHONY: install
 install: ## Install the virtual environment and install the pre-commit hooks
 	@if [ ! -d .git ]; then \
-		echo "❌ Error: Not a git repository. Run 'git init -b main' first (see README step 1)."; \
+		echo "❌ Error: Not a git repository. Clone the repository with git, or run 'git init -b main' first."; \
 		exit 1; \
 	fi
 	@echo "🚀 Creating virtual environment using uv"
@@ -71,6 +71,7 @@ docs-test: ## Test if documentation can be built without warnings or errors
 
 .PHONY: docs
 docs: ## Build and serve the documentation
+	@uv run python scripts/copy_shipped_assets.py
 	@uv run mkdocs serve
 
 .PHONY: release

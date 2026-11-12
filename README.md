@@ -25,10 +25,10 @@ the same standing over it.
 ## What is here
 
 ```text
-docs/       the site: ~580 authored pages, the mkdocs hooks, the templates and overrides
+docs/       the site: 114 pages (111 Markdown, 3 notebooks), the mkdocs hooks, the templates and overrides
 mkdocs.yml  the site's configuration
-scripts/    the seven that act on the site, plus the duplicated governance reader
-tests/      covers scripts/
+scripts/    twelve that build, check, render and release the site, plus the duplicated governance reader
+tests/      covers scripts/ and the parity and pinned-level hooks under docs/hooks/
 ```
 
 There is no `src/`. This repository publishes a site, not a package.
@@ -37,14 +37,23 @@ There is no `src/`. This repository publishes a site, not a package.
 
 ```bash
 make install     # create the virtual environment and install the pre-commit hooks
-make docs        # build and serve the site at http://127.0.0.1:8000
+make docs        # copy the weather-browser files, then build and serve the site at http://127.0.0.1:8000
 make docs-test   # build once, with --strict, exactly as CI does
-make check       # the quality gate: page kinds, capabilities, vendored artifacts, lint, types
+make check       # the quality gate, listed below
 ```
 
-`make docs-test` needs nothing beside this repository. That is the point, and the `portable`
-job in `.github/workflows/docs.yml` proves it on every run by building from a scratch directory
-outside the checkout.
+`make check` runs the page-kind and capability-declaration checks, the engine-asset check (only
+when a built `site/` exists), the vendored TypeScript artifacts against the `docs` level, the
+duplicated governance reader against idfkit's, the parity, naming and consumer pages against the
+`governance` level, lock-file consistency, pre-commit on all files, and pyright.
+
+A build needs an `idfkit-conformance` checkout besides this repository. Every page that carries a
+`{{ parity("id") }}` token is rendered from `governance/parity.toml`, read with `git show` at the
+pinned `governance` tag, and `docs/hooks/parity_ledger.py` finds the checkout through
+`IDFKIT_CONFORMANCE_DIR` or as a sibling directory named `idfkit-conformance`. The `portable` job
+in `.github/workflows/docs.yml` builds from a scratch directory outside the checkout, with only
+that conformance checkout and the toolchain exported from `uv.lock` beside it, which proves the
+documentation tree needs nothing else from this repository.
 
 ## The five pinned levels
 
@@ -55,7 +64,7 @@ Everything the site renders that it did not write itself is pinned to an immutab
 | ----- | --------- | -------------- |
 | `library` | an exact `idfkit` version on PyPI | the Python reference, and the four weather-browser files |
 | `docs` | a `docs-YYYY.N` tag in `idfkit-js` | the TypeScript reference, and every TypeScript example |
-| `governance` | a `governance-YYYY.N` tag in `idfkit-conformance` | the parity notices and the naming map |
+| `governance` | a `governance-YYYY.N` tag in `idfkit-conformance` | the parity notices, the parity page, the naming map and the consumer page |
 | `conformance` | a `conformance-YYYY.N` tag in `idfkit-conformance` | the corpus level the pages describe |
 | `identity` | an `identity-YYYY.N` tag in `idfkit-brand` | the colours, type and mark of every page, vendored under `docs/identity/` |
 
@@ -63,8 +72,9 @@ A reader can see all five on the site. That is not decoration: a page that says 
 works is a claim about a version, and a claim about a version that does not name it is not
 checkable.
 
-Levels advance by pull request, opened automatically when either library releases. The site's own
-checks then decide whether the pages survive the new version. A red result means a page gets
+Levels advance by pull request. Two are opened automatically when a library releases:
+`bump-idfkit.yml` advances `library` and `bump-docs-level.yml` advances `docs`. The `governance`,
+`conformance` and `identity` levels are advanced by a maintainer. The site's own checks then decide whether the pages survive the new version. A red result means a page gets
 fixed, never that a check gets relaxed.
 
 The two libraries the site documents release on their own schedules:
