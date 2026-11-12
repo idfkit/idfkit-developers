@@ -44,6 +44,8 @@ from a demand inlet to a zone, then one per path from a zone to the demand outle
 | T010 | A branch lists nodes the component does not have | error |
 | T011 | Consecutive branch components do not connect | error |
 | T030 | An outlet a branch carries that nothing takes | warning |
+| T012 | A branch a loop side's splitter or mixer names that its BranchList omits, or a listed branch no splitter feeds | warning |
+| T013 | A heating or cooling coil on a PlantLoop's supply side, or a boiler on its demand side | warning |
 | T090 | An object type with node fields but no connection rule | info |
 | T091 | A template system is present; its topology is not covered | info |
 
