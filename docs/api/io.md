@@ -7,9 +7,12 @@ Functions and classes for reading and writing EnergyPlus models in IDF
 
 Top-level convenience functions:
 
-- `load_idf(path, version=None, *, strict_parsing=True, strict=False, preserve_formatting=False)` for IDF files. Strict parsing
+- `load_idf(path, version=None, *, strict_parsing=True, strict=True, preserve_formatting=False)` for IDF files. Strict parsing
   is on by default.
-- `load_epjson(path, version=None, *, strict=False, preserve_formatting=False)` for epJSON files.
+- `load_epjson(path, version=None, *, strict=True, preserve_formatting=False)` for epJSON files.
+
+`strict` governs field access on the loaded objects: an unknown field name raises `InvalidFieldError`, or returns `None`
+with `strict=False`.
 
 ::: idfkit.load_idf
 

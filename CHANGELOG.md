@@ -38,6 +38,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The I/O API page gave `strict=False` as the default of `load_idf()` and `load_epjson()`; it is
+  `strict=True`.
+- The installation page, the common-errors page and the sizing-workflow notebook offered an
+  `idfkit[weather]` extra that does not exist, and the installation page left out `async-s3`. They
+  now list the extras `pyproject.toml` declares, with `pandas` ahead of its alias `dataframes`.
 - The Scythe integration example raised `InvalidFieldError` on an EnergyPlus 24.2 model, the
   version its Docker image runs: it set `Thermal_Resistance` on a `Material`, which has no such
   field, and `Watts_per_Zone_Floor_Area` on `Lights`, a name EnergyPlus replaced in 24.1. It now
