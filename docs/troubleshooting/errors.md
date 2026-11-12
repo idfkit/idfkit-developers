@@ -127,12 +127,12 @@ Common extras:
 
 | Feature | Install Command |
 |---------|-----------------|
-| DataFrames | `pip install idfkit[dataframes]` |
+| DataFrames | `pip install idfkit[pandas]` |
 | Plotting (matplotlib) | `pip install idfkit[plot]` |
 | Plotting (plotly) | `pip install idfkit[plotly]` |
 | Progress bars (tqdm) | `pip install idfkit[progress]` |
 | S3 Storage | `pip install idfkit[s3]` |
-| Weather refresh | `pip install idfkit[weather]` |
+| Async S3 Storage | `pip install idfkit[async-s3]` |
 
 ### boto3 Not Found
 

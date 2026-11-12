@@ -97,10 +97,12 @@ Python's optional features are extras on the one package.
 Convert simulation results to pandas DataFrames:
 
 ```bash
-pip install idfkit[dataframes]
+pip install idfkit[pandas]
 # or
-uv add idfkit[dataframes]
+uv add idfkit[pandas]
 ```
+
+`idfkit[dataframes]` is an alias of `pandas`, kept for older install lines.
 
 ### Plotting
 
@@ -124,14 +126,20 @@ pip install idfkit[progress]
 Store simulation results in Amazon S3:
 
 ```bash
-pip install idfkit[s3]
+pip install idfkit[s3]        # boto3, for S3FileSystem
+pip install idfkit[async-s3]  # aiobotocore, for AsyncS3FileSystem
 ```
+
+`idfkit[cloud]` is an alias of `s3`.
 
 ### Everything at once
 
 ```bash
 pip install idfkit[all]
 ```
+
+This installs pandas, matplotlib, plotly, boto3, aiobotocore and tqdm. Weather
+search and download need no extra.
 
 ## Generated types in TypeScript
 
