@@ -168,6 +168,46 @@ pip install idfkit[s3]
    people_obj.zone_name = "Correct_Zone_Name"
    ```
 
+### `add()` Refused: Unknown Field
+
+```
+InvalidFieldError: add() of object type 'Zone' refused; nothing was added:
+  - X Origin: unknown (spell it 'x_origin')
+```
+
+**Cause:** A keyword given to `add()` is not a field of the object type.
+`validate=False` skips value, required-field and range checks, but not field
+names, so this is raised either way.
+
+**Solutions:**
+
+1. Use the snake_case schema key the message suggests: `x_origin`, not `"X Origin"`.
+2. Pass the object's name as the `name` argument, not inside `fields`.
+3. For a type with no Name field, such as `Output:Variable` or `Output:Meter`,
+   pass no name and give its first field instead, as the message says:
+   ```python
+   model.add("Output:Meter", key_name="Electricity:Facility", reporting_frequency="Hourly")
+   ```
+
+### `add()` Refused: Malformed Extensible Group
+
+```
+TypeError: add() of object type 'Output:Table:SummaryReports' refused; nothing was added:
+  - reports: wrapper-value (expected dict, ExtensibleGroup, or kwargs; got str)
+```
+
+**Cause:** An extensible group was given as something other than a list of
+dicts, such as a string, a list of tuples or another object's live view, or a
+group used a key the group does not define.
+
+**Solution:** Pass a list of dicts keyed by the group's field names. Copy another
+object's groups with `.as_list()`:
+
+```python
+model.add("Output:Table:SummaryReports", reports=[{"report_name": "AllSummary"}])
+model.add("BuildingSurface:Detailed", "Wall 2", ..., vertices=wall.vertices.as_list())
+```
+
 ### Required Field Missing
 
 ```

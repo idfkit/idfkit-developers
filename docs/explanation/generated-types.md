@@ -36,7 +36,10 @@ Python](parity.md#generated-object-types). Two things differ.
 
 **Coverage.** The Python stub set is generated one EnergyPlus version at a time
 and currently ships for 26.2.0 only, so a model loaded at 9.4 gets 26.2 field
-names and choice lists in the editor. The TypeScript maps are emitted per
+names and choice lists in the editor. A field name that the older version has
+and 26.2 does not is a type error on that model's typed objects, although it
+works at run time; reach it with item access (`lights["watts_per_zone_floor_area"]`)
+or `getattr`. The TypeScript maps are emitted per
 version and chosen by the caller, so an older model is typed as that older model
 or left untyped, never mistyped.
 
@@ -50,6 +53,12 @@ throws `"celing_height" is not a field of Zone`. Reading is where they part. In
 Python's strict mode, which is the default, reading `zone.celing_height` raises
 as well. In TypeScript a name with no accessor behind it is simply `undefined`,
 and nothing distinguishes a typo from a field the file left unset.
+
+Before run time, both catch the typo by default where the types apply. In
+TypeScript that takes the type map passed to the document. In Python a typed
+object, one taken from `doc["Zone"]`, turns `zone.celing_height` into a type
+error, read or written; a plain `IDFObject` from `add()` or `get_collection()`
+accepts any name.
 Parameterizing the document turns that read into a compile error, which is the
 practical argument for passing the `TypeMap` even in a codebase that is
 otherwise loosely typed.
