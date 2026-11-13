@@ -41,9 +41,9 @@ permissions:
 
 jobs:
   rehearse:
-    uses: idfkit/idfkit-conformance/.github/workflows/rehearse.yml@governance-2026.20
+    uses: idfkit/idfkit-conformance/.github/workflows/rehearse.yml@governance-2026.32
     with:
-      governance_level: governance-2026.20
+      governance_level: governance-2026.32
       consumer: idfkit-developers
       library: ${{ inputs.library }}
       candidate_ref: ${{ inputs.candidate_ref }}
