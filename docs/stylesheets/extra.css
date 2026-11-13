@@ -178,3 +178,20 @@
   font-size: 0.8rem;
   color: var(--md-default-fg-color--light);
 }
+
+/* ===== Header: one "Go to repository" link per library =====
+   Material sizes the header's source slot for one link (11.7rem). partials/source.html puts the
+   idfkit and idfkit-js links side by side in it, each keeping the theme's own width. */
+@media screen and (min-width: 60em) {
+  .md-header__source {
+    display: flex;
+    gap: 0.8rem;
+    width: auto;
+    max-width: none;
+  }
+
+  .md-header__source > .md-source {
+    width: 9.5rem;
+    min-width: 0;
+  }
+}
