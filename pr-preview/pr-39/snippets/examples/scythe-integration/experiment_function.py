@@ -10,7 +10,7 @@ from scythe.utils.filesys import FileReference
 
 
 class BuildingSimInput(ExperimentInputSpec):
-    r_value: float = Field(default=..., ge=0, le=15)
+    r_value: float = Field(default=..., ge=0.001, le=15)
     lpd: float = Field(default=..., ge=0, le=20)
     setpoint: float = Field(default=..., ge=18, le=30)
     economizer: Literal["NoEconomizer", "DifferentialDryBulb", "DifferentialEnthalpy"] = Field(default=...)
@@ -39,13 +39,20 @@ def simulate_building(input_spec: BuildingSimInput, tempdir: Path) -> BuildingSi
     # Load the base IDF model (FileReference resolves to a local path)
     model = load_idf(input_spec.idf_file)
 
-    # Apply parametric overrides
-    for material in model["Material"]:
-        if "wall_insulation" in material.Name.lower():
-            material.Thermal_Resistance = input_spec.r_value
+    # Apply parametric overrides. The insulation layer is a Material:NoMass,
+    # which takes its R-value directly (Material is set by thickness and conductivity).
+    insulation = [m for m in model["Material:NoMass"] if "wall_insulation" in m.name.lower()]
+    if not insulation:
+        msg = "No Material:NoMass named like 'wall_insulation' in the base model"
+        raise ValueError(msg)
+    for material in insulation:
+        material.thermal_resistance = input_spec.r_value
 
+    # Field names follow EnergyPlus 24.1 and later (the worker image below runs 24.2);
+    # up to 23.2 the Lights field is watts_per_zone_floor_area.
     for lights in model["Lights"]:
-        lights.Watts_per_Zone_Floor_Area = input_spec.lpd
+        lights.design_level_calculation_method = "Watts/Area"
+        lights.watts_per_floor_area = input_spec.lpd
 
     for thermostat in model["ThermostatSetpoint:DualSetpoint"]:
         # Adjust cooling setpoint schedule
