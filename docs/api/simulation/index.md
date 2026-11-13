@@ -22,6 +22,8 @@ The simulation module provides EnergyPlus execution and result parsing.
 | [`SimulationJob`](batch.md) | Job specification for batch runs |
 | [`BatchResult`](batch.md) | Aggregated batch results |
 | [`SQLResult`](sql.md) | SQL database query interface |
+| [`ResultIndex`](results.md#linking-results-to-the-model) | Simulation results linked to model objects |
+| [`classify_message()`](results.md#message-catalogue) | Classify an EnergyPlus message by kind |
 | [`SimulationCache`](cache.md) | Content-addressed result cache |
 | [`FileSystem`](fs.md) | Pluggable storage protocol |
 | [`S3FileSystem`](fs.md) | Amazon S3 storage backend |
