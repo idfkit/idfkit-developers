@@ -187,7 +187,10 @@ error: "IDFDocument[Literal[True]]" has no attribute "add"  [attr-defined]
 error: "IDFDocument[Literal[True]]" has no attribute "zones"  [attr-defined]
 ```
 
-The same happens for `get_collection` and `version`. Until that is fixed in
+The same happens for `get_collection` and `version`. mypy also misses an
+invalid value assigned to a field through a union of release types, such as
+`IDFDocumentV9_4 | IDFDocument`, although it reports the same value passed to
+`update()`. Until that is fixed in
 idfkit's stubs, pyright is the checker to rely on for idfkit code; if you keep
 mypy, silence `attr-defined` on those lines rather than for the whole project.
 

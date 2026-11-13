@@ -108,10 +108,17 @@ read and the value you may write have different types through
 --8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/changed_field.py:example"
 ```
 
-Do not treat the type you read as a closed list. Compare it with the values you
-handle and leave a branch for anything else; a `match` that ends in
-`assert_never` passes the checker only if the read type is narrower than what
-real files contain.
+Do not treat the type you read through `AnyIDFDocument` as a closed list.
+Compare it with the values you handle and leave a branch for anything else. A
+`match` that ends in `assert_never` cannot pass there, because the read type
+includes `str`:
+
+```text
+error: Argument of type "str" cannot be assigned to parameter "arg" of type "Never" in function "assert_never"
+```
+
+To handle every value exhaustively, restrict the function to releases whose
+choices are fixed; see [handle every value of a field](#handle-every-value-of-a-field).
 
 The checker is the only guard on writes. Assigning a value the model's release
 rejects does not raise at run time: a 9.4 document stores
@@ -162,6 +169,63 @@ error: Argument of type "IDFDocumentV9_4[bool]" cannot be assigned to parameter 
 
 A document typed for a range is still a document of some release, so it
 passes to every function that takes `AnyIDFDocument`.
+
+Writes through a range follow the same rule as through `AnyIDFDocument`:
+pyright accepts a value only if every release in the union accepts it. Through
+`IDFDocumentV9_4 | IDFDocument`, `heater_fuel_type = "NaturalGas"` passes, while
+`"DistrictHeatingWater"` is reported against 9.4's class and `"DistrictHeating"`
+against the latest:
+
+```text
+error: Cannot assign to attribute "heater_fuel_type" for class "WaterHeaterMixed_v9_3_to_v23_1"
+error: Cannot assign to attribute "heater_fuel_type" for class "WaterHeaterMixed"
+```
+
+mypy reports the same value passed to `update()`, but misses both assignments
+through a union of release types. If the project runs mypy, write changed
+fields in range code with `update()`.
+
+The annotation is a claim the checker holds callers to; nothing checks it when
+the code runs. To guard against a caller that passed an unchecked
+`load_idf` result of another release, narrow with `as_version` as in the next
+section.
+
+## Hand the caller's type back from a range function
+
+A function that returns the document it was given loses the caller's type if
+it is annotated with the union: pyright infers the whole union as the return
+type, and mypy, which does not infer return types, gives `Any`. Bind a
+`TypeVar` to the union instead:
+
+```python
+--8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/range_typevar.py:example"
+```
+
+`latest` is `IDFDocument[Literal[True]]` and `older` is `IDFDocumentV26_1[bool]`
+under pyright. A 9.4 document is still rejected, by both checkers:
+
+```text
+error: Argument of type "IDFDocumentV9_4[bool]" cannot be assigned to parameter "doc" of type "Since26_1@use_district_steam" in function "use_district_steam"
+error: Value of type variable "Since26_1" of "use_district_steam" cannot be "IDFDocumentV9_4[Any]"  [type-var]
+```
+
+The first line is pyright's, the second mypy's. `IDFDocumentV26_2` is
+`IDFDocument`, so a plain `load_idf` result passes without `as_version`.
+
+## Handle every value of a field
+
+Through a range in which every release lists the field's choices, the value
+reads as those choices, and a `match` over them can be checked as exhaustive.
+From 23.2 on, `heater_fuel_type` reads as twelve choices or `None`:
+
+```python
+--8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/exhaustive_range.py:example"
+```
+
+Leave a choice out and pyright names it at the `assert_never` call, for example
+`Argument of type "Literal['Propane']" cannot be assigned to parameter "arg" of
+type "Never"`. Add 9.4 to the range and the read type gains its own choices
+(`"DistrictHeating"`, `"Steam"`), which the `match` then has to handle too.
 
 ## Narrow a model of unknown release into a range
 

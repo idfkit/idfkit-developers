@@ -46,24 +46,38 @@ Through a release's type, everything is that release's: the object types, the
 field names, the value types and choices, the `update()` keywords, and the
 accessors such as `model.zones`.
 
+## Type a new document of an older release
+
+`new_document(version=...)` builds a model of that release, but the checker
+cannot see the argument, so the result is typed for the latest release like
+any other document. Wrap it in `as_version` when the code, a test fixture for
+example, should be checked against the older release:
+
+```python
+--8<-- "docs/snippets/how-to/type-a-model-for-its-version/new_document_for_a_release.py:example"
+```
+
 ## Handle one release differently inside general code
 
 A function that takes models of any release sometimes needs one release's
-names, for example a field that release spells differently. Check the version,
-then type the model for that release inside the branch:
+names, for example a field that release spells differently. `People`'s zone
+field was renamed in 9.6, so `AnyIDFDocument` offers neither name. Check the
+version, then type the model for that release inside the branch. `as_version`
+takes one release type, so each release before the rename gets its own branch:
 
 ```python
 --8<-- "docs/snippets/how-to/type-a-model-for-its-version/narrow_to_one_release.py:example"
 ```
 
-Inside the `if`, `legacy` is an `IDFDocumentV9_4` and its fields are checked
-against 9.4. Use `as_version` for this, not `isinstance` or a `case` pattern:
-both work at run time, but pyright rejects them for document types.
+In the first two branches the document is typed for 9.4 and 9.5, and
+`update()` is checked against each. Use `as_version` for this, not `isinstance`
+or a `case` pattern: both work at run time, but pyright rejects them for
+document types. A release the function was not written for, here anything
+before 9.4, raises rather than being written with the wrong field name.
 
-The `else` branch reaches the later name with item access, `obj["field"]`,
-which pyright does not check: the field differs between the releases that
-branch covers, so no typed name fits all of them. To type that branch too,
-narrow it to a range of releases; see
+The branch for 9.6 and later reaches the new name with item access,
+`obj["field"]`, which pyright does not check. To type that branch too, narrow
+it to a range of releases; see
 [how to write code for any EnergyPlus version](write-code-for-any-energyplus-version.md#narrow-a-model-of-unknown-release-into-a-range).
 
 ## Read the release's errors

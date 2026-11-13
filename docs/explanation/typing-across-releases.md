@@ -157,7 +157,8 @@ Three gaps are known, and each has a workaround in the how-to guides:
 - There is no helper that narrows a document into a range of releases in one
   call. The loop over `as_version` is the pattern until there is.
 - mypy reads the stubs but reports document methods such as `add`,
-  `get_collection` and the accessors as missing. pyright is the checker these
+  `get_collection`, `version` and the accessors as missing, and misses invalid
+  assignments through a union of release types. pyright is the checker these
   stubs are tested against.
 
 ## See also

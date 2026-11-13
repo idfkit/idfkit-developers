@@ -18,9 +18,7 @@ def layer_names(construction: Construction) -> list[str]:
 def tall_zones(doc: AnyIDFDocument, minimum: float) -> list[str]:
     """Zone changed between releases: take the document and let it type each zone."""
     return [
-        zone.name
-        for zone in doc["Zone"]
-        if isinstance(zone.ceiling_height, float) and zone.ceiling_height >= minimum
+        zone.name for zone in doc["Zone"] if isinstance(zone.ceiling_height, float) and zone.ceiling_height >= minimum
     ]
 
 
