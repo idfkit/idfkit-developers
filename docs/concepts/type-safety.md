@@ -42,6 +42,31 @@ Disable **strict mode** to fall back to returning `None` for unknown fields:
     Strict mode is on by default. Disable it with `strict=False` when loading
     third-party IDF files that may contain non-standard fields.
 
+## Undeclared Names Are Type Errors
+
+Strict mode catches a misspelled field when the code runs. On a typed object, a
+type checker catches it before, whatever `strict` is set to. A typed object is
+one taken from `doc["Zone"]` or `doc.zones`, along with its extensible groups,
+such as `surface.vertices[0]`. Its class declares the schema's snake_case field
+names and nothing else:
+
+```python
+zone = doc["Zone"]["Office"]
+zone.x_orgin = 0.0       # pyright and mypy report the assignment
+print(zone.celing_height)  # pyright reports the read
+```
+
+The same holds for two spellings that work at run time: an eppy-style
+capitalised name such as `zone.X_Origin`, and a field that exists only in an
+EnergyPlus version older than the stubs, such as `Lights.watts_per_zone_floor_area`
+up to 23.2. Reach such a field with item access, `lights["watts_per_zone_floor_area"]`,
+or with `getattr`.
+
+Objects from `doc.add()`, `doc.get_collection()` and the eppy API
+(`doc.idfobjects[...]`, `newidfobject()`, `getobject()`) are plain `IDFObject`
+and accept any attribute name, so in the snippet above `zone.x_orgin` is caught
+only at run time.
+
 ## Dynamic Key Access
 
 When the object type is a string literal, `doc["Zone"]` returns a fully typed
