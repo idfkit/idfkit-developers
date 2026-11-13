@@ -11,7 +11,7 @@ from scythe.utils.filesys import FileReference
 class BuildingSimInput(ExperimentInputSpec):
     """Input specification for a parametric building energy study."""
 
-    r_value: float = Field(description="Wall insulation R-value [m2K/W]", ge=0, le=15)
+    r_value: float = Field(description="Wall insulation R-value [m2K/W]", ge=0.001, le=15)
     lpd: float = Field(description="Lighting power density [W/m2]", ge=0, le=20)
     setpoint: float = Field(description="Cooling setpoint [deg C]", ge=18, le=30)
     economizer: Literal["NoEconomizer", "DifferentialDryBulb", "DifferentialEnthalpy"] = Field(

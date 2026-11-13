@@ -20,7 +20,7 @@ version = "0.0.0"
 description = "The unified idfkit documentation site"
 requires-python = ">=3.12"
 dependencies = [
-    "idfkit==1.1.1",
+    "idfkit==1.2.0",
 ]
 
 [tool.uv]
@@ -49,18 +49,26 @@ dev = [
 ]
 
 # ----------------------------------------------------------------------------------------------
-# The four declared levels.
+# The five declared levels.
 #
 # Three of these are copied from idfkit's pyproject.toml, where they governed a site that lived
 # inside the library. The fourth is new here and is the whole reason the other three can move:
 # once the site is not inside the library, the library becomes an input like any other, and an
 # input the site renders a reference from must be pinned exactly like the artifacts it renders
-# examples from.
+# examples from. The fifth, the identity level, pins the visual identity the site renders in.
 #
-# The build MUST refuse to start when it cannot state all four (data-model DeclaredLevel rule 1,
+# The build MUST refuse to start when it cannot state all five (data-model DeclaredLevel rule 1,
 # FR-025). docs/hooks/pinned_levels.py enforces that, and it is what caught the incomplete
 # portable build on 2026-09-03.
 # ----------------------------------------------------------------------------------------------
+
+# Visual identity level the site renders in, as an immutable tag in idfkit-brand (feature 008).
+# docs/identity/ is vendored from that tag's dist and compared byte for byte by
+# check-identity.yml; the roster entry for this host (touchpoints.toml, id "developers") names
+# this key as the one place the level is declared, and the check fails when the two disagree.
+# Read by docs/hooks/pinned_levels.py for the footer's provenance line.
+[tool.idfkit.identity]
+level = "identity-2026.5"
 
 # Conformance corpus level the site states, as an immutable tag in idfkit-conformance. The corpus
 # itself is the libraries' business; the site reports which level the pages describe.
@@ -88,7 +96,7 @@ level = "docs-2026.8"
 # four weather-browser files out of the same one. Pinning it is what keeps the reference and the
 # assets on a page describing the same version of the library.
 [tool.idfkit.library]
-level = "1.1.1"
+level = "1.2.0"
 
 [tool.pyright]
 pythonVersion = "3.12"

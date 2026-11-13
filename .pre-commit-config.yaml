@@ -9,7 +9,7 @@ repos:
         args: [--unsafe]
       - id: check-json
         exclude: ^.devcontainer/devcontainer.json
-      # Three trees must never be reformatted, for the reason old-sitemaps/ must not be
+      # Four trees must never be reformatted, for the reason old-sitemaps/ must not be
       # reformatted in the library: a hook that only means to add a trailing newline makes a byte
       # comparison fail.
       #
@@ -17,16 +17,18 @@ repos:
       #                       the pinned docs level by scripts/sync_js_artifacts.py --check
       #   docs/snippets/js/   vendored from the same release, same comparison
       #   docs/weather/browse/ copied from the installed library at build time, and gitignored
+      #   docs/identity/      vendored from idfkit-brand at the pinned identity level, compared
+      #                       byte for byte by check-identity.yml (check_touchpoint.py)
       #
       # old-sitemaps/ is NOT excluded here, because it does not live here. It stays with the
       # redirects in idfkit (contracts/repository-layout.md).
       - id: pretty-format-json
-        exclude: ^(.devcontainer/devcontainer.json|.*\.ipynb$|docs/typedoc/|docs/snippets/js/|docs/weather/browse/)
+        exclude: ^(.devcontainer/devcontainer.json|.*\.ipynb$|docs/typedoc/|docs/snippets/js/|docs/weather/browse/|docs/identity/)
         args: [--autofix, --no-sort-keys]
       - id: end-of-file-fixer
-        exclude: ^(docs/typedoc/|docs/snippets/js/|docs/weather/browse/)
+        exclude: ^(docs/typedoc/|docs/snippets/js/|docs/weather/browse/|docs/identity/)
       - id: trailing-whitespace
-        exclude: ^(docs/typedoc/|docs/snippets/js/|docs/weather/browse/)
+        exclude: ^(docs/typedoc/|docs/snippets/js/|docs/weather/browse/|docs/identity/)
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Kept level with the ruff this project declares as a dev dependency. They drifted two minor

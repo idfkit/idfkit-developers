@@ -23,6 +23,7 @@ make docs        # serve at http://127.0.0.1:8000
 make docs-test   # one strict build, as CI does
 make check       # the quality gate
 make test        # pytest over tests/
+make release     # publish main to developers.idfkit.com as the next site-YYYY.N release
 ```
 
 Before committing: `make check && make docs-test`.
@@ -31,7 +32,8 @@ Before committing: `make check && make docs-test`.
 
 ```text
 docs/               ~580 authored pages
-  hooks/            mkdocs hooks: pinned_levels, parity_ledger, parity_macro, typedoc_shim
+  hooks/            mkdocs hooks: pinned_levels, parity_ledger, parity_macro, typedoc_shim, identity
+  identity/         vendored from idfkit-brand at the pinned identity level; never hand-edited
   snippets/         Python examples type-checked by pyright; js/ is vendored
   typedoc/          vendored TypeDoc JSON from idfkit-js
   weather/browse/   copied from the installed library at build time; gitignored
@@ -57,11 +59,27 @@ No `src/`. Nothing here is built as a distribution.
 6. **`docs/weather/browse/` is never committed.** It comes out of the installed library at build
    time.
 
-## The four pinned levels
+## Publishing
 
-`[tool.idfkit.library]`, `[tool.idfkit.docs]`, `[tool.idfkit.governance]` and
-`[tool.idfkit.conformance]` in `pyproject.toml`. The build refuses to start when any is undeclared,
-and each names an immutable tag or an exact version, never a branch or a range.
+**Merging to `main` does not publish.** `deploy-docs.yml` deploys a `site-YYYY.N` release of this
+repository, never a merge, so a run of edits goes out together when someone decides it should.
+Publish with `make release`, which tags `main` and lets the release event deploy it.
+
+A merge that moves any `[tool.idfkit.*] level` releases and deploys itself
+(`release-on-level-change.yml`), because `surfaces.yml` holds the live site to the library level on
+`main`. Every release publishes all of `main`, so **do not merge a page that must not be read yet**,
+such as one describing an unreleased library: leave it a draft until the bump it depends on lands.
+
+## The five pinned levels
+
+`[tool.idfkit.library]`, `[tool.idfkit.docs]`, `[tool.idfkit.governance]`,
+`[tool.idfkit.conformance]` and `[tool.idfkit.identity]` in `pyproject.toml`. The build refuses to
+start when any is undeclared, and each names an immutable tag or an exact version, never a branch
+or a range.
+
+The identity level is the tag of `idfkit-brand` that `docs/identity/` is vendored from, compared
+byte for byte by `check-identity.yml`. Never edit a file under `docs/identity/`; adopt a newer tag
+through the `identity-adopt` skill in `idfkit-brand`.
 
 Levels advance by pull request, opened automatically when either library releases. The site's own
 checks decide whether the pages survive.

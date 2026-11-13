@@ -1,0 +1,79 @@
+name: release-on-level-change
+
+# Cut a site release, and publish it, when a merge to main moves a pinned level.
+#
+# developers.idfkit.com publishes releases of this repository, not merges (deploy-docs.yml). Most
+# merges can wait for a maintainer to cut one. A level change cannot. bump-idfkit.yml and
+# bump-docs-level.yml open the pull requests that move [tool.idfkit.library] and
+# [tool.idfkit.docs], and scripts/check_surfaces.py holds the live site to the library level
+# declared on main (004-FR-030, SC-011). A merged bump that waited for someone to remember a
+# release would put the site back where the first surfaces run found it: stating a level the
+# repository had already moved off.
+#
+# So every push to main that touches pyproject.toml asks scripts/site_release.py whether any
+# [tool.idfkit.*] level differs from the commit before it. If one does, this cuts the next
+# site-YYYY.N release at that commit, with the changed levels in its notes, and calls
+# deploy-docs.yml to publish it. Everything else merged since the last release goes out with it,
+# which is the cost of a level change being urgent: nothing on main is meant to be unpublishable.
+#
+# It calls deploy-docs.yml instead of relying on the release event, because a release created with
+# GITHUB_TOKEN triggers no workflow at all. That also means this never deploys twice.
+
+on:
+  push:
+    branches: [main]
+    paths: [pyproject.toml]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-on-level-change
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.cut.outputs.tag }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Did a pinned level move?
+        id: levels
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          changed="$(python3 scripts/site_release.py levels-changed "$BEFORE" "$GITHUB_SHA")"
+          if [ -z "$changed" ]; then
+            echo "No [tool.idfkit.*] level moved; this merge waits for the next release."
+          fi
+          {
+            echo "changed<<EOF"
+            echo "$changed"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Cut the release
+        id: cut
+        if: steps.levels.outputs.changed != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANGED: ${{ steps.levels.outputs.changed }}
+        run: |
+          set -euo pipefail
+          tag="$(python3 scripts/site_release.py next-tag)"
+          notes="$(printf 'Released automatically: this merge moved a pinned level.\n\n%s\n' "$(sed 's/^/- /' <<< "$CHANGED")")"
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes "$notes" --generate-notes
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: release
+    if: needs.release.outputs.tag != ''
+    uses: ./.github/workflows/deploy-docs.yml
+    with:
+      tag: ${{ needs.release.outputs.tag }}
