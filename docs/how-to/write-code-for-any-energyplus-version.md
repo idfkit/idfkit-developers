@@ -245,9 +245,11 @@ Two shorter forms do not work:
 
 - `as_version(doc, Since9_6)` is rejected: `Type "UnionType" is not assignable
   to type "type[_D@as_version]"`.
-- `isinstance(doc, IDFDocumentV9_6)`, and `case IDFDocumentV9_6():` in a
-  `match`, work at run time but pyright rejects them: `TypedDict class not
-  allowed for instance or class checks`.
+- `isinstance(doc, IDFDocumentV9_6)` works at run time, but pyright rejects
+  it: `Second argument to "isinstance" must be a class or tuple of classes`,
+  with the detail `TypedDict class not allowed for instance or class checks`.
+- `case IDFDocumentV9_6():` in a `match` also works at run time, and pyright
+  rejects it too: `TypedDict class not allowed in class pattern`.
 
 ## Verify the result
 

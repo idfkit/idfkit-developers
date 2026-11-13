@@ -42,6 +42,10 @@ typeCheckingMode = "strict"
 Strict mode makes pyright report everything it is unsure about, which is what
 we want while we learn what it can see.
 
+The pyright output on this page was captured with pyright 1.1.414. Run
+`uv run pyright --version` to see yours; with another version the wording of
+some messages may differ slightly.
+
 ## Step 2: Write the script
 
 Create `offices.py` with this content:

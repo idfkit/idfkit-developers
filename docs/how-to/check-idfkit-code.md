@@ -81,8 +81,9 @@ if TYPE_CHECKING:
     from idfkit.document import Zone
 ```
 
-Importing them from `idfkit` instead works at run time inside the block, but
-strict mode reports it:
+Importing them from `idfkit` instead also works inside the block, but recent
+pyright versions report it in strict mode. This is pyright 1.1.414; older
+releases such as 1.1.408 accept the import:
 
 ```text
 error: "Zone" is not exported from module "idfkit"
@@ -90,7 +91,8 @@ error: "Zone" is not exported from module "idfkit"
 ```
 
 Do not follow that hint: `idfkit._generated_types` is private.
-`idfkit.document` re-exports the same classes. Importing them outside a
+`idfkit.document` re-exports the same classes and works with every pyright
+version. Importing them outside a
 `TYPE_CHECKING` block raises `ImportError` when the module runs.
 
 ## Run pyright
