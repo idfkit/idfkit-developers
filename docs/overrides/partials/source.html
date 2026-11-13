@@ -6,6 +6,9 @@
   stays Material's own component, idfkit from repo_url, and every further repository in
   extra.source_repositories carries data-idfkit-source instead, which
   javascripts/source-facts.js fills with that repository's own facts.
+
+  Forked from Material 9.7.7's partials/source.html: on a Material upgrade, diff the first link
+  against the new partial.
 -#}
 {% set icon = config.theme.icon.repo or "fontawesome/brands/git-alt" %}
 <a href="{{ config.repo_url }}" title="{{ lang.t('source') }}" class="md-source" data-md-component="source">
@@ -17,7 +20,7 @@
   </div>
 </a>
 {%- for repository in config.extra.source_repositories or [] %}
-<a href="{{ repository.url }}" title="{{ lang.t('source') }}" class="md-source" data-idfkit-source>
+<a href="{{ repository.url }}" title="{{ lang.t('source') }}: {{ repository.name }}" class="md-source" data-idfkit-source>
   <div class="md-source__icon md-icon">
     {% include ".icons/" ~ icon ~ ".svg" %}
   </div>
