@@ -178,3 +178,35 @@
   font-size: 0.8rem;
   color: var(--md-default-fg-color--light);
 }
+
+/* ===== Header: one "Go to repository" link per library =====
+   Material sizes the header's source slot for one link (11.7rem). partials/source.html adds the
+   idfkit-js link beside idfkit's. Below 76.25em the header has no room for both without shrinking
+   the lockup, and the navigation drawer, reachable there, lists both, so the header keeps only
+   Material's link. From 76.25em both sit side by side, and the second steps aside while search
+   is open, because Material widens the search box to 34.4rem and both would be pushed off screen. */
+.md-header__source > [data-idfkit-source] {
+  display: none;
+}
+
+@media screen and (min-width: 76.25em) {
+  .md-header__source {
+    display: flex;
+    gap: 0.4rem;
+    width: auto;
+    max-width: none;
+  }
+
+  .md-header__source > .md-source {
+    width: 10.5rem;
+    min-width: 0;
+  }
+
+  .md-header__source > [data-idfkit-source] {
+    display: block;
+  }
+
+  [data-md-toggle="search"]:checked ~ .md-header .md-header__source > [data-idfkit-source] {
+    display: none;
+  }
+}

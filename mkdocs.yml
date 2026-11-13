@@ -309,6 +309,12 @@ theme:
     view: material/eye
 
 extra:
+  # The header's further "Go to repository" links, after repo_url's: one per library the site
+  # documents. docs/overrides/partials/source.html renders them, javascripts/source-facts.js
+  # fetches each one's release, stars and forks.
+  source_repositories:
+    - name: idfkit/idfkit-js
+      url: https://github.com/idfkit/idfkit-js
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/idfkit/idfkit
@@ -322,6 +328,8 @@ extra:
 # defined window.document$, which is the hook that survives instant navigation.
 extra_javascript:
   - javascripts/tab-sync.js
+  # Release, stars and forks for the header's second repository link (extra.source_repositories).
+  - javascripts/source-facts.js
   # The reader-initiated browser-simulation runner. It loads nothing until the button on the
   # browser-simulation how-to is pressed; the file's header says why that is a hard rule.
   - javascripts/engine-runner.js
