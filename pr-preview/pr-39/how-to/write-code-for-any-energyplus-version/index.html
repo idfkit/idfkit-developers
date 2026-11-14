@@ -6052,7 +6052,10 @@ spellings do not work for this:</p>
   that differ between the releases are reported as missing.</li>
 <li><code>isinstance(doc, IDFDocumentV9_6)</code> works at run time, but pyright rejects
   it: <code>Second argument to "isinstance" must be a class or tuple of classes</code>,
-  with the detail <code>TypedDict class not allowed for instance or class checks</code>.</li>
+  with the detail <code>TypedDict class not allowed for instance or class checks</code>.
+  Against the latest release it does not even work at run time:
+  <code>IDFDocumentV26_2</code> is <code>IDFDocument</code>, the class of every document, so
+  <code>isinstance(doc, IDFDocumentV26_2)</code> is <code>True</code> for a 9.4 model too.</li>
 <li><code>case IDFDocumentV9_6():</code> in a <code>match</code> also works at run time, and pyright
   rejects it too: <code>TypedDict class not allowed in class pattern</code>.</li>
 </ul>

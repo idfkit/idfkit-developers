@@ -5430,8 +5430,11 @@ that computes a type or field name at run time cannot be typed by them at all;
 these two methods are how such code, and code that deliberately reaches past
 the shared names, says so. Neither is checked, which is the price.</p>
 <h2 id="why-as_version-and-not-isinstance">Why <code>as_version</code> and not <code>isinstance</code><a class="headerlink" href="#why-as_version-and-not-isinstance" title="Permanent link">&para;</a></h2>
-<p>At run time each release's document type is a real class, and
-<code>isinstance(doc, IDFDocumentV9_4)</code> answers correctly. In the stubs, though, a
+<p>At run time each older release's document type is a real class, and
+<code>isinstance(doc, IDFDocumentV9_4)</code> answers correctly. The latest release's
+type is the exception: <code>IDFDocumentV26_2</code> is <code>IDFDocument</code>, the class every
+document is an instance of, so <code>isinstance</code> against it says nothing about the
+release. In the stubs, a
 document type is assembled from a <code>TypedDict</code> that maps each object type to its
 collection, which is what lets <code>doc["Zone"]</code> be typed per key, and pyright does
 not allow a <code>TypedDict</code> in an instance check or a class pattern. <code>as_version</code>
