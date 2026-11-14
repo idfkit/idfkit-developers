@@ -5700,9 +5700,12 @@ handles:</p>
 </span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="n">ceiling_height</span><span class="p">(</span><span class="n">as_version</span><span class="p">(</span><span class="n">load_idf</span><span class="p">(</span><span class="s2">"legacy.idf"</span><span class="p">),</span> <span class="n">IDFDocumentV9_4</span><span class="p">)[</span><span class="s2">"Zone"</span><span class="p">][</span><span class="s2">"Office"</span><span class="p">])</span>  <span class="c1"># a 9.4 zone</span>
 </span></code></pre></div>
 <p>Import the classes from <code>idfkit.document</code> inside <code>if TYPE_CHECKING:</code>; they do
-not exist at run time. Every object type has an <code>Any&lt;Class&gt;</code>, whether or not
-its declaration changed between releases, so you never need to know which
-types did. Passing the wrong kind of object is reported against it:</p>
+not exist at run time. Every object type of the latest release has an
+<code>Any&lt;Class&gt;</code>, whether or not its declaration changed between releases, so you
+never need to know which types did. A type a later release removed has none:
+<code>DistrictHeating</code>, gone after 23.1, is reached through its range class from
+<code>idfkit.versioned</code>, <code>DistrictHeating_v8_9_to_v23_1</code>, imported the same way.
+Passing the wrong kind of object is reported against the class:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>error: Argument of type "Material" cannot be assigned to parameter "zone" of type "AnyZone" in function "ceiling_height"
 </span></code></pre></div>
 <p>On an <code>Any&lt;Class&gt;</code>:</p>
