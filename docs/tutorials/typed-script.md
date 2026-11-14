@@ -118,7 +118,9 @@ Notice that pyright knows `office` is a `Zone`, although we never annotated it,
 and that it knows every value the convection field accepts. Your editor shows
 the same list when you hover over the field or start typing a value.
 
-Delete the two `reveal_type` lines and keep the `office = ...` line.
+Pyright understands `reveal_type` without an import; Python doesn't, so the
+script stops with a `NameError` if you run it with these lines in it. Delete
+the two `reveal_type` lines and keep the `office = ...` line.
 
 ## Step 4: Misspell a field
 
