@@ -37,6 +37,59 @@ Two consequences decide the hard cases:
   it. Taking `AnyIDFDocument` therefore costs callers nothing, and costs the
   function every name some release lacks.
 
+## Declare the package's choice in one place
+
+In a package, make the choice from the table once. Put it in one private module
+and annotate everything else with the names it exports, so that supporting a
+different set of releases later is an edit to that module alone. The module
+holds four things:
+
+- `SUPPORTED`, a tuple of the release types, for `as_version`;
+- `Model`, an alias for the same releases, for annotations, and `ModelT`, a
+  `TypeVar` bound to it, for functions that return the model they were given;
+- the object classes, imported under the names the package uses;
+- `as_model`, the one function that gives a loaded model the package's type.
+
+This package supports 9.6 and later, the releases that have `Space`:
+
+```python
+--8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/one_place.py:types"
+```
+
+The rest of the package annotates with `Model`, `Zone` and `Space`, and calls
+`as_model` at its public entry points:
+
+```python
+--8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/one_place.py:usage"
+```
+
+To change what the package supports, edit only the first module:
+
+| To support | `SUPPORTED` | `Model` | Object classes | `as_model` |
+|---|---|---|---|---|
+| every release | remove it | `AnyIDFDocument` | `AnyZone as Zone`, ... | `return doc` |
+| a range, as above | the range's types | their union | `AnyZone as Zone`, ... | `as_version(doc, SUPPORTED)` |
+| the latest only | `(IDFDocument,)` | `IDFDocument` | `Zone`, `Space`, ... | `as_version(doc, SUPPORTED)` |
+
+Then run pyright. It reports each line the new choice no longer allows, so the
+rest of the change is a list it gives you. Widening this package to every
+release, for example, reports the two lines that read `model["Space"]`:
+
+```text
+error: Could not access item in TypedDict
+    "Space" is not a defined key in "IDFDocumentAllVersions[bool]" (reportGeneralTypeIssues)
+```
+
+Keep `SUPPORTED` and `Model` next to each other: they list the same releases
+twice, and nothing checks that they agree. Keep the `--targets` of
+`idfkit check` in step too, since they live in the CI workflow or the
+pre-commit configuration rather than in Python; see
+[how to check idfkit code](check-idfkit-code.md#run-both-in-ci).
+
+Under mypy, `as_model` is reported as returning the wrong type for a range,
+because mypy collapses the tuple's union. A package that checks with mypy is
+better served by `AnyIDFDocument` or a single release type.
+
 ## Accept a model of any release
 
 Annotate the document `AnyIDFDocument` and let everything you reach through it
