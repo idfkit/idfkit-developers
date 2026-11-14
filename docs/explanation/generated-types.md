@@ -34,15 +34,20 @@ Both libraries generate types from the epJSON schema, and the parity ledger
 records the capability as [complete in TypeScript and partial in
 Python](parity.md#generated-object-types). Two things differ.
 
-**Coverage.** The Python stub set is generated one EnergyPlus version at a time
-and currently ships for 26.2.0 only, so a model loaded at 9.4 gets 26.2 field
-names and choice lists in the editor. The TypeScript maps are emitted per
-version and chosen by the caller, so an older model is typed as that older model
-or left untyped, never mistyped.
+**Coverage.** Both cover every supported release. The TypeScript maps are
+emitted per version and installed per version. The Python stubs carry every
+release in one set: the latest is what a document is typed as, and each older
+release has its own document type, `IDFDocumentV9_4` and so on, which a model is
+given with `as_version` after a run-time check of its version.
 
-**Application.** Python's stubs apply implicitly to every document. TypeScript's
-are opt-in by construction: an unparameterised document stays untyped, which is
-what version-generic code needs.
+**Application.** Python's stubs apply implicitly to every document, as the
+latest release; a model of an older one is typed as such only when the caller
+says so, and a model whose release the code does not know is typed with
+`AnyIDFDocument`, which offers only the object types and fields every release
+has. TypeScript's are opt-in by construction: an unparameterised document stays
+untyped, which is what version-generic code needs. Python's version-generic
+code stays typed, at the price of seeing less; see
+[why code for any release sees less](typing-across-releases.md).
 
 The runtime story differs on reads. Both libraries refuse a misspelled field
 name when you write one: Python raises `InvalidFieldError` and TypeScript
@@ -52,7 +57,9 @@ as well. In TypeScript a name with no accessor behind it is simply `undefined`,
 and nothing distinguishes a typo from a field the file left unset.
 Parameterizing the document turns that read into a compile error, which is the
 practical argument for passing the `TypeMap` even in a codebase that is
-otherwise loosely typed.
+otherwise loosely typed. In Python the stubs make a misspelled read a type
+error as well, on every typed object, so the run-time error is the second line
+of defence rather than the first.
 
 ## It costs nothing, installed or not
 

@@ -46,6 +46,7 @@ nav:
     - tutorials/index.md
     - Build your first model: tutorials/first-model.md
     - Simulate an office block: tutorials/office-block.md
+    - Build a type-checked script: tutorials/typed-script.md
     - Core Tutorial: getting-started/core-tutorial.ipynb
 
   - How-to guides:
@@ -59,6 +60,10 @@ nav:
       - Edit extensible groups: how-to/edit-extensible-groups.md
       - Compare two EnergyPlus versions: how-to/compare-versions.md
       - Read a model's geometry: geometry/reading.md
+    - Writing typed code:
+      - Check idfkit code with pyright and idfkit check: how-to/check-idfkit-code.md
+      - Write code for any EnergyPlus version: how-to/write-code-for-any-energyplus-version.md
+      - Type a model for its EnergyPlus version: how-to/type-a-model-for-its-version.md
     - In the browser:
       - Parse in the browser: how-to/parse-in-the-browser.md
       - Run a simulation in the browser: how-to/run-a-simulation-in-the-browser.md
@@ -173,6 +178,7 @@ nav:
     - How conformance is established: explanation/conformance.md
     - Type-safe development: concepts/type-safety.md
     - Static types generated from the schema: explanation/generated-types.md
+    - Why code for any release sees less: explanation/typing-across-releases.md
     - Why accessors and not a Proxy: explanation/accessors-not-proxies.md
     - Content-addressed schemas: explanation/content-addressed-schemas.md
     - A synchronous core with async edges: explanation/sync-core-async-edge.md

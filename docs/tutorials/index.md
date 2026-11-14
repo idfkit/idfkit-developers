@@ -19,6 +19,10 @@ If you already know what you want to accomplish and just need the steps, the
   a rectangle, zones it, wraps it in an envelope, fetches design weather, and
   runs a local EnergyPlus to find out how much heating it needs on the coldest
   day. About twenty minutes, Python only, and it needs EnergyPlus installed.
+- [**Build a type-checked script**](typed-script.md) sets up pyright in strict
+  mode, writes a short script that builds a model, and lets the checker catch a
+  misspelled field and an invalid choice before the script runs. About ten
+  minutes, Python only, no EnergyPlus needed.
 - [**Core Tutorial**](../getting-started/core-tutorial.ipynb) works through the
   Python library end to end in a notebook, from basic use to the expert
   surface. Longer, and Python only.

@@ -25,7 +25,10 @@ For example, hovering over `zone.ceiling_height` in your IDE will show:
 
 ## Strict Field Access
 
-By default, accessing a misspelled field name raises an `InvalidFieldError`.
+A misspelled field name is a type error: the stubs declare every field an object
+has, so pyright and Pylance report any other name before the code runs. At run
+time, by default, accessing a misspelled field name raises an
+`InvalidFieldError`.
 Disable **strict mode** to fall back to returning `None` for unknown fields:
 
 ```python
@@ -79,8 +82,21 @@ Hovering over `SpaceHVACZoneReturnMixer` in your IDE shows the docstring
 including "Since: 24.2.0", making it clear which minimum EnergyPlus version
 is required.
 
+A document is typed for the latest supported release unless you say
+otherwise. To type a model of an older release as that release, see
+[how to type a model for its EnergyPlus version](../how-to/type-a-model-for-its-version.md).
+For a function that accepts a model of any release, annotate it
+`AnyIDFDocument`, which offers only what every supported release has; see
+[how to write code for any EnergyPlus version](../how-to/write-code-for-any-energyplus-version.md),
+and [why code for any release sees less](../explanation/typing-across-releases.md)
+for the reasons.
+
 ## See Also
 
+- [Build a type-checked script](../tutorials/typed-script.md) — a first script under pyright strict mode
+- [Type a model for its EnergyPlus version](../how-to/type-a-model-for-its-version.md) — types for an older release
+- [Write code for any EnergyPlus version](../how-to/write-code-for-any-energyplus-version.md) — `AnyIDFDocument` and ranges of releases
+- [Check idfkit code with pyright and `idfkit check`](../how-to/check-idfkit-code.md) — which check catches what
 - [Version Compatibility](version-compatibility.md) — static linting for cross-version issues
 - [API Reference: Document](../api/document.md) — full `IDFDocument` API
 - [Build your first model](../tutorials/first-model.md) — build a model from scratch
