@@ -63,6 +63,15 @@ release" grows when idfkit adopts a new EnergyPlus release, `Any<Class>` can
 lose a field on an idfkit upgrade, which is the type checker reporting a real
 change rather than an instability in the stubs.
 
+In general, `Any<Class>` is the class as every supported release *that has it*
+declares it. For most types that is every release, but not for all: `AnySpace`
+is a `Space` as 9.6 and later declare it, because no earlier release has one.
+"Any" describes the object, as it describes the document in `AnyIDFDocument`;
+it does not make the type reachable from every document. A `Space` comes only
+from a document of a release that has the type, so `doc["Space"]` through
+`AnyIDFDocument` stays an error, and code that writes to spaces narrows the
+model first and then hands the objects to helpers typed `AnySpace`.
+
 Fields follow the same rule as object types. A field one release renamed or
 dropped is not offered, and since idfkit types unknown attribute names as
 errors on every typed object, a misspelling and a field another release lacks
