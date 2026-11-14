@@ -133,9 +133,12 @@ handles:
 ```
 
 Import the classes from `idfkit.document` inside `if TYPE_CHECKING:`; they do
-not exist at run time. Every object type has an `Any<Class>`, whether or not
-its declaration changed between releases, so you never need to know which
-types did. Passing the wrong kind of object is reported against it:
+not exist at run time. Every object type of the latest release has an
+`Any<Class>`, whether or not its declaration changed between releases, so you
+never need to know which types did. A type a later release removed has none:
+`DistrictHeating`, gone after 23.1, is reached through its range class from
+`idfkit.versioned`, `DistrictHeating_v8_9_to_v23_1`, imported the same way.
+Passing the wrong kind of object is reported against the class:
 
 ```text
 error: Argument of type "Material" cannot be assigned to parameter "zone" of type "AnyZone" in function "ceiling_height"
