@@ -55,6 +55,8 @@ language you work in.
 - [Weather data pipeline](../concepts/weather-pipeline.md): how station search,
   downloads, and design days fit together.
 - [Caching strategy](../concepts/caching.md): what idfkit caches, and why.
+- [Why idfkit locks its caches and not your documents](threads-and-documents.md):
+  what is safe to share between threads, and what threads buy, in Python.
 - [Geocoding and IP location](geocoding.md): the free services behind address
   and "near me" lookup, and their accuracy and privacy trade-offs.
 - [How the schedule evaluator works](../design/schedule-evaluator.md): how the
