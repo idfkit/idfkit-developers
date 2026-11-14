@@ -55,6 +55,14 @@ be declared closed, and pyright took about a minute on any file that named a
 release type. Dropping the keys made the check both correct, a hard error with
 an explicit escape hatch, and fast, a few seconds per file.
 
+The object classes follow the same rule. `AnyZone` is a zone as every
+supported release declares it, the class the latest `Zone` and each older
+release's zone class derive from, so a parameter annotated `AnyZone` accepts a
+zone of any release. Its fields are the shared ones. Because "every supported
+release" grows when idfkit adopts a new EnergyPlus release, `Any<Class>` can
+lose a field on an idfkit upgrade, which is the type checker reporting a real
+change rather than an instability in the stubs.
+
 Fields follow the same rule as object types. A field one release renamed or
 dropped is not offered, and since idfkit types unknown attribute names as
 errors on every typed object, a misspelling and a field another release lacks
@@ -148,12 +156,8 @@ each other, and code meant to span releases is best checked by both.
 
 ## Where the design is unfinished
 
-Three gaps are known, and each has a workaround in the how-to guides:
+Two gaps are known, and each has a workaround in the how-to guides:
 
-- There is no public name for "an object of any release". The class exists in
-  the stubs, as `_ZoneBase` for zones, but it is private, so a helper that
-  takes a zone from any release cannot be annotated with one yet. A public name
-  is a planned follow-up in idfkit.
 - There is no helper that narrows a document into a range of releases in one
   call. The loop over `as_version` is the pattern until there is.
 - mypy reads the stubs but reports document methods such as `add`,

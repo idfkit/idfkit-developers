@@ -65,27 +65,52 @@ them, and the ones that return the document they were given, such as
 
 ## Pass objects to helper functions
 
-The object classes in the stubs describe the latest release. A parameter
-annotated `Zone` accepts a zone from a latest-release document and rejects one
-from anywhere else: a 9.4 zone is a `Zone_v8_9_to_v9_4`, and a zone reached
-through `AnyIDFDocument` is `Zone | _ZoneBase`. There is no public name yet for
-"a zone of any release".
+Annotate a helper's object parameter with the class for the releases the code
+handles:
 
-So, in code for any release:
-
-- When the helper needs an object whose type changed between releases, give it
-  the document and let it reach the objects itself, as `tall_zones` does below.
-- When the type was declared the same way in every release, the public class
-  fits every release. That holds for 504 of the 789 shared types, among them
-  `Construction`, `ZoneList` and `Schedule:Compact`. If pyright accepts the
-  object from an `AnyIDFDocument`, the annotation is safe.
-- `IDFObject` accepts any object of any release, untyped.
+- In code for any release, use `Any<Class>`: `AnyZone`, `AnyConstruction`,
+  `AnyWaterHeaterMixed`, and so on. It accepts that object from a document of
+  any release, including one reached through `AnyIDFDocument`, and offers what
+  every release has, by the same rules as `AnyIDFDocument`.
+- In code for the latest release only, use the plain class, such as `Zone`. It
+  rejects a zone of any other release: a 9.4 zone is a `Zone_v8_9_to_v9_4`.
 
 ```python
 --8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/object_parameters.py:example"
 ```
 
-Import the classes inside `if TYPE_CHECKING:`; they do not exist at run time.
+Import the classes from `idfkit.document` inside `if TYPE_CHECKING:`; they do
+not exist at run time. Every object type has an `Any<Class>`, whether or not
+its declaration changed between releases, so you never need to know which
+types did. Passing the wrong kind of object is reported against it:
+
+```text
+error: Argument of type "Material" cannot be assigned to parameter "zone" of type "AnyZone" in function "ceiling_height"
+```
+
+On an `Any<Class>`:
+
+- **Extensible groups are typed**, such as `AnyBuildingSurfaceDetailed.vertices`.
+  A group whose fields changed between releases follows the same read and write
+  rule as a field: `AnyOutputTableAnnual.variable_details[0].digits_after_decimal`
+  reads as `float | int | None`, and assigning `2.5` is an error because 22.2
+  and later take an integer.
+- **A group that some release lacks entirely is not offered.** `AnyScheduleYear`
+  and `AnyPlantEquipmentList` are among the few types affected. Reach those
+  groups through the release's own type, or with item access.
+
+The rules also apply when idfkit itself changes. `Any<Class>` covers the
+releases the installed idfkit supports, so it narrows when idfkit adopts a new
+EnergyPlus release that renames or drops a field. `AnyPeople` shows the
+effect: 9.6 renamed `zone_or_zonelist_name`, so `AnyPeople` has neither the old
+name nor the new one, and reading either is reported like any other unknown
+field. A future EnergyPlus rename does the same to fields your code uses today.
+Run pyright after upgrading idfkit, and treat such errors as the new release's
+changes reaching your code.
+
+Code that needs nothing beyond `IDFObject` can still take an `IDFObject`, which
+accepts any object of any release, untyped, or take the document and reach the
+objects itself.
 
 ## Read and write a field whose values changed
 

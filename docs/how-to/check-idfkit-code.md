@@ -178,7 +178,7 @@ mypy reads the same stubs and reports the same field, value, key and
 `update()` mistakes, in its own words:
 
 ```text
-error: Unexpected keyword argument "x_orign" for "update" of "_ZoneBase"; did you mean "x_origin", "y_origin", or "z_origin"?  [call-arg]
+error: Unexpected keyword argument "x_orign" for "update" of "AnyZone"; did you mean "x_origin", "y_origin", or "z_origin"?  [call-arg]
 error: TypedDict "IDFDocumentAllVersions[bool]" has no key "Space"  [typeddict-item]
 ```
 
