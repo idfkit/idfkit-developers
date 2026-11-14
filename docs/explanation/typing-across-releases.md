@@ -129,8 +129,11 @@ the shared names, says so. Neither is checked, which is the price.
 
 ## Why `as_version` and not `isinstance`
 
-At run time each release's document type is a real class, and
-`isinstance(doc, IDFDocumentV9_4)` answers correctly. In the stubs, though, a
+At run time each older release's document type is a real class, and
+`isinstance(doc, IDFDocumentV9_4)` answers correctly. The latest release's
+type is the exception: `IDFDocumentV26_2` is `IDFDocument`, the class every
+document is an instance of, so `isinstance` against it says nothing about the
+release. In the stubs, a
 document type is assembled from a `TypedDict` that maps each object type to its
 collection, which is what lets `doc["Zone"]` be typed per key, and pyright does
 not allow a `TypedDict` in an instance check or a class pattern. `as_version`

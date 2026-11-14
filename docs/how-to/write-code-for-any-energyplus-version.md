@@ -354,6 +354,9 @@ spellings do not work for this:
 - `isinstance(doc, IDFDocumentV9_6)` works at run time, but pyright rejects
   it: `Second argument to "isinstance" must be a class or tuple of classes`,
   with the detail `TypedDict class not allowed for instance or class checks`.
+  Against the latest release it does not even work at run time:
+  `IDFDocumentV26_2` is `IDFDocument`, the class of every document, so
+  `isinstance(doc, IDFDocumentV26_2)` is `True` for a 9.4 model too.
 - `case IDFDocumentV9_6():` in a `match` also works at run time, and pyright
   rejects it too: `TypedDict class not allowed in class pattern`.
 
