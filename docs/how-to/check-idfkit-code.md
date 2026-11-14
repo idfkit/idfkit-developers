@@ -105,7 +105,9 @@ uv run pyright src/
 
 It exits non-zero when it reports an error, so the same command works as a CI
 step. A file that names one or two release types (`IDFDocumentV9_4` and so on)
-or `AnyIDFDocument` takes a few seconds to check.
+or `AnyIDFDocument` takes about 2 seconds to check, and one that names most of
+the 18 release types, such as a tuple for a range, about 5. Those times were
+measured with pyright 1.1.414.
 
 ## Run `idfkit check` against the releases you support
 
@@ -192,7 +194,9 @@ error: "IDFDocument[Literal[True]]" has no attribute "zones"  [attr-defined]
 The same happens for `get_collection` and `version`. mypy also misses an
 invalid value assigned to a field through a union of release types, such as
 `IDFDocumentV9_4 | IDFDocument`, although it reports the same value passed to
-`update()`. Until that is fixed in
+`update()`. And it reads `as_version(doc, (A, B))` as only what A and B share,
+so a field that differs between them is reported as missing. Until that is
+fixed in
 idfkit's stubs, pyright is the checker to rely on for idfkit code; if you keep
 mypy, silence `attr-defined` on those lines rather than for the whole project.
 

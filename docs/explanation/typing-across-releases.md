@@ -128,10 +128,12 @@ not allow a `TypedDict` in an instance check or a class pattern. `as_version`
 is the narrowing that works in both worlds: a run-time check of the version, and
 a return type the checker trusts.
 
-It takes exactly one release type because its job is to state one fact. A range
-is a union of such facts, and narrowing into one means trying its members, as
+It takes a release type, or a tuple of them, the way `isinstance` takes a class
+or a tuple of classes: a tuple is a plain value that run time can check one
+member at a time, and that pyright reads as the union of its members. A union
+named with a type alias is not accepted there by pyright, which is why
 [the how-to](../how-to/write-code-for-any-energyplus-version.md#narrow-a-model-of-unknown-release-into-a-range)
-shows.
+keeps the tuple for `as_version` and the alias for annotations.
 
 ## Two checkers, two kinds of knowledge
 
@@ -156,14 +158,16 @@ each other, and code meant to span releases is best checked by both.
 
 ## Where the design is unfinished
 
-Two gaps are known, and each has a workaround in the how-to guides:
+One gap is known, and the how-to guides work around it. mypy reads the stubs
+but:
 
-- There is no helper that narrows a document into a range of releases in one
-  call. The loop over `as_version` is the pattern until there is.
-- mypy reads the stubs but reports document methods such as `add`,
-  `get_collection`, `version` and the accessors as missing, and misses invalid
-  assignments through a union of release types. pyright is the checker these
-  stubs are tested against.
+- reports document methods such as `add`, `get_collection`, `version` and the
+  accessors as missing;
+- misses invalid assignments through a union of release types;
+- collapses the union `as_version` returns for a tuple into what all its
+  releases share.
+
+pyright is the checker these stubs are tested against.
 
 ## See also
 

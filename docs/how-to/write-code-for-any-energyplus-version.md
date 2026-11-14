@@ -160,8 +160,23 @@ empty:
 --8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/reach_a_type_some_release_lacks.py:example"
 ```
 
-When the code needs the type's fields typed, restrict it to the releases that
-have the type instead, as the next section does.
+When the code needs the type's fields typed, narrow the model to the releases
+that have the type, and pass the objects to helpers annotated with the type's
+`Any<Class>`. `AnySpace` accepts a `Space` of any release that has one, 9.6 and
+later. Keep the public signature `AnyIDFDocument`, so the decision about older
+models lives in one place:
+
+```python
+--8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/space_for_any_release.py:example"
+```
+
+`_label` holds no version logic, and `label_spaces` is the only line that knows
+`Space` arrived in 9.6. Return early, as here, or raise if an older model is a
+caller's mistake. A `Space` is reached only through a document of a release that
+has it: `doc["Space"]` through `AnyIDFDocument` is an error, and the objects
+`get_collection("Space")` returns are `IDFObject`, which pyright does not accept
+as an `AnySpace`. Narrowing is covered in
+[narrow a model of unknown release into a range](#narrow-a-model-of-unknown-release-into-a-range).
 
 ## Restrict a function to a range of releases
 
@@ -255,21 +270,34 @@ type "Never"`. Add 9.4 to the range and the read type gains its own choices
 ## Narrow a model of unknown release into a range
 
 A function that takes `AnyIDFDocument` and wants to call `space_areas` has to
-establish that the model is 9.6 or later. `as_version` takes one release type,
-not a union, so try the range's types in turn:
+establish that the model is 9.6 or later. Pass `as_version` a tuple of the
+range's release types, as you would pass `isinstance` a tuple of classes:
 
 ```python
 --8<-- "docs/snippets/how-to/write-code-for-any-energyplus-version/narrow_into_range.py:example"
 ```
 
-Each `as_version` call checks the model's version at run time and raises
-`TypeError` on a mismatch, so the loop returns the model typed for its own
-release, or `None` before 9.6.
+Pyright types the result as the union of the tuple's types,
+`IDFDocumentV9_6[bool] | IDFDocumentV22_1[bool] | ... | IDFDocument[bool]`.
+`as_version` checks the version again at run time; without the early return, a
+9.4 model would raise:
 
-Two shorter forms do not work:
+```text
+TypeError: The document is EnergyPlus 9.4.0, not one of 9.6.0, 26.2.0, so it cannot be typed as IDFDocumentV9_6 | IDFDocument
+```
 
-- `as_version(doc, Since9_6)` is rejected: `Type "UnionType" is not assignable
-  to type "type[_D@as_version]"`.
+That message is from a two-type tuple; a longer tuple lists every release in it.
+
+Keep the tuple for `as_version` and the alias for annotations. The other
+spellings do not work for this:
+
+- The alias, `as_version(doc, Since9_6)`, is rejected by pyright: `No overloads
+  for "as_version" match the provided arguments`.
+- An inline union, `as_version(doc, IDFDocumentV9_6 | IDFDocument)`, works under
+  pyright and at run time, but mypy rejects it.
+- Under mypy, a tuple is accepted but its union collapses to what all its
+  releases share: `recent["Space"]` is `IDFCollection[AnySpace]`, and fields
+  that differ between the releases are reported as missing.
 - `isinstance(doc, IDFDocumentV9_6)` works at run time, but pyright rejects
   it: `Second argument to "isinstance" must be a class or tuple of classes`,
   with the detail `TypedDict class not allowed for instance or class checks`.

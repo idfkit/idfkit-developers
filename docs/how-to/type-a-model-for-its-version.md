@@ -57,28 +57,31 @@ example, should be checked against the older release:
 --8<-- "docs/snippets/how-to/type-a-model-for-its-version/new_document_for_a_release.py:example"
 ```
 
-## Handle one release differently inside general code
+## Handle a renamed field inside general code
 
-A function that takes models of any release sometimes needs one release's
-names, for example a field that release spells differently. `People`'s zone
-field was renamed in 9.6, so `AnyIDFDocument` offers neither name. Check the
-version, then type the model for that release inside the branch. `as_version`
-takes one release type, so each release before the rename gets its own branch:
+A function that takes models of any release sometimes needs a field that
+releases spell differently. `People`'s zone field was renamed in 9.6, so
+`AnyIDFDocument` offers neither name. Check the version, then type the model
+for the releases on that side of the rename. `as_version` takes one release
+type or a tuple of them:
 
 ```python
---8<-- "docs/snippets/how-to/type-a-model-for-its-version/narrow_to_one_release.py:example"
+--8<-- "docs/snippets/how-to/type-a-model-for-its-version/renamed_field.py:example"
 ```
 
-In the first two branches the document is typed for 9.4 and 9.5, and
-`update()` is checked against each. Use `as_version` for this, not `isinstance`
-or a `case` pattern: both work at run time, but pyright rejects them for
-document types. A release the function was not written for, here anything
-before 9.4, raises rather than being written with the wrong field name.
+Under pyright, each `update()` is checked against every release in its tuple:
+swapping the two names reports `No parameter named
+"zone_or_zonelist_or_space_or_spacelist_name"` in the first branch and `No
+parameter named "zone_or_zonelist_name"` in the second. Use `as_version` for
+this, not `isinstance` or a `case` pattern: both work at run time, but pyright
+rejects them for document types.
 
-The branch for 9.6 and later reaches the new name with item access,
-`obj["field"]`, which pyright does not check. To type that branch too, narrow
-it to a range of releases; see
-[how to write code for any EnergyPlus version](write-code-for-any-energyplus-version.md#narrow-a-model-of-unknown-release-into-a-range).
+mypy rejects both names here, because it collapses a tuple's union to what all
+its releases share. Under mypy, give each branch one release type, with one
+branch per release before the rename.
+
+To narrow to one release only, pass that release's type alone, as in the first
+section.
 
 ## Read the release's errors
 
