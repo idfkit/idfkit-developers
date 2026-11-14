@@ -5399,7 +5399,9 @@ line that follows the <code>for</code> loop:</p>
 <p>Notice that pyright knows <code>office</code> is a <code>Zone</code>, although we never annotated it,
 and that it knows every value the convection field accepts. Your editor shows
 the same list when you hover over the field or start typing a value.</p>
-<p>Delete the two <code>reveal_type</code> lines and keep the <code>office = ...</code> line.</p>
+<p>Pyright understands <code>reveal_type</code> without an import; Python doesn't, so the
+script stops with a <code>NameError</code> if you run it with these lines in it. Delete
+the two <code>reveal_type</code> lines and keep the <code>office = ...</code> line.</p>
 <h2 id="step-4-misspell-a-field">Step 4: Misspell a field<a class="headerlink" href="#step-4-misspell-a-field" title="Permanent link">&para;</a></h2>
 <p>In <code>describe</code>, change <code>zone.ceiling_height</code> to <code>zone.ceilng_height</code>, dropping
 the second <code>i</code>, and run pyright:</p>
