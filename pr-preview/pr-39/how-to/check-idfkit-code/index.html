@@ -5501,7 +5501,7 @@ the key.</dd>
 <h2 id="if-the-project-uses-mypy">If the project uses mypy<a class="headerlink" href="#if-the-project-uses-mypy" title="Permanent link">&para;</a></h2>
 <p>mypy reads the same stubs and reports the same field, value, key and
 <code>update()</code> mistakes, in its own words:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>error: Unexpected keyword argument "x_orign" for "update" of "_ZoneBase"; did you mean "x_origin", "y_origin", or "z_origin"?  [call-arg]
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>error: Unexpected keyword argument "x_orign" for "update" of "AnyZone"; did you mean "x_origin", "y_origin", or "z_origin"?  [call-arg]
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>error: TypedDict "IDFDocumentAllVersions[bool]" has no key "Space"  [typeddict-item]
 </span></code></pre></div>
 <p>It also reports document methods and accessors as missing, which they are not:</p>
