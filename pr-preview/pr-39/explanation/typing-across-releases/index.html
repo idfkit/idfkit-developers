@@ -5378,6 +5378,14 @@ zone of any release. Its fields are the shared ones. Because "every supported
 release" grows when idfkit adopts a new EnergyPlus release, <code>Any&lt;Class&gt;</code> can
 lose a field on an idfkit upgrade, which is the type checker reporting a real
 change rather than an instability in the stubs.</p>
+<p>In general, <code>Any&lt;Class&gt;</code> is the class as every supported release <em>that has it</em>
+declares it. For most types that is every release, but not for all: <code>AnySpace</code>
+is a <code>Space</code> as 9.6 and later declare it, because no earlier release has one.
+"Any" describes the object, as it describes the document in <code>AnyIDFDocument</code>;
+it does not make the type reachable from every document. A <code>Space</code> comes only
+from a document of a release that has the type, so <code>doc["Space"]</code> through
+<code>AnyIDFDocument</code> stays an error, and code that writes to spaces narrows the
+model first and then hands the objects to helpers typed <code>AnySpace</code>.</p>
 <p>Fields follow the same rule as object types. A field one release renamed or
 dropped is not offered, and since idfkit types unknown attribute names as
 errors on every typed object, a misspelling and a field another release lacks
@@ -5429,10 +5437,12 @@ collection, which is what lets <code>doc["Zone"]</code> be typed per key, and py
 not allow a <code>TypedDict</code> in an instance check or a class pattern. <code>as_version</code>
 is the narrowing that works in both worlds: a run-time check of the version, and
 a return type the checker trusts.</p>
-<p>It takes exactly one release type because its job is to state one fact. A range
-is a union of such facts, and narrowing into one means trying its members, as
+<p>It takes a release type, or a tuple of them, the way <code>isinstance</code> takes a class
+or a tuple of classes: a tuple is a plain value that run time can check one
+member at a time, and that pyright reads as the union of its members. A union
+named with a type alias is not accepted there by pyright, which is why
 <a href="../../how-to/write-code-for-any-energyplus-version/#narrow-a-model-of-unknown-release-into-a-range">the how-to</a>
-shows.</p>
+keeps the tuple for <code>as_version</code> and the alias for annotations.</p>
 <h2 id="two-checkers-two-kinds-of-knowledge">Two checkers, two kinds of knowledge<a class="headerlink" href="#two-checkers-two-kinds-of-knowledge" title="Permanent link">&para;</a></h2>
 <p><code>idfkit check</code> and pyright both report object types and choices that a release
 lacks, and still catch different lines, because they know different things.</p>
@@ -5450,15 +5460,16 @@ assignment.</p>
 <p>So they overlap on typed lookups such as <code>doc["Space"]</code> and otherwise complement
 each other, and code meant to span releases is best checked by both.</p>
 <h2 id="where-the-design-is-unfinished">Where the design is unfinished<a class="headerlink" href="#where-the-design-is-unfinished" title="Permanent link">&para;</a></h2>
-<p>Two gaps are known, and each has a workaround in the how-to guides:</p>
+<p>One gap is known, and the how-to guides work around it. mypy reads the stubs
+but:</p>
 <ul>
-<li>There is no helper that narrows a document into a range of releases in one
-  call. The loop over <code>as_version</code> is the pattern until there is.</li>
-<li>mypy reads the stubs but reports document methods such as <code>add</code>,
-  <code>get_collection</code>, <code>version</code> and the accessors as missing, and misses invalid
-  assignments through a union of release types. pyright is the checker these
-  stubs are tested against.</li>
+<li>reports document methods such as <code>add</code>, <code>get_collection</code>, <code>version</code> and the
+  accessors as missing;</li>
+<li>misses invalid assignments through a union of release types;</li>
+<li>collapses the union <code>as_version</code> returns for a tuple into what all its
+  releases share.</li>
 </ul>
+<p>pyright is the checker these stubs are tested against.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../../how-to/write-code-for-any-energyplus-version/">How to write code for any EnergyPlus version</a>

@@ -39,6 +39,7 @@ def space_areas(doc: Since9_6) -> dict[str, float | None]:
 from idfkit.document import AnyIDFDocument
 from idfkit.versioned import as_version
 
+# A tuple of the same release types, for as_version; the alias above is for annotations.
 SINCE_9_6 = (
     IDFDocumentV9_6,
     IDFDocumentV22_1,
@@ -54,21 +55,10 @@ SINCE_9_6 = (
 )
 
 
-def as_since_9_6(doc: AnyIDFDocument) -> Since9_6 | None:
-    """The document typed for its own release, or None for a release before 9.6."""
-    for release in SINCE_9_6:
-        try:
-            return as_version(doc, release)  # checks the file's version at run time
-        except TypeError:
-            continue
-    return None
-
-
 def report_spaces(doc: AnyIDFDocument) -> dict[str, float | None]:
-    since_9_6 = as_since_9_6(doc)
-    if since_9_6 is None:
+    if doc.version < (9, 6, 0):
         return {}  # a model before 9.6 has no Space objects
-    return space_areas(since_9_6)
+    return space_areas(as_version(doc, SINCE_9_6))  # checked again at run time
 
 
 # --8<-- [end:example]

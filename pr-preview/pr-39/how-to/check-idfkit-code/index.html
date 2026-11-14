@@ -5447,7 +5447,9 @@ version. Importing them outside a
 </span></code></pre></div>
 <p>It exits non-zero when it reports an error, so the same command works as a CI
 step. A file that names one or two release types (<code>IDFDocumentV9_4</code> and so on)
-or <code>AnyIDFDocument</code> takes a few seconds to check.</p>
+or <code>AnyIDFDocument</code> takes about 2 seconds to check, and one that names most of
+the 18 release types, such as a tuple for a range, about 5. Those times were
+measured with pyright 1.1.414.</p>
 <h2 id="run-idfkit-check-against-the-releases-you-support">Run <code>idfkit check</code> against the releases you support<a class="headerlink" href="#run-idfkit-check-against-the-releases-you-support" title="Permanent link">&para;</a></h2>
 <p>List the releases with <code>--targets</code>, or a migration's two ends with <code>--from</code> and
 <code>--to</code>. The command takes files, not directories, so pass it the file list:</p>
@@ -5511,7 +5513,9 @@ the key.</dd>
 <p>The same happens for <code>get_collection</code> and <code>version</code>. mypy also misses an
 invalid value assigned to a field through a union of release types, such as
 <code>IDFDocumentV9_4 | IDFDocument</code>, although it reports the same value passed to
-<code>update()</code>. Until that is fixed in
+<code>update()</code>. And it reads <code>as_version(doc, (A, B))</code> as only what A and B share,
+so a field that differs between them is reported as missing. Until that is
+fixed in
 idfkit's stubs, pyright is the checker to rely on for idfkit code; if you keep
 mypy, silence <code>attr-defined</code> on those lines rather than for the whole project.</p>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
