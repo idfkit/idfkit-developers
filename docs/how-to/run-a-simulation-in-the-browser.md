@@ -101,8 +101,8 @@ verbatim, so what you press is what you read.
 
 <div class="engine-runner"
      data-engine-example="../../snippets/js/how-to/run-a-simulation-in-the-browser/live_runner.js"
-     data-engine-schemas="https://cdn.jsdelivr.net/npm/@idfkit/schemas@0.1.0/data/"
-     data-engine-weather="https://cdn.jsdelivr.net/npm/@idfkit/engine-assets@26.2/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw">
+     data-engine-schemas="https://cdn.jsdelivr.net/npm/@idfkit/schemas@0.4.0/data/"
+     data-engine-weather="https://cdn.jsdelivr.net/gh/NREL/EnergyPlus@v26.2.0/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw">
   <button class="md-button" type="button" data-engine-run>
     Run EnergyPlus in this tab
   </button>

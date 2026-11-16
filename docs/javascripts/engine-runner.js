@@ -37,11 +37,18 @@
 
   /* jsDelivr serves the published packages as ES modules. Versions are pinned: an unpinned
      specifier would silently start executing a different EnergyPlus release than the page says
-     it does, which is exactly the claim FR-073 asks the page to make precisely. */
-  const ENGINE = 'https://cdn.jsdelivr.net/npm/@idfkit/engine@0.3.0/+esm';
-  const CORE = 'https://cdn.jsdelivr.net/npm/@idfkit/core@0.1.0/+esm';
-  const SCHEMAS = 'https://cdn.jsdelivr.net/npm/@idfkit/schemas@0.1.0/+esm';
-  const ASSETS = 'https://cdn.jsdelivr.net/npm/@idfkit/engine-assets@26.2';
+     it does, which is exactly the claim FR-073 asks the page to make precisely.
+
+     The pins move together. `core` and `schemas` are the release the vendored docs level was
+     built against (docs-2026.8 is 0.4.0; 0.1.0 still exported `IDFDocument`). `engine` must be
+     one that loads the EnergyPlus the assets carry: 0.3.0 and 0.4.0 look for the 26.1 binary,
+     0.5.0 onwards for 26.2. The binaries sit under `assets/`, not at the package root, and the
+     worker ships in `@idfkit/engine`, not in `engine-assets`, so it needs its own URL. */
+  const ENGINE = 'https://cdn.jsdelivr.net/npm/@idfkit/engine@0.6.0/+esm';
+  const WORKER = 'https://cdn.jsdelivr.net/npm/@idfkit/engine@0.6.0/dist/engine.worker.js';
+  const CORE = 'https://cdn.jsdelivr.net/npm/@idfkit/core@0.4.0/+esm';
+  const SCHEMAS = 'https://cdn.jsdelivr.net/npm/@idfkit/schemas@0.4.0/+esm';
+  const ASSETS = 'https://cdn.jsdelivr.net/npm/@idfkit/engine-assets@26.2.0/assets';
 
   const SPECIFIERS = new Map([
     ['@idfkit/engine', ENGINE],
@@ -84,8 +91,18 @@
       const { SchemaBundle, httpSource } = await import(/* webpackIgnore: true */ CORE);
       const schema = await new SchemaBundle(httpSource(root.dataset.engineSchemas)).load('26.2.0');
 
-      const epw = await fetch(root.dataset.engineWeather).then((r) => r.text());
-      await example.run(schema, epw, ASSETS, say);
+      const weather = await fetch(root.dataset.engineWeather);
+      if (!weather.ok) throw new Error(`the weather file returned HTTP ${weather.status}`);
+      const epw = await weather.text();
+
+      /* The example takes the worker URL from the idfkit-js docs release that adds it on. Until
+         that release is vendored, it takes (schema, epw, assetBaseUrl, log). Reading the arity
+         keeps one runner correct across the level bump, so the bump needs no edit here. */
+      if (example.run.length >= 5) {
+        await example.run(schema, epw, ASSETS, WORKER, say);
+      } else {
+        await example.run(schema, epw, ASSETS, say);
+      }
     } catch (error) {
       /* SC-029: the example is already on the page as text and stays there. */
       say(
