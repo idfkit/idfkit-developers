@@ -28,6 +28,19 @@ exists in only one of them, the guide says so on its first screen.
 - [How to compare two EnergyPlus versions](compare-versions.md): what changed
   between two releases, and whether a model survives the move
 
+## Writing typed code
+
+These three are Python only. TypeScript gets the same checks from its compiler
+and the per-release type packages.
+
+- [How to check idfkit code with pyright and `idfkit check`](check-idfkit-code.md):
+  which of the two catches what, strict mode, and both in CI
+- [How to write code for any EnergyPlus version](write-code-for-any-energyplus-version.md):
+  when to annotate `IDFDocument` and when `AnyIDFDocument`, and code for a range
+  of releases
+- [How to type a model for its EnergyPlus version](type-a-model-for-its-version.md):
+  editor completion and type errors that match one file's release
+
 ## In the browser
 
 These two are TypeScript only, because there is no Python browser runtime.

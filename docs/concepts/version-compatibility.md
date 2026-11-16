@@ -292,7 +292,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - run: uv sync
-      - run: uv run idfkit check src/ --from 24.2 --to 25.1 --sarif > results.sarif
+      - run: uv run idfkit check $(git ls-files 'src/*.py') --from 24.2 --to 25.1 --sarif > results.sarif
         continue-on-error: true
       - uses: github/codeql-action/upload-sarif@v3
         with:
@@ -371,3 +371,5 @@ for (obj_type, field), removed in diff.removed_choices.items():
   why holding several versions at once is cheap
 - [Type safety](type-safety.md) for catching the same class of mistake in an
   editor
+- [How to check idfkit code with pyright and `idfkit check`](../how-to/check-idfkit-code.md)
+  for which of the two catches what

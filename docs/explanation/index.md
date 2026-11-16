@@ -41,6 +41,9 @@ language you work in.
   give you completion and catch typos, in Python.
 - [Static types generated from the schema](generated-types.md): how a misspelled
   field name becomes a compile error, in TypeScript.
+- [Why code for any release sees less](typing-across-releases.md): why a
+  function that accepts any EnergyPlus release is offered only the names every
+  release has, and why a changed field reads wide and writes narrow, in Python.
 - [Why accessors and not a `Proxy`](accessors-not-proxies.md): why
   `zone.ceiling_height` is a real property, in TypeScript.
 - [Content-addressed schemas](content-addressed-schemas.md): how 18 versions of
