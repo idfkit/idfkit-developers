@@ -36,3 +36,24 @@ SQLite output database parsing and query interface.
     options:
       show_root_heading: true
       show_source: true
+
+## ComponentSize
+
+::: idfkit.simulation.parsers.sql.ComponentSize
+    options:
+      show_root_heading: true
+      show_source: true
+
+## SQLErrorRow
+
+::: idfkit.simulation.parsers.sql.SQLErrorRow
+    options:
+      show_root_heading: true
+      show_source: true
+
+## ZoneRow
+
+::: idfkit.simulation.parsers.sql.ZoneRow
+    options:
+      show_root_heading: true
+      show_source: true
