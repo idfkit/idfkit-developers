@@ -58,6 +58,7 @@ nav:
       - Save a file without reformatting it: how-to/preserve-formatting.md
       - Edit extensible groups: how-to/edit-extensible-groups.md
       - Compare two EnergyPlus versions: how-to/compare-versions.md
+      - Use idfkit from several threads: how-to/use-threads.md
       - Read a model's geometry: geometry/reading.md
     - In the browser:
       - Parse in the browser: how-to/parse-in-the-browser.md
@@ -182,10 +183,11 @@ nav:
     - Simulation architecture: concepts/simulation-architecture.md
     - Weather data pipeline: concepts/weather-pipeline.md
     - Caching strategy: concepts/caching.md
+    - Why idfkit locks its caches and not your documents: explanation/threads-and-documents.md
     - Geocoding & IP location: explanation/geocoding.md
     - How the schedule evaluator works: design/schedule-evaluator.md
     - Performance & benchmarks: benchmarks.md
-    # One page about the agent skill, not the skill itself. The 16 topic references it
+    # One page about the agent skill, not the skill itself. The 17 topic references it
     # describes are baked into the wheel and are NOT published here, deliberately: the skill
     # loads the reference set baked into the idfkit version installed in the reader's project,
     # and a page can only ever show the one version this site pins. Publishing them made the

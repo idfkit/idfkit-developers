@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A how-to guide, *How to use idfkit from several threads*, and an explanation, *Why idfkit locks
+  its caches and not your documents*: what threads may share, how to copy or lock a shared model,
+  why weather files are fetched once before fanning out, and what threads buy on a regular and on a
+  free-threaded build of Python. Both describe the first idfkit release after 1.2.0.
 - The visual identity of idfkit at `identity-2026.5`: a fifth pinned level,
   `[tool.idfkit.identity]`, the `material` derivation and the host files vendored under
   `docs/identity/`, the palette, stylesheets, mark and favicon read from them, the ownership line
@@ -28,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- *Caching strategy* says how each cache stays thread- and process-safe: the simulation cache
+  renames a finished directory into place, and the weather cache, from the release after 1.2.0,
+  renames each finished file.
+- *Developing with an AI assistant* lists the seventeenth bundled reference, `threading.md`, and
+  *Installation* names the free-threaded build of Python 3.14 among the supported runtimes.
 - `docs/stylesheets/extra.css` holds layout rules only; every colour, font and easing comes from
   the vendored derivation.
 - The site serves its two typefaces itself from `docs/identity/material/fonts/` and no longer

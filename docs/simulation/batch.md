@@ -84,6 +84,10 @@ Default: `min(len(jobs), os.cpu_count())`
 - Lower memory overhead than multiprocessing
 - Simpler error handling
 
+Each job copies its model when it starts, not when the batch is submitted, so do not edit a
+job's model until the batch returns. For what else threads may share, see
+[How to use idfkit from several threads](../how-to/use-threads.md).
+
 ## Error Handling
 
 Failed simulations don't stop the batch:
