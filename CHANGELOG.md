@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The eppy migration guide says that a type checker accepts only snake_case field names on a
+  typed object, such as one from `doc["Zone"]["Office"]`, while objects from the eppy API accept
+  either spelling. This follows idfkit/idfkit#272, which makes an undeclared field name a type
+  error on typed objects.
 - `docs/stylesheets/extra.css` holds layout rules only; every colour, font and easing comes from
   the vendored derivation.
 - The site serves its two typefaces itself from `docs/identity/material/fonts/` and no longer
