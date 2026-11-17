@@ -28,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The pages describe what idfkit has done since 1.2.0. Typed objects now reject undeclared field
+  names at type-check time, including eppy-style capitalised spellings and field names from
+  EnergyPlus versions before 26.2. `add()` now refuses unknown keys and malformed extensible
+  groups, and a name on a type with no Name field. These are covered in the type-safety concept,
+  the generated-types and epJSON field-name explanations, the extensible-groups how-to, the
+  common-errors page, and the `Output:Variable` examples.
 - `docs/stylesheets/extra.css` holds layout rules only; every colour, font and easing comes from
   the vendored derivation.
 - The site serves its two typefaces itself from `docs/identity/material/fonts/` and no longer
@@ -38,6 +44,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The I/O API page gave `strict=False` as the default of `load_idf()` and `load_epjson()`; it is
+  `strict=True`.
+- The installation page, the common-errors page and the sizing-workflow notebook offered an
+  `idfkit[weather]` extra that does not exist, and the installation page left out `async-s3`. They
+  now list the extras `pyproject.toml` declares, with `pandas` ahead of its alias `dataframes`.
 - The Scythe integration example raised `InvalidFieldError` on an EnergyPlus 24.2 model, the
   version its Docker image runs: it set `Thermal_Resistance` on a `Material`, which has no such
   field, and `Watts_per_Zone_Floor_Area` on `Lights`, a name EnergyPlus replaced in 24.1. It now

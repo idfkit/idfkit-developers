@@ -52,8 +52,10 @@ in the type generator: five places to keep consistent, for a cosmetic gain, in a
 library whose whole job is to be a faithful representation of a model.
 
 Python gives up less, because the epJSON spelling is already a legal Python
-attribute name. It also accepts the IDD spelling as an alias, so `Ceiling
-Height` and `CEILING_HEIGHT` both reach `ceiling_height`. Storage and output are
+attribute name. At run time it also accepts the IDD spelling as an alias, so `Ceiling
+Height` and `CEILING_HEIGHT` both reach `ceiling_height`. A type checker does
+not: on a typed object, `zone.CEILING_HEIGHT` is reported, and only the epJSON
+spelling is declared. Storage and output are
 unaffected: the epJSON name is what is held and what is written.
 
 ## Where the rule stops
