@@ -15,6 +15,19 @@ page is the reference for the one step.
 --8<-- "docs/snippets/weather/design-days/basic_usage.py:example"
 ```
 
+### From a station
+
+`DesignDayManager.from_station()` downloads the DDY for a station and parses it:
+
+```python
+--8<-- "docs/snippets/weather/design-days/from_station.py:example"
+```
+
+`dataset` defaults to the station's own dataset, which for a search result is
+the newest. It accepts a `dataset_variant` (`"TMYx.2009-2023"`) or its years
+(`"2009-2023"`), and raises `ValueError` listing the available datasets when the
+station has no such one.
+
 ## Quick Apply
 
 Use `apply_ashrae_sizing()` for a streamlined workflow:

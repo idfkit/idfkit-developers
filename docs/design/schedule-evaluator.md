@@ -60,6 +60,9 @@ Schedule:Compact,
   Until: 24:00, 0.0;
 ```
 
+Like EnergyPlus, the parser accepts each keyword with or without its colon
+(`Through 12/31`, `For AllDays`, `Until 24:00`).
+
 The parser turns those flat fields into structured periods and day rules, so
 evaluation becomes "find the period containing the date, find the day rule
 matching the day type, find the first `Until:` time at or after the moment":
@@ -162,6 +165,18 @@ through an explicit `day_type` override, so sizing previews are opt-in:
 ```python
 --8<-- "docs/snippets/design/schedule-evaluator/2_design_days.py:example"
 ```
+
+### Incomplete schedules are errors, not guesses
+
+EnergyPlus stops on a `Schedule:Compact` whose last `Through:` is not `12/31`
+("missing days in its schedule pointers") or whose `For:` block does not reach
+`Until: 24:00` ("incomplete day detected"). The evaluator could reuse the last
+period or the last value for the uncovered time, but it would then show values
+for a model that cannot run. So it raises `MalformedScheduleError` instead, and
+`compact_problems()` lists the same gaps without raising.
+
+Missing day types are a different case. A schedule with `For: Weekdays` alone is
+accepted, because EnergyPlus only warns about it.
 
 ### Schedule:File
 

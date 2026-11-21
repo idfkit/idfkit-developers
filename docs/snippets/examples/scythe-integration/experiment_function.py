@@ -36,8 +36,9 @@ def simulate_building(input_spec: BuildingSimInput, tempdir: Path) -> BuildingSi
     from idfkit.simulation import simulate
     from idfkit.weather import DesignDayManager
 
-    # Load the base IDF model (FileReference resolves to a local path)
-    model = load_idf(input_spec.idf_file)
+    # Load the base IDF model (FileReference resolves to a local path). since="24.1"
+    # refuses an older model and types this one for the releases from 24.1 on.
+    model = load_idf(input_spec.idf_file, since="24.1")
 
     # Apply parametric overrides. The insulation layer is a Material:NoMass,
     # which takes its R-value directly (Material is set by thickness and conductivity).
@@ -49,7 +50,7 @@ def simulate_building(input_spec: BuildingSimInput, tempdir: Path) -> BuildingSi
         material.thermal_resistance = input_spec.r_value
 
     # Field names follow EnergyPlus 24.1 and later (the worker image below runs 24.2);
-    # up to 23.2 the Lights field is watts_per_zone_floor_area.
+    # up to 23.2 the Lights field is watts_per_zone_floor_area, which since= rules out.
     for lights in model["Lights"]:
         lights.design_level_calculation_method = "Watts/Area"
         lights.watts_per_floor_area = input_spec.lpd

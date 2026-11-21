@@ -11,17 +11,17 @@ ts = sql.get_timeseries(
     environment="sizing",
 )
 
-# Annual/run period results only (default)
+# Run period results only
 ts = sql.get_timeseries(
     "Zone Mean Air Temperature",
     "ZONE 1",
     environment="annual",
 )
 
-# All environments (design days + run periods)
+# All environments (design days, then run periods)
 ts = sql.get_timeseries(
     "Zone Mean Air Temperature",
     "ZONE 1",
-    environment=None,
+    environment="all",
 )
 # --8<-- [end:example]

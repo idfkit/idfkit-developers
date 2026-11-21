@@ -30,6 +30,11 @@ not know what it was handed does not have to look the key up.
     surface.vertices[0].as_dict()  # {'vertex_x_coordinate': ..., ...}
     ```
 
+    Reading a required group key that is unset, such as a vertex's z,
+    raises `MissingRequiredFieldError`; `group.get("vertex_z_coordinate")`
+    returns `None` instead. `add()` refuses a vertex without its z unless you
+    pass `validate=False`.
+
 === "TypeScript"
 
     ```ts

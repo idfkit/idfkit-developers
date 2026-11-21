@@ -22,7 +22,7 @@ print(version_string(doc.version))
 
 
 # --8<-- [start:zone]
-zone = doc.add("Zone", "Open Office", ceiling_height=2.7, multiplier=1)
+zone = doc.zones.add("Open Office", ceiling_height=2.7, multiplier=1)
 
 print(zone.name, zone.ceiling_height)
 # --8<-- [end:zone]

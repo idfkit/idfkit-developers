@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from idfkit import IDFDocument, MigrationReport
-
-model: IDFDocument = ...  # type: ignore[assignment]
-report: MigrationReport = ...  # type: ignore[assignment]
 # --8<-- [start:example]
 from idfkit import load_idf, migrate
 from idfkit.simulation import find_energyplus
@@ -16,7 +12,11 @@ report = migrate(model, target_version=config.version, energyplus=config)
 
 print(report.summary())
 
+if not report.steps:
+    print("Already at the target version")
+
+# The migrated model has no filepath: save it to a new path
 migrated = report.migrated_model
-if migrated is not None:
-    print(f"Migrated model version: {migrated.version}")
+print(f"Migrated model version: {migrated.version}")
+migrated.save("migrated_building.idf")
 # --8<-- [end:example]

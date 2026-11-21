@@ -65,7 +65,8 @@ string.
 
 A zone is a volume of air EnergyPlus solves for. `add` takes the object type,
 the name, and the fields, and hands back the object it created; its fields are
-ordinary properties from there on.
+ordinary properties from there on. Python's typed form adds through the type's
+collection instead, so the type is not named again: `doc.zones.add(name, ...)`.
 
 === "Python"
 
@@ -86,8 +87,8 @@ Open Office 2.7
 Those field names are the epJSON names, spelled exactly as the schema spells
 them: `ceiling_height` in both languages, not `ceilingHeight`, and [not the
 IDD's `Ceiling Height`](../explanation/epjson-field-names.md). An editor can
-complete them, from the shipped stubs in Python and from an opt-in type package
-in TypeScript, which is [Static types generated from the
+complete them, from the shipped stubs in Python when you add through the
+collection and from an opt-in type package in TypeScript, which is [Static types generated from the
 schema](../explanation/generated-types.md).
 
 ## Step 3: Add a wall, its construction, and its material

@@ -101,7 +101,9 @@ version explicitly:
     ```
 
 An explicit version overrides detection entirely, so it doubles as a "parse this
-as if it were 26.1" escape hatch. Use it knowingly: that is precisely the
+as if it were 26.1" escape hatch. In Python, `version=` takes a
+`(major, minor, patch)` tuple; a string such as `"26.1"` raises `TypeError`.
+A `Version` line inside a `!` comment is not detected. Use it knowingly: that is precisely the
 mis-mapping the resolution logic exists to prevent. Python rejects a version
 that is not a known EnergyPlus release with `UnsupportedVersionError`, and
 raises `VersionNotFoundError` when detection finds nothing and you passed
@@ -129,7 +131,9 @@ leaving the decision to the caller.
 A document is bound to one version for its lifetime. There is no
 version-agnostic mode, because field order and reference lists genuinely differ
 between releases, so working across versions means holding several documents,
-not one flexible one.
+not one flexible one. In Python, code that handles several releases is typed
+for what they share: a loaded model is an `AnyIDFDocument` until you name its
+release, as [Typed for a Release](type-safety.md#typed-for-a-release) explains.
 
 Keep a single schema source for all of them. Python's `get_schema()` goes
 through a process-wide `SchemaManager` that caches every version it has loaded,
@@ -151,21 +155,28 @@ name. There is no TypeScript counterpart: generated type packages such as
 
 ### What it detects
 
-| Code | Description |
-|------|-------------|
-| `C001` | Object type exists in one schema version but not another |
-| `C002` | Enumerated choice value for a field exists in one version but not another |
+| Code | Severity | Description |
+|------|----------|-------------|
+| `C001` | warning | Object type exists in one schema version but not another |
+| `C002` | warning | Enumerated choice value for a field exists in one version but not another |
+| `C003` | error | Object type passed to `get_collection()` exists in none of the target versions |
+| `C004` | warning | Literal object type passed to `get_collection()`, whose result is untyped; index the document instead. Opt-in: `--extend-select C004` |
+| `C005` | warning | Suppression comment that silences nothing, or names an unknown rule |
+| `C006` | error | Object type, field name or choice value passed to `add()` that none of the target versions accepts |
+
+Every rule except `C004` is on by default.
 
 The linter extracts string literals from these AST patterns:
 
 - `doc.add("ObjectType", ...)`: the first positional argument is treated as an
-  EnergyPlus object type.
+  EnergyPlus object type, and keyword argument names as its field names.
 - `doc.add("ObjectType", field="value")`: keyword argument string values are
   checked against the field's enumerated choices in the schema.
 - `doc.add("ObjectType", "Name", {"field": "value"})`: string values in a dict
   literal argument are also checked.
 - `doc["ObjectType"]`: subscript access is checked when the file imports from
   `idfkit`.
+- `doc.get_collection("ObjectType")`: the literal is checked as an object type.
 
 Dynamic strings, f-strings, and variable references are ignored on purpose, to
 keep false positives low.
@@ -178,7 +189,38 @@ idfkit check my_model.py --from 24.2 --to 25.1
 
 # Several target versions at once
 idfkit check my_model.py --targets 24.1,24.2,25.1
+
+# Every supported release from 9.4 on, over a whole directory
+idfkit check src/ --since 9.4
+
+# Every supported release
+idfkit check src/ --targets all
 ```
+
+A path can be a file or a directory, which is searched for `*.py` files. With no
+path, `idfkit check` lints the `paths` set in `pyproject.toml`, or else the
+current directory. A release idfkit does not support is refused, newer ones
+included, rather than checked as the nearest one.
+
+### Configure in pyproject.toml
+
+Settings for a project go in a `[tool.idfkit.check]` table in the nearest
+`pyproject.toml`, so a bare `idfkit check` runs with them:
+
+```toml
+[tool.idfkit.check]
+since = "9.4"                    # or targets = "all", or targets = ["9.4", "24.1", "26.2"]
+paths = ["src"]
+exclude = ["src/legacy/**"]      # glob patterns, relative to this pyproject.toml
+extend-select = ["C004"]
+ignore = []
+per-file-ignores = { "tests/**" = ["C004"] }
+fail-on = "warning"              # or "error"
+```
+
+The table also takes `before`, `select`, `group` and `exclude-group`.
+Command-line options override it. `--config PATH` reads the table from another
+file, and `--isolated` ignores every `pyproject.toml`.
 
 ### Emit machine-readable output for CI
 
@@ -227,29 +269,49 @@ By default every diagnostic is reported. `--severity` sets a minimum:
 idfkit check my_model.py --from 24.2 --to 25.1 --severity error
 ```
 
+`--select` replaces the default rule set, and `--extend-select` adds to it, as
+in `--extend-select C004`.
+
+### Silence one line, or code a guard admits
+
+A trailing `# idfkit: ignore[C001]` comment silences the listed rules on its
+line. A suppression comment that silences nothing, or names an unknown rule, is
+itself reported as `C005`, so stale ones do not pile up.
+
+Code that runs only on some releases is checked only against those. A lookup on
+a document narrowed with `as_version(doc, ...)`, or inside a guard such as
+`if doc.version >= (9, 4, 0):`, is checked against the targets that narrowing
+or guard admits.
+
 ### Exit codes
 
 | Code | Meaning |
 |------|---------|
-| `0` | No compatibility issues found |
-| `1` | One or more compatibility issues found |
-| `2` | Usage error (bad arguments, missing file, etc.) |
+| `0` | Nothing at or above the `--fail-on` severity was reported |
+| `1` | Something at or above the `--fail-on` severity (default `warning`) was reported |
+| `2` | Usage, configuration or syntax error, including a target release idfkit does not support |
 
 ### Complete flag reference
 
 | Flag | Description |
 |------|-------------|
-| `FILE ...` | Python file(s) to lint (positional, required) |
-| `--from VERSION` | Source EnergyPlus version (e.g. `24.2`) |
-| `--to VERSION` | Target EnergyPlus version (required with `--from`) |
-| `--targets VERSIONS` | Comma-separated target versions (alternative to `--from`/`--to`) |
+| `PATH ...` | Files or directories to lint (directories are searched for `*.py`). Defaults to `paths` in `[tool.idfkit.check]`, else the current directory |
+| `--from VERSION` | Source release of a single migration (e.g. `24.2`), with `--to`. Only those two releases are compared |
+| `--to VERSION` | Target release of the migration (required with `--from`) |
+| `--targets VERSIONS` | Comma-separated target releases, or `all` for every supported release |
+| `--since VERSION` | Target every supported release from `VERSION` on (inclusive) |
+| `--before VERSION` | Target every supported release before `VERSION` (exclusive); combines with `--since` |
+| `--config PYPROJECT` | Read `[tool.idfkit.check]` from this file instead of searching for one |
+| `--isolated` | Ignore every `pyproject.toml` |
 | `--json` | Output diagnostics as JSON |
 | `--sarif` | Output diagnostics as SARIF 2.1.0 |
-| `--select CODES` | Only report these lint rule codes (e.g. `C001,C002`) |
-| `--ignore CODES` | Suppress these lint rule codes (e.g. `C002`) |
+| `--select CODES` | Rule codes to check, replacing the default set (`C001,C002,C003,C005,C006`) |
+| `--extend-select CODES` | Rule codes to check in addition (e.g. `C004`) |
+| `--ignore CODES` | Rule codes not to check (e.g. `C002`) |
 | `--group GROUPS` | Only lint object types in these IDD groups |
 | `--exclude-group GROUPS` | Exclude object types in these IDD groups |
-| `--severity LEVEL` | Minimum severity: `warning` or `error` |
+| `--severity LEVEL` | Minimum severity to report: `warning` or `error` |
+| `--fail-on LEVEL` | Lowest reported severity that makes the exit status 1 (default `warning`) |
 
 ### Run the linter on every commit
 
@@ -313,8 +375,14 @@ diagnostics = check_compatibility(
 
 for d in diagnostics:
     print(d)
-    # my_script.py:12:5: C001 [warning] Object type 'Foo' not found in 25.1.0 (exists in 24.2.0)
+    # my_script.py:3:8: C006 [error] Object type 'Foo' is not in any target version (24.2.0, 25.1.0); ...
 ```
+
+Each literal is reported once, however many targets lack it: `missing_in` lists
+every one of them, and `to_version` is the earliest. `select`, `ignore` and
+`suppressions` work as the command-line options and comments do; pass
+`select={"C001", "C002", "C003", "C004", "C005", "C006"}` to include the opt-in
+rule.
 
 Group filtering and SARIF formatting are available the same way:
 

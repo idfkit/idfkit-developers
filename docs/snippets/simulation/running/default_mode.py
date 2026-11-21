@@ -6,5 +6,5 @@ from idfkit.simulation import simulate
 model: IDFDocument = ...  # type: ignore[assignment]
 weather: str = ...  # type: ignore[assignment]
 # --8<-- [start:example]
-result = simulate(model, weather)  # Uses model's RunPeriod objects
+result = simulate(model, weather)  # SimulationControl decides: sizing periods, then RunPeriod objects
 # --8<-- [end:example]

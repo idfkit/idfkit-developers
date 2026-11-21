@@ -95,6 +95,13 @@ editor decides whether to warn before saving.
     --8<-- "docs/snippets/js/how-to/preserve-formatting/ask_whether_a_write_will_preserve.ts:example"
     ```
 
+Python also warns by itself. Saving a document read without
+`preserve_formatting=True` over the file it came from, when that file holds `!`
+comments, warns with `FormattingLossWarning`: the save drops the comments and
+re-sorts the objects. Load with `preserve_formatting=True` to keep them, save to
+another path, or pass `preserve_formatting=False` to the save to accept the loss
+without the warning.
+
 ## Preserving and reformatting are refused together
 
 Reproducing the original text and laying it out differently are contradictory
@@ -164,10 +171,10 @@ read time, which is what makes a removal visible at all.
 Reproduction is defined against **the text the read was given**, not against a
 file's bytes. If you decode a file yourself and hand over a string, you get that
 string back. If you read through the library, you get back what the library's
-own decoding produced, and decoding is where two known defects live: the
-TypeScript reader refuses a file carrying a UTF-8 byte-order mark, and Python's
-`save_idf` opens its destination without `newline=""`, so the standard library
-translates line endings on the way out.
+own decoding produced.
 
-Neither is closed by preservation, and neither is visible to it. An editor that
-needs byte identity end to end should decode and encode the file itself.
+Python's `save_idf` writes back the encoding and line endings the file was read
+with; `encoding=` and `newline=` override them. In TypeScript, decoding is where
+a known defect lives: the reader refuses a file carrying a UTF-8 byte-order
+mark. Preservation does not close it and cannot see it, so a TypeScript editor
+that needs byte identity end to end should decode and encode the file itself.

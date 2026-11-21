@@ -211,6 +211,8 @@ Generate SVG for a Construction IDFObject.
 
 **Raises:**
 - `TypeError`: If not an IDFObject or not a Construction
+- `DanglingReferenceError`: If a layer names a material the document does not have
+- `ValueError`: If the construction has layers but is not in a document
 
 ---
 
@@ -360,6 +362,10 @@ All view functions accept a `zones` parameter to display only specific zones:
 ```python
 fig = view_model(model, zones=["Zone1", "Zone2"])
 ```
+
+`zones` takes a list of zone names or `Zone` objects. An unknown name raises
+`ObjectNotFoundError` rather than drawing an empty figure. A single zone still goes in a list:
+a bare string such as `zones="Zone1"` raises `TypeError`.
 
 ## See Also
 

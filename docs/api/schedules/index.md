@@ -12,6 +12,7 @@ running a simulation.
 | [`to_series()`](#idfkit.schedules.to_series) | Convert to pandas Series |
 | [`plot_schedule()`](#idfkit.schedules.plot_schedule) | Quick visualization |
 | [`get_holidays()`](#idfkit.schedules.get_holidays) | Extract holidays from model |
+| [`compact_problems()`](#idfkit.schedules.compact_problems) | List fatal coverage gaps in a Schedule:Compact |
 
 ## String Parameters
 
@@ -29,6 +30,11 @@ The `day_type` and `interpolation` parameters accept strings for convenience:
       show_source: false
 
 ::: idfkit.schedules.values
+    options:
+      show_root_heading: true
+      show_source: false
+
+::: idfkit.schedules.compact_problems
     options:
       show_root_heading: true
       show_source: false

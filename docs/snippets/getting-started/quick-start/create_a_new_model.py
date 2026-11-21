@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from idfkit import IDFDocument
-
-model: IDFDocument = ...  # type: ignore[assignment]
 # --8<-- [start:example]
 from idfkit import new_document
+from idfkit.versioned import IDFDocumentV24_1
 
-# Create a baseline model for EnergyPlus 24.1
-model = new_document(version=(24, 1, 0))
+# Create a baseline model for EnergyPlus 24.1, typed for that release
+model = new_document(IDFDocumentV24_1)
 
 # Update pre-seeded singleton objects
 building = model["Building"].first()
@@ -23,8 +21,8 @@ if geometry_rules is not None:
     geometry_rules.coordinate_system = "Relative"
 
 # Add additional named objects
-model.add("Zone", "Office", x_origin=0, y_origin=0, z_origin=0)
+model.zones.add("Office", x_origin=0, y_origin=0, z_origin=0)
 
 # Add an additional unnamed singleton object
-model.add("Timestep", number_of_timesteps_per_hour=4)
+model["Timestep"].add(number_of_timesteps_per_hour=4)
 # --8<-- [end:example]

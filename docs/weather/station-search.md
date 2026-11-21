@@ -64,8 +64,28 @@ Colorado first and `"London, GBR"` ranks the British Londons above the others.
 Any other word shorter than three letters has to be a whole word of the name,
 so the `"co"` in `"Golden, CO"` does not match Mbanza Congo or Columbus.
 
-The Python and TypeScript `StationIndex.search` follow the same rules and return
-the same stations with the same scores.
+A name that starts with the query ranks above one that only contains it later,
+so `"London"` lists London City and London Gatwick before East London. Add a
+country or state code to narrow further.
+
+The TypeScript `StationIndex.search` does not yet match the Python one: it does
+not group a station's datasets (its results have no `variants`), and its scores
+can differ.
+
+### One result per station
+
+A station usually has several TMYx datasets, one per year range. `search()`
+returns one result per physical station: `result.station` is its newest dataset,
+and `result.variants` holds every dataset, newest first. Use `dataset_variant` or
+`dataset_years` to choose one:
+
+```python
+--8<-- "docs/snippets/weather/station-search/one_result_per_station.py:example"
+```
+
+`WeatherStation.station_key` is what every dataset of one station shares.
+`nearest()` groups the same way: datasets of one station at the same location
+form one result, and `distance_km` is the newest dataset's distance.
 
 ### Search Tips
 
@@ -152,8 +172,8 @@ Use `nearest()` with `max_distance_km` to find stations within a geographic area
 --8<-- "docs/snippets/weather/station-search/get_by_wmo_number.py:example"
 ```
 
-Note: WMO numbers are **not unique** — multiple entries can share a WMO
-(different year ranges, data sources).
+Note: WMO numbers are **not unique**. `get_by_wmo()` returns every entry that
+shares one, including each dataset (year range) of the same station.
 
 ## WeatherStation Attributes
 
@@ -233,7 +253,7 @@ The index uses efficient data structures for fast searching:
 1. **Load once** — Keep the index in memory for multiple searches
 2. **Use spatial search** — More accurate than name matching for locations
 3. **Check multiple results** — First result isn't always the best match
-4. **Verify WMO** — Same physical station may have multiple entries
+4. **Choose the dataset** — Each result's `variants` lists the station's datasets; `result.station` is the newest
 
 ## See Also
 

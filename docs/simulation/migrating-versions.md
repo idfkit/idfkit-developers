@@ -37,6 +37,27 @@ actually traversed, per-step `steps` diagnostics, a structural `diff`, a
 `success` flag, and a `summary()` for logs. For the full field list, see the
 [Migration API reference](../api/migration.md).
 
+`migrated_model` is always a document. When the model is already at the target,
+no step runs, `report.steps` is empty and `migrated_model` is a copy of the
+input. It has no `filepath`, so a bare `save()` raises `ValueError` rather than
+overwrite the original with a model at another version: save it to an explicit
+path.
+
+Pass a document type from `idfkit.versioned` as the target to type the result
+for that release: `migrate(model, IDFDocumentV25_2)` makes
+`report.migrated_model` an `IDFDocumentV25_2`. A version tuple or string gives
+an `AnyIDFDocument`.
+
+### Caching
+
+`migrate()` remembers the result of each migration in the running process. A
+second migration of the same content to the same target reuses it without
+running the transition binaries; `report.from_cache` is then `True` and `steps`
+are the records of the earlier run. Pass `cache=False` to always run them, or
+call `clear_migration_cache()` from `idfkit.migration` to forget every result.
+The cache is bypassed when `work_dir` or `keep_work_dir` is given, because those
+ask for the per-step files.
+
 ## CLI
 
 The `idfkit migrate` subcommand is a thin wrapper over `migrate()` for shell
@@ -46,7 +67,7 @@ users. It loads the input IDF, forward-migrates it through the installed
 ### Basic usage
 
 ```bash
-# Migrate to the latest supported version; writes old-v25-2-0.idf next to input
+# Migrate to the installed EnergyPlus version; e.g. writes old-v25-2-0.idf next to input
 idfkit migrate old.idf
 
 # Explicit target and output path
@@ -56,15 +77,21 @@ idfkit migrate old.idf --to 25.2 -o new.idf
 idfkit migrate old.idf --to 25.2 --json
 ```
 
-When `--to` is omitted the target is the latest supported version. When
-`--output` is omitted the result is written to `<stem>-v<major>-<minor>-<patch>.idf`
-next to the input.
+When `--to` is omitted the target is the version of the EnergyPlus installation
+that runs the transition binaries (`--energyplus`, or the one found
+automatically), which is the newest release that installation can simulate;
+with no installation found the command exits with status 2. A `--to` naming a
+release idfkit does not support is refused with status 2, not moved to the
+nearest one. When `--output` is omitted the result is written to
+`<stem>-v<major>-<minor>-<patch>.idf` next to the input. When the model is
+already at the target, nothing is written unless `--output` is given, in which
+case the input is copied there.
 
 ### Exit codes
 
 | Code | Meaning |
 |------|---------|
-| `0` | Migration succeeded (or source version equals target — no-op) |
+| `0` | Migration succeeded (or source version equals target: a no-op, which writes no file without `--output`) |
 | `1` | Migration runtime failure (a transition binary exited non-zero) |
 | `2` | Argument or configuration error (bad version, missing input, EnergyPlus not found) |
 
@@ -74,7 +101,7 @@ next to the input.
 |------|-------------|
 | `INPUT` | Path to the source IDF file (positional, required) |
 | `-o`, `--output OUTPUT` | Output IDF path. Defaults to `<stem>-v<target>.idf` next to the input. |
-| `--to VERSION` | Target EnergyPlus version (e.g. `25.2`). Defaults to the latest supported. |
+| `--to VERSION` | Target EnergyPlus version (e.g. `25.2`). Defaults to the version of the EnergyPlus installation used. |
 | `--energyplus PATH` | Path to the EnergyPlus install or executable. Auto-discovered via `$ENERGYPLUS_DIR`, `PATH`, and platform defaults when omitted. |
 | `--work-dir DIR` | Directory in which to stage per-step transition output. Defaults to a temporary directory. |
 | `--keep-work-dir` | Preserve intermediate files for inspection (only meaningful with the default temp directory). |

@@ -220,6 +220,11 @@ directly.
 Pre-built footprint generators for common commercial building shapes.
 All return a list of `(x, y)` tuples in counter-clockwise order.
 
+A footprint you write by hand may be in either order. `create_block`, `ZonedBlock` and
+`add_shading_block` reverse a clockwise footprint, so the block is never built inside-out, and
+raise `ValueError` for one with no area. `counter_clockwise_footprint()` does the same
+normalisation for your own code.
+
 ### `footprint_rectangle`
 
 ```python

@@ -94,14 +94,26 @@ EnergyPlus computes the correct outward normal regardless of convention:
 
 ### `set_default_constructions`
 
-Assigns a placeholder construction name to any surface that lacks one:
+Assigns a construction name to every opaque surface that lacks one. Walls and doors get
+`construction_name`. `Roof`, `Floor` and `Ceiling` surfaces get `roof_construction`,
+`floor_construction` and `ceiling_construction`, each falling back to `construction_name`.
+Windows, glass doors and tubular daylighting surfaces stay unset unless you pass
+`window_construction`; `validate_document` then reports them as missing a required field.
 
 ```python
 from idfkit.geometry_builders import set_default_constructions
 
-count = set_default_constructions(doc, "Generic Wall")
+count = set_default_constructions(
+    doc,
+    "Generic Wall",
+    roof_construction="Generic Roof",
+    window_construction="Generic Glazing",
+)
 print(f"Updated {count} surfaces")
 ```
+
+The function only sets names. It does not create the `Construction` objects; `validate_document`
+reports one that does not exist.
 
 ### `bounding_box`
 

@@ -211,9 +211,20 @@ for layer in layers:
     print(f"  R-value: {layer.r_value:.3f} m²·K/W")
 ```
 
+A layer whose material is of a type this module does not compute, such as a shade or a
+blind, is left out. A layer that names no object at all raises `DanglingReferenceError`, so a
+misspelt material never yields a silently low R-value.
+
 ## API Reference
 
 ### Functions
+
+Every function below raises:
+
+- `DanglingReferenceError` (from `idfkit.exceptions`) if a layer names a material the document
+  does not have.
+- `ValueError` if the construction has layers but is not in a document, so they cannot be
+  resolved.
 
 #### `calculate_r_value(construction, include_films=True)`
 

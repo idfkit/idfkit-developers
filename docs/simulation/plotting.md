@@ -43,11 +43,21 @@ shown below as `sql`.
 --8<-- "docs/snippets/simulation/plotting/energy_balance.py:example"
 ```
 
+The chart reads the `End Uses` table of the `AnnualBuildingUtilityPerformanceSummary`
+report, so the model needs `Output:Table:SummaryReports` and an `Output:SQLite`
+set to `SimpleAndTabular`; without them the call raises `ResultLookupError`.
+Values are summed across fuels, water is left out, and the axis uses the
+report's energy unit (`GJ` for SI, `kBtu` for IP).
+
 ### Comfort Hours
 
 ```python
 --8<-- "docs/snippets/simulation/plotting/comfort_hours.py:example"
 ```
+
+When `Zone Mean Air Temperature` is reported at several frequencies, the chart
+uses `Hourly`. Pass `frequency=` (for example `"Timestep"`) to choose another;
+with no hourly series and no `frequency`, the call raises `ResultLookupError`.
 
 ## Time Series Plotting
 

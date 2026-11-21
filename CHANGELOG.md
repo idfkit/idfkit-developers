@@ -28,12 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The pages describe what idfkit has done since 1.2.0. Typed objects now reject undeclared field
-  names at type-check time, including eppy-style capitalised spellings and field names from
-  EnergyPlus versions before 26.2. `add()` now refuses unknown keys and malformed extensible
-  groups, and a name on a type with no Name field. These are covered in the type-safety concept,
-  the generated-types and epJSON field-name explanations, the extensible-groups how-to, the
-  common-errors page, and the `Output:Variable` examples.
+- The Python pages describe idfkit 1.3.0-rc.2: documents typed per EnergyPlus release
+  (`AnyIDFDocument`, `as_type=`, `as_version()`), typed creation through collections, value
+  checks on assignment in strict documents, the new loader and `save_idf()` options, result
+  accessors that raise when an output is missing, `idfkit check` rules C003 to C006 and its
+  `pyproject.toml` settings, the migration CLI's default target, and per-station weather search.
 - `docs/stylesheets/extra.css` holds layout rules only; every colour, font and easing comes from
   the vendored derivation.
 - The site serves its two typefaces itself from `docs/identity/material/fonts/` and no longer

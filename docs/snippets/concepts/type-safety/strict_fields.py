@@ -6,10 +6,11 @@ from idfkit import new_document
 # Strict field access is on by default
 doc = new_document()
 
-zone = doc.add("Zone", "Office")
-zone.x_origin = 0.0  # OK — valid field
+zone = doc.zones.add("Office")
+zone.x_origin = 0.0  # OK: a valid field and a valid value
 
-# zone.x_orgin = 0.0  # InvalidFieldError! Typo caught immediately
+# zone.x_orgin = 0.0    # InvalidFieldError: typo caught immediately
+# zone.multiplier = 0   # ValidationFailedError: below the minimum of 1
 
 # Also the default when loading files
 # model = load_idf("building.idf")

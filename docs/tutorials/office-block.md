@@ -125,12 +125,13 @@ transparent, then hand them out.
 100 mm of insulation is what keeps step 7's answer plausible. Take it out and
 the block asks for roughly four times the heat.
 
-Order matters in the two calls that follow. `set_wwr()` punches windows into the
+Two calls then assign the constructions. `set_wwr()` punches windows into the
 exterior walls at a 40 percent window-to-wall ratio and gives each one the
-glazing construction, so those eight surfaces already have theirs.
-`set_default_constructions()` then fills in every surface that still lacks one.
-Run them the other way round and the fill step would have claimed the windows
-first.
+glazing construction. `set_default_constructions()` fills in the opaque surfaces
+that still lack one: walls, floors and the roof. It never gives a window an
+opaque construction; glazing it finds unset stays unset unless you pass
+`window_construction=`. Pass `roof_construction=` too and the roof can differ
+from the walls.
 
 ## Step 4: Bring in the design weather
 
@@ -277,8 +278,8 @@ two objects. Along the way:
 
 - `create_block()` with a `ZoningScheme` turned a footprint into zones and
   surfaces, and the zoning choice decided what step 7 could see.
-- Constructions stack materials outside to inside, and `set_wwr()` before
-  `set_default_constructions()` is the order that leaves nothing overwritten.
+- Constructions stack materials outside to inside. `set_wwr()` gives the windows
+  their glazing, and `set_default_constructions()` fills only the opaque surfaces.
 - `StationIndex` searches locally, `WeatherDownloader` fetches once and caches,
   and `DesignDayManager` turns a `.ddy` file into a sizing period plus a
   location.

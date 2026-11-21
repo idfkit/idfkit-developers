@@ -9,5 +9,5 @@ station: WeatherStation = ...  # type: ignore[assignment]
 results = index.get_by_wmo("725300")
 
 for station in results:
-    print(f"{station.display_name}: {station.source}")
+    print(f"{station.display_name}: {station.dataset_variant}")
 # --8<-- [end:example]
