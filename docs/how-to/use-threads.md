@@ -10,8 +10,8 @@ its own copy of the text.
 
 {{ parity("document-model") }}
 
-!!! note "Requires an idfkit release with the threading fixes"
-    The rules below hold from the first idfkit release after 1.2.0, which loads each schema
+!!! note "Requires idfkit 1.3.0 or later"
+    The rules below hold from idfkit 1.3.0, which loads each schema
     version once under a lock and makes its process-wide caches safe on a free-threaded build.
 
 ## Choose the kind of concurrency the job needs

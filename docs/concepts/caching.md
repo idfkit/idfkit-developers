@@ -127,7 +127,7 @@ No manual cache invalidation is needed in normal workflows.
 
 ## Parallel Safety
 
-From the first idfkit release after 1.2.0, both caches are **thread-safe** and **process-safe**:
+From idfkit 1.3.0, both caches are **thread-safe** and **process-safe**:
 
 - A simulation entry is written to a temporary directory and renamed into place in one step
 - A weather file (the archive, each extracted file, the cleaned DDY, the station index) is
