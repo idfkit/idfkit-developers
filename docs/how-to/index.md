@@ -27,6 +27,8 @@ exists in only one of them, the guide says so on its first screen.
   lists, and anything else that repeats
 - [How to compare two EnergyPlus versions](compare-versions.md): what changed
   between two releases, and whether a model survives the move
+- [How to use idfkit from several threads](use-threads.md): what threads may
+  share, and how to run them in parallel on free-threaded Python
 
 ## In the browser
 
