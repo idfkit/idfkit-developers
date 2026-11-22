@@ -43,3 +43,9 @@ Weather station index, search, and geocoding.
     options:
       show_root_heading: true
       show_source: true
+
+## GeocodingErrorKind
+
+::: idfkit.weather.geocode.GeocodingErrorKind
+    options:
+      show_root_heading: true

@@ -127,6 +127,7 @@ nav:
         - Visualization: api/visualization.md
         - Exceptions: api/exceptions.md
         - Versions: api/versions.md
+        - Versioned Documents: api/versioned.md
       - Simulation:
         - Overview: api/simulation/index.md
         - Runner: api/simulation/runner.md
