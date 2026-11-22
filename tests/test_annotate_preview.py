@@ -168,3 +168,18 @@ def test_shifted_source_line_numbers_are_not_changes() -> None:
     result = diff_page(_page(source(64)), _page(source(72)))
     assert result is not None
     assert result.status == "unchanged"
+
+
+def test_a_page_whose_only_change_is_outside_the_article_is_unchanged() -> None:
+    base = _page("<p>Same.</p>")
+    head = base.replace("<p>nav</p>", "<p>nav</p><p>a new page in the nav</p>")
+    result = diff_page(base, head)
+    assert result is not None
+    assert result.status == "unchanged"
+
+
+def test_a_base_page_without_an_article_makes_the_head_page_new() -> None:
+    redirect = '<html><head><meta http-equiv="refresh" content="0; url=../x/"></head><body></body></html>'
+    result = diff_page(redirect, _page("<p>Now a real page.</p>"))
+    assert result is not None
+    assert result.status == "new"

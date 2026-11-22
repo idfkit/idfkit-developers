@@ -46,6 +46,19 @@
 
   const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
+  // The next change in `direction` (+1 or -1) that is on screen. With the highlights off a removed
+  // block is hidden, and stepping onto it would move the counter without moving the page.
+  function step(direction) {
+    for (let tried = 1; tried <= chunks.length; tried += 1) {
+      const start = current < 0 && direction < 0 ? 0 : current;
+      const index = (((start + direction * tried) % chunks.length) + chunks.length) % chunks.length;
+      if (chunks[index].getClientRects().length) {
+        select(index);
+        return;
+      }
+    }
+  }
+
   // An attribute, not a class: Material styles `table:not([class])`, so a class would unstyle a table.
   function select(index) {
     chunks[current]?.removeAttribute("data-pv-current");
@@ -149,10 +162,8 @@
       { className: "pv-bar", role: "region", ariaLabel: "Changes in this pull request" },
       el("strong", {}, label),
       el("span", { className: "pv-position" }),
-      button("↑", "Previous change", () =>
-        chunks.length && select(current <= 0 ? chunks.length - 1 : current - 1),
-      ),
-      button("↓", "Next change", () => chunks.length && select((current + 1) % chunks.length)),
+      button("↑", "Previous change", () => step(-1)),
+      button("↓", "Next change", () => step(1)),
       button("Old", "Show or hide the base version of this block", togglePrevious, "pv-previous-button"),
       el("label", { title: "Show or hide the highlights" }, toggle, " Highlights"),
     );

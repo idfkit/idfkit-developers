@@ -87,6 +87,9 @@ _IN_PAGE_HREF = re.compile(r'href="#[^"]*"')
 _WHITESPACE = re.compile(r"\s+")
 _ID = re.compile(r'\sid="[^"]*"')
 _TAG = re.compile(r"<[^>]+>")
+_NEWLINE = re.compile(r"\n")
+_ARTICLE_START = re.compile(r'<article\b[^>]*?\sclass="(?:[^"]*\s)?md-content__inner(?:\s[^"]*)?"')
+_ARTICLE_END = "</article>"
 
 
 @dataclass
@@ -107,19 +110,29 @@ class Element:
 class _ArticleParser(HTMLParser):
     """Build the element tree of the page's `<article class="md-content__inner">`, with offsets."""
 
-    def __init__(self, source: str) -> None:
+    def __init__(self, source: str, origin: int = 0) -> None:
+        """Parse *source*, a slice of a page that starts at offset *origin* of the page."""
         super().__init__(convert_charrefs=True)
-        self._line_starts = [0]
-        for index, char in enumerate(source):
-            if char == "\n":
-                self._line_starts.append(index + 1)
+        self._line_starts = [origin, *(origin + m.end() for m in _NEWLINE.finditer(source))]
         self.article: Element | None = None
         self._stack: list[Element] = []
+        # How many elements of each tag are open, so an end tag with no open element is
+        # recognised without scanning the stack.
+        self._open_tags: dict[str, int] = {}
         self._done = False
 
     def _offset(self) -> int:
         line, column = self.getpos()
         return self._line_starts[line - 1] + column
+
+    def _push(self, element: Element) -> None:
+        self._stack.append(element)
+        self._open_tags[element.tag] = self._open_tags.get(element.tag, 0) + 1
+
+    def _pop(self) -> Element:
+        element = self._stack.pop()
+        self._open_tags[element.tag] -= 1
+        return element
 
     def _open(self, tag: str, attrs: list[tuple[str, str | None]], *, closed: bool) -> None:
         if self._done:
@@ -131,13 +144,13 @@ class _ArticleParser(HTMLParser):
         if self.article is None:
             if tag == "article" and "md-content__inner" in classes:
                 self.article = element
-                self._stack.append(element)
+                self._push(element)
             return
         self._stack[-1].children.append(element)
         if closed or tag in VOID:
             element.end = start + len(raw)
         else:
-            self._stack.append(element)
+            self._push(element)
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         self._open(tag, attrs, closed=False)
@@ -148,11 +161,11 @@ class _ArticleParser(HTMLParser):
     def handle_endtag(self, tag: str) -> None:
         if self._done or not self._stack or tag in VOID:
             return
-        if not any(element.tag == tag for element in self._stack):
+        if not self._open_tags.get(tag):
             return
         end = self._offset() + len(f"</{tag}>")
         while self._stack:
-            element = self._stack.pop()
+            element = self._pop()
             element.end = end
             if element.tag == tag:
                 break
@@ -164,10 +177,29 @@ class _ArticleParser(HTMLParser):
             self._stack[-1].has_text = True
 
 
+def article_span(source: str) -> tuple[int, int] | None:
+    """Where the page's `<article class="md-content__inner">` starts and ends, or None.
+
+    Found by searching rather than parsing, so that an unchanged page is recognised without
+    parsing it, and only the article, not the navigation and footer around it, is parsed.
+    """
+    match = _ARTICLE_START.search(source)
+    if match is None:
+        return None
+    end = source.rfind(_ARTICLE_END)
+    if end < match.start():
+        return None
+    return match.start(), end + len(_ARTICLE_END)
+
+
 def parse_article(source: str) -> Element | None:
     """The page's article element, or None for a page without one (the 404 page, a redirect)."""
-    parser = _ArticleParser(source)
-    parser.feed(source)
+    span = article_span(source)
+    if span is None:
+        return None
+    start, end = span
+    parser = _ArticleParser(source[start:end], start)
+    parser.feed(source[start:end])
     parser.close()
     article = parser.article
     if article is None or article.end < 0:
@@ -262,14 +294,27 @@ def _mark(
 
 def diff_page(base_source: str | None, head_source: str) -> PageDiff | None:
     """Compare one page's two builds. None when the head page has no article to annotate."""
+    no_counts = {"added": 0, "changed": 0, "removed": 0}
+    head_span = article_span(head_source)
+    if head_span is None:
+        return None
+    base_span = article_span(base_source) if base_source is not None else None
+    # Most pages of most pull requests are untouched: an article identical to the base's is
+    # unchanged, and is not parsed at all.
+    if (
+        base_source is not None
+        and base_span is not None
+        and base_source[base_span[0] : base_span[1]] == head_source[head_span[0] : head_span[1]]
+    ):
+        return PageDiff("unchanged", [], no_counts)
     head = parse_article(head_source)
     if head is None:
         return None
-    if base_source is None:
-        return PageDiff("new", [(head.name_end, ' data-pv-page="new"')], {"added": 0, "changed": 0, "removed": 0})
-    base = parse_article(base_source)
-    base_blocks = blocks(base) if base is not None else []
-    insertions, counts = _mark(base_source, base_blocks, head_source, head)
+    base = parse_article(base_source) if base_source is not None else None
+    if base_source is None or base is None:
+        # No base page, or one with no article (a redirect stub): the page is new here.
+        return PageDiff("new", [(head.name_end, ' data-pv-page="new"')], no_counts)
+    insertions, counts = _mark(base_source, blocks(base), head_source, head)
     if not insertions:
         return PageDiff("unchanged", [], counts)
     insertions.append((head.name_end, ' data-pv-page="changed"'))
@@ -336,7 +381,7 @@ def annotate(base_site: Path, head_site: Path) -> dict[str, Any]:
         page_url(page.relative_to(base_site))
         for page in base_site.rglob("*.html")
         if not (head_site / page.relative_to(base_site)).is_file()
-        and parse_article(page.read_text(encoding="utf-8")) is not None
+        and article_span(page.read_text(encoding="utf-8")) is not None
     )
     summary: dict[str, Any] = {"pages": pages, "removed": removed}
 
