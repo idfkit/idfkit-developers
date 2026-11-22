@@ -153,3 +153,15 @@ class TestCommandLine:
         _commit(repository, "1.3.0-rc.2", "bump, not released")
         assert release.main(["levels-changed", "site-2026.4", "HEAD"]) == 0
         assert capsys.readouterr().out == "library: 1.2.0 -> 1.3.0-rc.2\n"
+
+    def test_latest_tag_ignores_a_tag_off_the_checked_out_history(
+        self, repository: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        _commit(repository, "1.2.0", "pin 1.2.0")
+        _git(repository, "tag", "site-2026.4")
+        _git(repository, "checkout", "-q", "-b", "side")
+        _commit(repository, "1.3.0", "on a branch")
+        _git(repository, "tag", "site-2026.5")
+        _git(repository, "checkout", "-q", "-")
+        assert release.main(["latest-tag"]) == 0
+        assert capsys.readouterr().out == "site-2026.4\n"

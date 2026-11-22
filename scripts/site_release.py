@@ -10,8 +10,9 @@ year, and a counter that starts at 1 each year. The same shape as the ``docs-YYY
 that says which of them it is. It is a date and a count, not a semantic version, because a site
 has no API whose compatibility a version number could promise anything about.
 
-``latest-tag`` prints the most recent ``site-YYYY.N`` tag: the release the live site should be
-serving. surfaces.yml checks the live site against the levels that release declares
+``latest-tag`` prints the most recent ``site-YYYY.N`` tag on the checked-out history: the release
+the live site should be serving. A tag off that history is ignored, because deploy-docs.yml refuses
+to publish a tag that is not on ``main``. surfaces.yml checks the live site against the levels that release declares
 (``scripts/check_surfaces.py --declared-at``), so a level merged to ``main`` but not yet released
 is not a failure.
 
@@ -20,7 +21,8 @@ differs between two commits, one per line, and nothing when none does. surfaces.
 the latest release and ``main``, and warns, without failing, while ``main`` declares a level no
 release has published: a release is due.
 
-Exit status: 0 on success, 2 when a commit or ``pyproject.toml`` cannot be read.
+Exit status: 0 on success, 2 when a commit or ``pyproject.toml`` cannot be read, or when
+``latest-tag`` finds no release tag.
 """
 
 from __future__ import annotations
@@ -112,9 +114,10 @@ def _pyproject_at(commit: str) -> dict[str, Any]:
     return tomllib.loads(shown.stdout)
 
 
-def _tags() -> list[str]:
-    listed = subprocess.run(
-        ["git", "tag", "--list", "site-*"],  # noqa: S607
+def _tags(*, merged: bool = False) -> list[str]:
+    """The ``site-*`` tags; with *merged*, only those on the history of ``HEAD``."""
+    listed = subprocess.run(  # noqa: S603
+        ["git", "tag", "--list", "site-*", *(["--merged", "HEAD"] if merged else [])],  # noqa: S607
         capture_output=True,
         text=True,
         check=False,
@@ -143,7 +146,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         year = args.year if args.year is not None else datetime.now(tz=UTC).year
         print(next_tag(_tags(), year))
     elif args.command == "latest-tag":
-        latest = latest_tag(_tags())
+        latest = latest_tag(_tags(merged=True))
         if latest is None:
             sys.stderr.write("no site-YYYY.N release tag found\n")
             return 2

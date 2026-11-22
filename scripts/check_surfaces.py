@@ -93,7 +93,8 @@ from _governance_source import read_pinned
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_PATH = REPO_ROOT / "pyproject.toml"
 REGISTER_RELATIVE = Path("governance") / "consumers.toml"
-#: The consumer id of this repository in the register. Its levels are read from this checkout.
+#: The consumer id of this repository in the register. Its levels are read from the checkout
+#: ``--declared-at`` names (surfaces.yml passes the latest site release), this one by default.
 THIS_CONSUMER = "idfkit-developers"
 
 PERMANENT = frozenset({301, 308})
