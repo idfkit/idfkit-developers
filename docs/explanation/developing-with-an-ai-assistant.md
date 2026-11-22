@@ -1,7 +1,7 @@
 # Developing with an AI assistant
 
 idfkit ships a reference set written for **AI coding assistants** writing Python against it,
-bundled inside the wheel as the `developing-with-idfkit` skill. Sixteen topics, each
+bundled inside the wheel as the `developing-with-idfkit` skill. Seventeen topics, each
 self-contained and task-oriented: a "when to use" summary, a quick start, a core API table,
 then the details.
 
@@ -92,7 +92,7 @@ skill = files("idfkit") / ".agents" / "skills" / "developing-with-idfkit"
 print((skill / "SKILL.md").read_text())
 ```
 
-## What the sixteen references cover
+## What the seventeen references cover
 
 The file name in the bundle is the second column, under
 `idfkit/.agents/skills/developing-with-idfkit/references/`. They are not linked, because they
@@ -116,6 +116,7 @@ are not pages: they are files inside the wheel you already have installed.
 | Compute R-value, U-value, SHGC, gas mixture properties | `thermal-properties.md` |
 | Render building geometry to 3D or SVG | `visualization.md` |
 | Migrate a model forward across EnergyPlus versions | `version-migration.md` |
+| Share models between threads, or run on free-threaded Python (`3.14t`) | `threading.md` |
 
 ## Conventions used in every reference
 

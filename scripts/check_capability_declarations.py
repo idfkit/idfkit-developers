@@ -19,7 +19,7 @@ THE EXEMPTIONS, AND WHY EACH IS ONE
 
 ``explanation/developing-with-an-ai-assistant.md``
                              the page about the bundled agent skill. It teaches no operation: it
-                             explains what the skill is, and why the 16 references it carries are
+                             explains what the skill is, and why the 17 references it carries are
                              shipped in the wheel rather than published here. There is nothing on
                              it whose availability could differ by language.
 
