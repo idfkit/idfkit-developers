@@ -23,10 +23,10 @@ never asked to share. So it is the state the library protects.
 
 ## Why the schema is loaded under a lock
 
-The schema is about 10 MB of JSON once decompressed, and loading it is the slowest step in
-opening a model. When sixteen threads ask for a version nobody has loaded yet, an unguarded loader reads the file
-sixteen times and builds sixteen schemas. The waste is the lesser problem. The library relies on
-there being one schema object per version: a document pickles its schema as a version number
+The schema is about 10 MB of JSON once decompressed, and loading it is the slowest step in opening a
+model. When sixteen threads ask for a version nobody has loaded yet, an unguarded loader reads the
+file sixteen times and builds sixteen schemas. The waste is the lesser problem. The library relies
+on there being one schema object per version: a document pickles its schema as a version number
 rather than as megabytes of content, and that works only for the schema the manager is known to have
 handed out. Fifteen of the sixteen would be strangers, each pickled whole.
 
