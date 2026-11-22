@@ -56,6 +56,38 @@ jobs:
           sed -i "s|^site_url:.*|site_url: ${PREVIEW_URL}|" mkdocs.yml
           ./scripts/build_docs.sh
 
+      - name: Build the base branch for the change highlights
+        # The preview marks, on each rendered page, the blocks this PR added, changed or removed
+        # (scripts/annotate_preview.py). It compares against the base branch rendered by the same
+        # build, at the commit this PR's merge ref was made from, not against the live site: the
+        # live site is the last site release, so it would also show every unreleased change already
+        # merged to the base as if this PR had made it.
+        #
+        # The base gets its own worktree and its own environment, because its uv.lock and pinned
+        # levels may differ from this branch's. A base that does not build costs the highlights
+        # and nothing else: the preview still deploys, unannotated.
+        id: base-build
+        continue-on-error: true
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          PREVIEW_URL="https://developers.idfkit.com/pr-preview/pr-${{ github.event.number }}/"
+          git fetch origin "$BASE_SHA" --depth=1
+          git worktree add --detach "$RUNNER_TEMP/base" "$BASE_SHA"
+          cd "$RUNNER_TEMP/base"
+          sed -i "s|^site_url:.*|site_url: ${PREVIEW_URL}|" mkdocs.yml
+          uv sync --frozen --python 3.12
+          ./scripts/build_docs.sh
+
+      - name: Mark what this PR changed on its pages
+        # Preview only. The script and the stylesheet and script it copies in live under scripts/,
+        # which no production build reads; deploy-docs.yml never runs it.
+        if: steps.base-build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          uv run python scripts/annotate_preview.py \
+            --base "$RUNNER_TEMP/base/site" --head site --summary "$RUNNER_TEMP/changes.json"
+
       - name: Fetch base branch for diff
         run: git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
 
@@ -108,6 +140,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           CHANGED_PAGES: ${{ steps.diff-docs.outputs.pages }}
+          CHANGES_JSON: ${{ runner.temp }}/changes.json
         with:
           script: |
             // The same address the build above was given as site_url, and the same one the
@@ -116,9 +149,28 @@ jobs:
             const previewUrl = `https://developers.idfkit.com/pr-preview/pr-${context.issue.number}/`;
             const marker = '<!-- docs-preview-comment -->';
 
+            // When the base branch built, the list comes from comparing the two rendered sites,
+            // which also catches pages changed by a snippet or by a library bump. Otherwise it
+            // falls back to the file-name heuristic of the step above.
+            const fs = require('fs');
+            let rendered = null;
+            try {
+              rendered = JSON.parse(fs.readFileSync(process.env.CHANGES_JSON, 'utf8'));
+            } catch {
+              rendered = null;
+            }
+
             const changedPages = (process.env.CHANGED_PAGES || '').trim();
             let changedSection = '';
-            if (changedPages) {
+            if (rendered) {
+              const lines = Object.entries(rendered.pages || {}).map(
+                ([p, info]) => `- ${previewUrl}${p}${info.status === 'new' ? ' (new)' : ''}`,
+              );
+              for (const p of rendered.removed || []) lines.push(`- \`${p}\` (removed)`);
+              changedSection = lines.length
+                ? `\n\n**Changed pages** (changes are highlighted on each page):\n${lines.join('\n')}`
+                : '\n\nNo rendered page changed.';
+            } else if (changedPages) {
               const links = changedPages.split('\n').map(p => `- ${previewUrl}${p}`).join('\n');
               changedSection = `\n\n**Changed pages:**\n${links}`;
             }

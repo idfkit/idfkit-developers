@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- PR previews mark, on each rendered page, the blocks the pull request added, changed or removed
+  against its base branch, with a toggle and previous/next controls; production builds are
+  unaffected.
 - The visual identity of idfkit at `identity-2026.5`: a fifth pinned level,
   `[tool.idfkit.identity]`, the `material` derivation and the host files vendored under
   `docs/identity/`, the palette, stylesheets, mark and favicon read from them, the ownership line
