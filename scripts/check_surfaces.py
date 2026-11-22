@@ -11,7 +11,10 @@ HALF A, THE DOCUMENTATION HOSTS. Landable immediately.
 * A host recorded as ``serving`` must put a level in front of the reader, and that level must be the
   one the register points at for the consumer that publishes it (FR-030). For
   ``developers.idfkit.com`` that is ``[tool.idfkit.library] level`` in this repository, which
-  ``docs/hooks/pinned_levels.py`` writes onto every page.
+  ``docs/hooks/pinned_levels.py`` writes onto every page, read from the checkout ``--declared-at``
+  names. The site is published from ``site-YYYY.N`` releases, never from a merge, so surfaces.yml
+  passes a checkout of the latest release: a level merged to ``main`` and not yet released is due,
+  not wrong. Without the option the declaration is read from this checkout.
 * A host that cannot be reached is reported as UNREACHABLE, never as a pass. Not-checked is not the
   same as clean, on the principle that keeps ``unreachable`` apart from ``strangers`` in the sweep.
 
@@ -90,7 +93,8 @@ from _governance_source import read_pinned
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_PATH = REPO_ROOT / "pyproject.toml"
 REGISTER_RELATIVE = Path("governance") / "consumers.toml"
-#: The consumer id of this repository in the register. Its levels are read from this checkout.
+#: The consumer id of this repository in the register. Its levels are read from the checkout
+#: ``--declared-at`` names (surfaces.yml passes the latest site release), this one by default.
 THIS_CONSUMER = "idfkit-developers"
 
 PERMANENT = frozenset({301, 308})
@@ -568,7 +572,7 @@ def check_serving(surface: Surface, web: Web, register: Register, root: Path) ->
             Finding(
                 surface.host,
                 f"states idfkit {', '.join(sorted(set(stated)))} and {publisher.id} declares {declared}. The published "
-                "site describes a level the repository no longer declares; deploy it, or correct the declaration.",
+                "site describes a level its release does not declare; deploy that release, or correct the declaration.",
             )
         ]
     return []
@@ -806,11 +810,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--conformance-dir", type=Path, help="an idfkit-conformance checkout with its tags")
     parser.add_argument("--workspace", type=Path, help="read instructions from sibling checkouts instead of GitHub")
     parser.add_argument("--half", choices=["a", "b", "both"], default="both")
+    parser.add_argument(
+        "--declared-at",
+        type=Path,
+        default=REPO_ROOT,
+        help="a checkout of this repository whose declared levels the live site must state; "
+        "surfaces.yml passes the latest site release (default: this checkout)",
+    )
     args = parser.parse_args(argv)
 
     register = load_register(args.register, args.conformance_dir)
     sources: Sources = WorkspaceSources(args.workspace) if args.workspace else GitHubSources()
-    report = run(register, UrllibWeb(), sources, HttpRegistry(), REPO_ROOT, args.half)
+    report = run(register, UrllibWeb(), sources, HttpRegistry(), args.declared_at, args.half)
 
     print(f"surface check against {register.description}")
     for passed in report.passed:
