@@ -1,4 +1,4 @@
-"""Guard the site-release helper behind deploy-docs.yml and release-on-level-change.yml.
+"""Guard the site-release helper behind deploy-docs.yml and surfaces.yml.
 
 ``scripts/site_release.py`` is a maintainer script rather than part of a package, so it is loaded
 by path, the way ``tests/test_check_page_kinds.py`` loads the gate it guards. The two git-reading
@@ -133,3 +133,23 @@ class TestCommandLine:
         _git(repository, "tag", "site-2026.2")
         assert release.main(["next-tag", "--year", "2026"]) == 0
         assert capsys.readouterr().out == "site-2026.3\n"
+
+    def test_latest_tag_reads_the_repository_tags(self, repository: Path, capsys: pytest.CaptureFixture[str]) -> None:
+        _commit(repository, "1.1.1", "pin 1.1.1")
+        for tag in ("site-2025.7", "site-2026.2", "site-2026.10", "v1.0.0"):
+            _git(repository, "tag", tag)
+        assert release.main(["latest-tag"]) == 0
+        assert capsys.readouterr().out == "site-2026.10\n"
+
+    def test_latest_tag_without_a_release_exits_2(self, repository: Path) -> None:
+        _commit(repository, "1.1.1", "pin 1.1.1")
+        assert release.main(["latest-tag"]) == 2
+
+    def test_a_level_merged_after_the_latest_release_is_reported(
+        self, repository: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        _commit(repository, "1.2.0", "pin 1.2.0")
+        _git(repository, "tag", "site-2026.4")
+        _commit(repository, "1.3.0-rc.2", "bump, not released")
+        assert release.main(["levels-changed", "site-2026.4", "HEAD"]) == 0
+        assert capsys.readouterr().out == "library: 1.2.0 -> 1.3.0-rc.2\n"

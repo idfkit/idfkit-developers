@@ -60,6 +60,26 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
+        with:
+          # The site-YYYY.N release tags, to find the one the live site should be serving.
+          fetch-depth: 0
+
+      - name: Check out the latest site release
+        # developers.idfkit.com publishes releases, never merges (deploy-docs.yml), so the live site
+        # is held to the levels the latest release declares. A level merged to main and not yet
+        # released is a release that is due, which the warning below says, not a failure.
+        id: released
+        run: |
+          tag="$(python3 scripts/site_release.py latest-tag)"
+          git worktree add --detach "$RUNNER_TEMP/released" "$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "path=$RUNNER_TEMP/released" >> "$GITHUB_OUTPUT"
+          unreleased="$(python3 scripts/site_release.py levels-changed "$tag" HEAD)"
+          if [ -n "$unreleased" ]; then
+            while IFS= read -r line; do
+              echo "::warning title=Release due::main declares a level $tag does not publish: $line. Run make release."
+            done <<< "$unreleased"
+          fi
 
       - name: Set up the environment
         uses: ./.github/actions/setup-python-env
@@ -88,4 +108,6 @@ jobs:
       - name: Check every surface
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
-        run: uv run python scripts/check_surfaces.py --conformance-dir conformance
+        run: |
+          uv run python scripts/check_surfaces.py --conformance-dir conformance \
+            --declared-at "${{ steps.released.outputs.path }}"

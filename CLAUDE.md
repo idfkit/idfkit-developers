@@ -65,10 +65,12 @@ No `src/`. Nothing here is built as a distribution.
 repository, never a merge, so a run of edits goes out together when someone decides it should.
 Publish with `make release`, which tags `main` and lets the release event deploy it.
 
-A merge that moves any `[tool.idfkit.*] level` releases and deploys itself
-(`release-on-level-change.yml`), because `surfaces.yml` holds the live site to the library level on
-`main`. Every release publishes all of `main`, so **do not merge a page that must not be read yet**,
-such as one describing an unreleased library: leave it a draft until the bump it depends on lands.
+That holds for a merge that moves a `[tool.idfkit.*] level` too: a library bump and the pages that
+describe it can merge in any order and go out in one release. `surfaces.yml` holds the live site to
+the levels of the latest `site-YYYY.N` release, not to `main`, and warns while `main` declares a level
+no release has published yet: that warning means a release is due. Every release publishes all of
+`main`, so **do not merge a page that must not be read yet** if a release may be cut before it is
+ready.
 
 ## The five pinned levels
 
