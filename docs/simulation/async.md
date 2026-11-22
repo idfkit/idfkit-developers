@@ -83,7 +83,21 @@ to map back to the original job.
 
 ### Early Termination
 
-Breaking out of the stream cancels remaining simulations:
+To stop at the first failed job, pass `fail_fast=True` to
+`async_simulate_batch()` or `async_simulate_batch_stream()`. The jobs still
+queued or running are cancelled and their EnergyPlus processes killed. The
+stream still yields one event per job, with `event.result.cancelled` set for
+the cancelled ones, and the `BatchResult` lists them in `batch.cancelled`:
+
+```python
+batch = await async_simulate_batch(jobs, fail_fast=True)
+print(len(batch.cancelled))
+```
+
+To stop on a condition of your own, break out of the stream. Closing the
+generator cancels the remaining simulations. A bare `break` closes it only when
+the generator is garbage-collected, so iterate inside `contextlib.aclosing()` to
+close it at a known point:
 
 ```python
 --8<-- "docs/snippets/simulation/async/early_termination.py:example"
@@ -216,7 +230,17 @@ except SimulationError as e:
 ```
 
 In batch mode, individual failures are captured in the results — the batch
-never raises due to a single job failing.
+never raises due to a single job failing. With `fail_fast=True` the first
+failure cancels the rest instead (see [Early Termination](#early-termination)).
+
+Like its sync counterpart, the `BatchResult` deletes the temporary run
+directories of jobs without an `output_dir` when you call
+`await batch.async_cleanup()` or leave an `async with` block:
+
+```python
+async with await async_simulate_batch(jobs) as batch:
+    ...  # read results here
+```
 
 ## See Also
 

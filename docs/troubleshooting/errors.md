@@ -27,7 +27,7 @@ EnergyPlusNotFoundError: Could not find EnergyPlus installation
 3. Pass the path explicitly:
    ```python
    from idfkit.simulation import find_energyplus
-   config = find_energyplus("/path/to/EnergyPlus")
+   config = find_energyplus(path="/path/to/EnergyPlus")
    result = simulate(model, weather, energyplus=config)
    ```
 
@@ -127,12 +127,12 @@ Common extras:
 
 | Feature | Install Command |
 |---------|-----------------|
-| DataFrames | `pip install idfkit[dataframes]` |
+| DataFrames | `pip install idfkit[pandas]` |
 | Plotting (matplotlib) | `pip install idfkit[plot]` |
 | Plotting (plotly) | `pip install idfkit[plotly]` |
 | Progress bars (tqdm) | `pip install idfkit[progress]` |
 | S3 Storage | `pip install idfkit[s3]` |
-| Weather refresh | `pip install idfkit[weather]` |
+| Async S3 Storage | `pip install idfkit[async-s3]` |
 
 ### boto3 Not Found
 
@@ -151,10 +151,14 @@ pip install idfkit[s3]
 ### Reference to Non-Existent Object
 
 ```
-[ERROR] People:'Zone1_People'.zone_name: Reference to non-existent object 'ZONE1'
+[ERROR] People:'Zone1_People'.zone_or_zonelist_or_space_or_spacelist_name: Reference to non-existent object 'Zone 1' (looked up in SpaceAndSpaceListNames or ZoneAndZoneListNames). Did you mean 'Zone1'?
 ```
 
-**Cause:** A field references an object name that doesn't exist.
+**Cause:** A field references an object name that doesn't exist. The message
+quotes the value as written, names the reference lists it was looked up in,
+and suggests a close name when there is one. The same check (`E009`) fires when
+the name exists but belongs to an object of the wrong type:
+`Reference to 'Always', which is a Schedule:Constant, not in SpaceAndSpaceListNames or ZoneAndZoneListNames`.
 
 **Solutions:**
 
@@ -167,6 +171,110 @@ pip install idfkit[s3]
    ```python
    people_obj.zone_name = "Correct_Zone_Name"
    ```
+
+### `add()` Refused: Unknown Field
+
+```
+InvalidFieldError: add() of object type 'Zone' refused; nothing was added:
+  - X Origin: unknown (spell it 'x_origin')
+```
+
+A misspelling adds a suggestion:
+
+```
+InvalidFieldError: add() of object type 'Zone' refused; nothing was added:
+  - x_orgin: unknown (not a field of Zone)
+Did you mean 'x_origin'?
+```
+
+**Cause:** A keyword given to `add()` is not a field of the object type.
+`validate=False` skips value, required-field and range checks, but not field
+names, so this is raised either way.
+
+**Solutions:**
+
+1. Use the snake_case schema key the message suggests: `x_origin`, not `"X Origin"`.
+2. Pass the object's name as the `name` argument, not inside `fields`.
+3. For a type with no Name field, such as `Output:Variable` or `Output:Meter`,
+   pass no name and give its first field instead. A name given anyway is
+   refused: `InvalidFieldError: Output:Variable has no Name field, so "x" would be dropped on write. Pass it as a field instead: key_value="x".`
+   ```python
+   model.add("Output:Meter", key_name="Electricity:Facility", reporting_frequency="Hourly")
+   ```
+
+### `add()` Refused: Malformed Extensible Group
+
+```
+TypeError: add() of object type 'Output:Table:SummaryReports' refused; nothing was added:
+  - reports: wrapper-value (expected a list, got str)
+```
+
+**Cause:** An extensible group was given as something other than a list of
+dicts, such as a string, a list of tuples or another object's live view, or a
+group used a key the group does not define.
+
+**Solution:** Pass a list of dicts keyed by the group's field names. Copy another
+object's groups with `.as_list()`:
+
+```python
+model.add("Output:Table:SummaryReports", reports=[{"report_name": "AllSummary"}])
+model.add("BuildingSurface:Detailed", "Wall 2", ..., vertices=wall.vertices.as_list())
+```
+
+### Object Not Found
+
+```
+ObjectNotFoundError: No Zone named 'Zone2'. Did you mean 'Zone1'?
+  Zone names: Zone1
+```
+
+**Cause:** `doc["Zone"]["Zone2"]` looked up a name the collection does not
+hold. The message suggests close names and lists the ones that exist. Use
+`doc["Zone"].get("Zone2")` to get `None` instead.
+
+### Unknown Object Type
+
+```
+UnknownObjectTypeWarning: Object type 'Zonee' is in no bundled EnergyPlus release; the collection is empty. Did you mean 'Zone'?
+```
+
+**Cause:** `doc["Zonee"]` named a type no EnergyPlus release has. Reading it
+returns an empty collection and warns; adding to it raises.
+
+### Assignment Refused in a Strict Document
+
+```
+ValidationFailedError: Validation failed with 1 error(s):
+  1. [ERROR] Zone:'Office'.multiplier: Expected integer, got str
+```
+
+**Cause:** In a strict document, the default, an assigned value is checked
+against the schema as `add()` checks it. A wrong type, a choice the field does
+not list, a number out of range, or a blank name is refused.
+
+**Solutions:**
+
+1. Assign a value of the field's type and range.
+2. Load or create the document with `strict=False` to store such values as given.
+
+### NaN or Infinity Refused
+
+```
+InvalidFieldError: Zone 'Office' field 'x_origin' is nan. NaN and infinity are not numbers EnergyPlus or epJSON can hold; give a finite number.
+```
+
+**Cause:** A NaN or infinite value was assigned, often from a pandas column
+with missing data. It is refused in either strictness mode. Fill or drop the
+missing values (`fillna()`) before assigning.
+
+### Required Field Read While Unset
+
+```
+MissingRequiredFieldError: Material 'M' has no value for its required field 'thickness'. EnergyPlus refuses an object without it; set it, or read it with obj.get('thickness') to get None when it is missing.
+```
+
+**Cause:** Required fields are typed without `None`, so reading one the model
+leaves unset raises. Use `obj.get("thickness")` to test whether it is set.
 
 ### Required Field Missing
 
@@ -198,7 +306,7 @@ model.add(
 IDFParseError: Failed to parse object
 ```
 
-**Cause:** `load_idf()` uses strict parsing by default
+**Cause:** `load_idf()` and `load_epjson()` use strict parsing by default
 (`strict_parsing=True`) and found malformed content (for example unknown object
 types, invalid bytes, or extra fields on non-extensible objects).
 
@@ -218,10 +326,32 @@ types, invalid bytes, or extra fields on non-extensible objects).
        doc = load_idf("file.idf", strict_parsing=False)
    ```
 
+   For epJSON, `load_epjson("file.epJSON", strict_parsing=False)` does the same.
+
+### Wrong File Format
+
+```
+FileFormatError: model.idf looks like an epJSON file (it starts with '{'), not IDF; use load_epjson() to read it
+```
+
+**Cause:** An epJSON file was passed to `load_idf()`, or an IDF file to
+`load_epjson()`. The message names the format found and the loader to use.
+`FileFormatError` is an `IDFParseError` and a `ValueError`, so code catching
+either still catches it.
+
+### Version Given as a String
+
+```
+TypeError: version must be a (major, minor, patch) tuple, e.g. (24, 1, 0); got '24.1'
+```
+
+**Solution:** Pass a tuple: `load_idf("file.idf", version=(24, 1, 0))`.
+
 ### Unsupported Schema Version
 
 ```
-ValueError: Schema for version (99, 0, 0) not found
+UnsupportedVersionError: EnergyPlus version 99.0.0 is not supported.
+Supported versions: 8.9.0, 9.0.1, 9.1.0, ..., 26.1.0, 26.2.0
 ```
 
 **Cause:** The IDF version isn't supported.
@@ -244,7 +374,7 @@ ValueError: Schema for version (99, 0, 0) not found
 ```
 VersionMismatchError: Model version 22.1.0 does not match target EnergyPlus version 25.2.0.
 Migration chain: 22.1.0->22.2.0 -> 22.2.0->23.1.0 -> ... -> 25.1.0->25.2.0
-Call idfkit.migrate(model, target_version=...) to migrate explicitly.
+To fix it, pass auto_migrate=True to simulate() (or to each SimulationJob in a batch) to migrate a copy before the run, or call idfkit.migrate(model, target_version=(25, 2, 0)) to migrate it once and keep the result.
 ```
 
 **Cause:** `simulate()` was called with a model whose `version` differs

@@ -7,7 +7,8 @@ from idfkit import load_idf
 model = load_idf("model.idf", preserve_formatting=True)
 
 # --8<-- [start:example]
-from idfkit import write_idf
+from idfkit import save_idf
 
-write_idf(model) == Path("model.idf").read_text(encoding="latin-1")  # True
+save_idf(model, "copy.idf")
+Path("copy.idf").read_bytes() == Path("model.idf").read_bytes()  # True
 # --8<-- [end:example]

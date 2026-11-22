@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- PR previews mark, on each rendered page, the blocks the pull request added, changed or removed
+  against its base branch, with a toggle and previous/next controls; production builds are
+  unaffected.
 - The visual identity of idfkit at `identity-2026.5`: a fifth pinned level,
   `[tool.idfkit.identity]`, the `material` derivation and the host files vendored under
   `docs/identity/`, the palette, stylesheets, mark and favicon read from them, the ownership line
@@ -28,6 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The Python pages describe idfkit 1.3.0-rc.2: documents typed per EnergyPlus release
+  (`AnyIDFDocument`, `as_type=`, `as_version()`), typed creation through collections, value
+  checks on assignment in strict documents, the new loader and `save_idf()` options, result
+  accessors that raise when an output is missing, `idfkit check` rules C003 to C006 and its
+  `pyproject.toml` settings, the migration CLI's default target, and per-station weather search.
 - A merge no longer publishes the site, even one that moves a pinned level: the site is published
   only by a `site-YYYY.N` release. The daily surfaces check holds the live site to the latest
   release's levels and warns while `main` declares a level no release has published.
@@ -41,6 +49,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The I/O API page gave `strict=False` as the default of `load_idf()` and `load_epjson()`; it is
+  `strict=True`.
+- The installation page, the common-errors page and the sizing-workflow notebook offered an
+  `idfkit[weather]` extra that does not exist, and the installation page left out `async-s3`. They
+  now list the extras `pyproject.toml` declares, with `pandas` ahead of its alias `dataframes`.
 - The Scythe integration example raised `InvalidFieldError` on an EnergyPlus 24.2 model, the
   version its Docker image runs: it set `Thermal_Resistance` on a `Material`, which has no such
   field, and `Watts_per_Zone_Floor_Area` on `Lights`, a name EnergyPlus replaced in 24.1. It now

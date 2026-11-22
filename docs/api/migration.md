@@ -100,3 +100,17 @@ Forward-migrate IDF models across EnergyPlus versions by orchestrating the
     options:
       show_root_heading: true
       show_source: true
+
+## resolve_source_version
+
+::: idfkit.migration.chain.resolve_source_version
+    options:
+      show_root_heading: true
+      show_source: true
+
+## Migration cache
+
+::: idfkit.migration.cache
+    options:
+      show_root_heading: true
+      show_source: false

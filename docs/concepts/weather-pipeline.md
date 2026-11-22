@@ -55,8 +55,11 @@ Understanding the distinction:
 | **Entry** | A specific TMYx dataset for a station (e.g., TMYx.2007-2021) |
 
 A single station often has multiple entries with different year ranges.
-When searching, results include all matching entries. Use the station's
-`wmo` number to identify the same physical location across entries.
+`search()` and `nearest()` return one result per physical station:
+`result.station` is its newest dataset, and `result.variants` holds all of its
+datasets, newest first. `WeatherStation.station_key` identifies a station across
+its datasets, and `dataset_variant` or `dataset_years` tells the datasets apart.
+`get_by_wmo()` and `filter()` still return individual entries.
 
 ## WMO Numbers
 

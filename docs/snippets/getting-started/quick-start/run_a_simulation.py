@@ -8,6 +8,8 @@ result: SimulationResult = ...  # type: ignore[assignment]
 # --8<-- [start:example]
 from idfkit.simulation import simulate
 
+# A design-day run needs SizingPeriod:DesignDay objects in the model (see
+# "Apply Design Days" below); without them simulate() raises SimulationError.
 result = simulate(
     model,
     weather="weather.epw",

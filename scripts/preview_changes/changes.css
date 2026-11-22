@@ -1,0 +1,166 @@
+/* What this pull request changed, on the page (PR previews only).
+
+   Copied into the preview by scripts/annotate_preview.py and never part of a production build:
+   nothing under docs/ or in mkdocs.yml names it. The diff colours are the only literals; every
+   other colour is Material's, so both schemes work. */
+
+:root {
+  --pv-added: rgb(46 160 67);
+  --pv-changed: rgb(210 153 34);
+  --pv-removed: rgb(218 54 51);
+}
+
+.md-typeset [data-pv="added"],
+.md-typeset [data-pv="changed"] {
+  border-radius: 0.1rem;
+}
+
+.md-typeset [data-pv="added"] {
+  background-color: rgb(46 160 67 / 0.12);
+  box-shadow:
+    -0.4rem 0 0 rgb(46 160 67 / 0.12),
+    -0.6rem 0 0 var(--pv-added);
+}
+
+.md-typeset [data-pv="changed"] {
+  background-color: rgb(210 153 34 / 0.14);
+  box-shadow:
+    -0.4rem 0 0 rgb(210 153 34 / 0.14),
+    -0.6rem 0 0 var(--pv-changed);
+}
+
+.md-typeset details.pv-removed {
+  border: 0;
+  border-left: 0.2rem solid var(--pv-removed);
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+  margin: 0.6em 0;
+  padding: 0 0 0 0.6rem;
+  font-size: 0.68rem;
+}
+
+.md-typeset details.pv-removed > summary {
+  background: none;
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+  color: var(--md-default-fg-color--light);
+  cursor: pointer;
+}
+
+.md-typeset details.pv-removed > summary::before,
+.md-typeset details.pv-removed > summary::after {
+  display: none;
+}
+
+.md-typeset details.pv-removed > :not(summary) {
+  opacity: 0.65;
+  text-decoration: line-through;
+  text-decoration-color: var(--pv-removed);
+}
+
+.md-typeset .pv-previous-shown {
+  border-left: 0.2rem dashed var(--pv-removed);
+  padding-left: 0.6rem;
+  opacity: 0.7;
+}
+
+.md-typeset .pv-previous-shown::before {
+  content: "Base version";
+  display: block;
+  font-size: 0.6rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset [data-pv-current] {
+  outline: 0.1rem dashed var(--md-accent-fg-color);
+  outline-offset: 0.3rem;
+}
+
+.md-typeset .pv-banner {
+  padding: 0.4rem 0.6rem;
+  border-left: 0.2rem solid var(--pv-added);
+  background-color: rgb(46 160 67 / 0.12);
+  font-weight: 700;
+}
+
+/* Off: the page as it will be published. */
+.pv-off .md-typeset [data-pv] {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.pv-off .md-typeset .pv-removed,
+.pv-off .md-typeset .pv-previous-shown,
+.pv-off .md-typeset .pv-banner {
+  display: none;
+}
+
+.pv-bar {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.4rem 0.6rem;
+  border: 0.05rem solid var(--md-default-fg-color--lightest);
+  border-radius: 0.2rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  box-shadow: var(--md-shadow-z2);
+  font-size: 0.65rem;
+}
+
+.pv-bar button {
+  padding: 0.1rem 0.4rem;
+  border: 0.05rem solid var(--md-default-fg-color--lighter);
+  border-radius: 0.1rem;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pv-bar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pv-bar .pv-position {
+  color: var(--md-default-fg-color--light);
+}
+
+.pv-bar .pv-pages {
+  position: relative;
+}
+
+.pv-bar .pv-pages > summary {
+  cursor: pointer;
+}
+
+.pv-bar .pv-pages > ul {
+  position: absolute;
+  right: 0;
+  bottom: 1.6rem;
+  max-height: 50vh;
+  overflow: auto;
+  margin: 0;
+  padding: 0.4rem 0.8rem;
+  min-width: 16rem;
+  list-style: none;
+  border: 0.05rem solid var(--md-default-fg-color--lightest);
+  background: var(--md-default-bg-color);
+  box-shadow: var(--md-shadow-z2);
+}
+
+.pv-bar .pv-tag {
+  color: var(--pv-added);
+}
+
+.pv-bar .pv-gone {
+  color: var(--md-default-fg-color--light);
+  text-decoration: line-through;
+}

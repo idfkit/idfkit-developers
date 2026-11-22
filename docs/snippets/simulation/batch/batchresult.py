@@ -14,9 +14,10 @@ batch.results  # The same results as a tuple
 batch[0]  # First result (by index)
 len(batch)  # Number of jobs
 
-# Filter by success
+# Filter by outcome: every result is in exactly one of the three
 batch.succeeded  # Only successful results
 batch.failed  # Only failed results
+batch.cancelled  # Jobs fail_fast=True cancelled (always empty without it)
 batch.all_succeeded  # True if all succeeded
 
 # Timing

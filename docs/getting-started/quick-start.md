@@ -24,6 +24,12 @@ back here.
 `IDFParseError` for malformed objects. Use `strict_parsing=False` only as a
 migration/compatibility fallback for legacy or noisy files.
 
+In Python, a loaded model is typed as `AnyIDFDocument`, with the fields every
+supported release shares, until you name its release with `as_type=`, `since=`
+or `before=`; see [Typed for a Release](../concepts/type-safety.md#typed-for-a-release).
+`encoding=` reads a file saved in a legacy encoding; by default a file is read
+as UTF-8, or as latin-1 when it is not valid UTF-8.
+
 ## Query Objects
 
 Access objects with O(1) dictionary lookups:

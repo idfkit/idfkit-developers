@@ -9,7 +9,10 @@ result: SimulationResult = ...  # type: ignore[assignment]
 batch = simulate_batch(jobs)
 
 for i, result in enumerate(batch):
-    if not result.success:
+    if result.refusal is not None:
+        # Never reached EnergyPlus (refused, or cancelled by fail_fast): no files to read
+        print(f"Job {i} refused: {result.refusal}")
+    elif not result.success:
         print(f"Job {i} failed:")
         print(f"  Exit code: {result.exit_code}")
         print(f"  Stderr: {result.stderr}")

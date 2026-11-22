@@ -34,15 +34,20 @@ Both libraries generate types from the epJSON schema, and the parity ledger
 records the capability as [complete in TypeScript and partial in
 Python](parity.md#generated-object-types). Two things differ.
 
-**Coverage.** The Python stub set is generated one EnergyPlus version at a time
-and currently ships for 26.2.0 only, so a model loaded at 9.4 gets 26.2 field
-names and choice lists in the editor. The TypeScript maps are emitted per
-version and chosen by the caller, so an older model is typed as that older model
-or left untyped, never mistyped.
+**Coverage.** Both now type a model as its own release. Python ships one
+document type per release in `idfkit.versioned`, from `IDFDocumentV8_9` to
+`IDFDocumentV26_2`, so a model typed as 9.4 gets 9.4 field names and choice
+lists in the editor, and a 26.2 field on it is a type error. The TypeScript maps
+are emitted per version too, one package each.
 
-**Application.** Python's stubs apply implicitly to every document. TypeScript's
-are opt-in by construction: an unparameterised document stays untyped, which is
-what version-generic code needs.
+**Application.** TypeScript's types are opt-in by construction: an
+unparameterised document stays untyped, which is what version-generic code
+needs. Python's never leave a document untyped. A loaded model is an
+`AnyIDFDocument`, typed with the fields every supported release shares, until
+you name its release with `as_type=`, `since=` or `before=` on the loader, or
+with `as_version()`. A field only some releases have is a type error on it, so
+version-generic code is held to what every release can do. `new_document()`
+with no type is typed as the latest release.
 
 The runtime story differs on reads. Both libraries refuse a misspelled field
 name when you write one: Python raises `InvalidFieldError` and TypeScript
@@ -53,6 +58,12 @@ and nothing distinguishes a typo from a field the file left unset.
 Parameterizing the document turns that read into a compile error, which is the
 practical argument for passing the `TypeMap` even in a codebase that is
 otherwise loosely typed.
+
+Before run time, both catch the typo by default where the types apply. In
+TypeScript that takes the type map passed to the document. In Python a typed
+object, one taken from `doc["Zone"]` or `doc.zones`, turns `zone.celing_height`
+into a type error, read or written; a plain `IDFObject` from `doc.add()` or
+`get_collection()` accepts any name.
 
 ## It costs nothing, installed or not
 

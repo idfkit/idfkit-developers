@@ -73,6 +73,25 @@ Read CSV files from any storage backend using the FileSystem interface:
 --8<-- "docs/snippets/schedules/index/schedulefile_with_remote_storage.py:example"
 ```
 
+## Incomplete Compact Schedules
+
+EnergyPlus stops on a `Schedule:Compact` whose last `Through:` is not `12/31`, or whose `For:`
+block does not reach `Until: 24:00`. `evaluate()` and `values()` refuse such a schedule too:
+they raise `MalformedScheduleError` rather than guess values for the uncovered time. Use
+`compact_problems()` to list the gaps without raising:
+
+```python
+--8<-- "docs/snippets/schedules/index/incomplete_compact_schedules.py:example"
+```
+
+Missing day types (`For: Weekdays` alone) are accepted, because EnergyPlus only warns about
+them.
+
+You can also catch these problems without evaluating anything.
+[`validate_document()`](../api/validation.md) reports an incomplete `Schedule:Compact` as `E011`
+and a `Schedule:Compact` or `Schedule:Constant` value outside its `ScheduleTypeLimits` as `E012`
+(unless you pass `check_ranges=False`).
+
 ## Pandas Integration
 
 Convert schedules to pandas Series for analysis and plotting:

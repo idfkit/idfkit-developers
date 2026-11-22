@@ -33,8 +33,10 @@ and everything it could read is in the document.
 
 The Python argument is `strict_parsing`, not `strict`, and the distinction is
 load-bearing. Python's `strict` is a separate setting on the document that
-decides whether reading an unknown field name raises or returns `None`, and it
-has nothing to do with how the file was parsed.
+governs field access and assignment: an unknown field name raises
+`InvalidFieldError` rather than returning `None`, and an assigned value the
+schema refuses raises `ValidationFailedError`. It has nothing to do with how the
+file was parsed.
 
 ## Collect what was skipped
 

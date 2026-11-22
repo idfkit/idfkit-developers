@@ -10,6 +10,9 @@ from idfkit.simulation import SimulationResult
 # From a local directory
 result = SimulationResult.from_directory("/path/to/sim_output")
 
+# A run made with another --output-suffix style (here eplusout.sql, eplustbl.htm)
+result = SimulationResult.from_directory("/path/to/legacy_output", output_suffix="L")
+
 # From a cloud storage location
 from idfkit.simulation import S3FileSystem
 

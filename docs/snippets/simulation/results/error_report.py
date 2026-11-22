@@ -7,7 +7,7 @@ result: SimulationResult = ...  # type: ignore[assignment]
 # --8<-- [start:example]
 errors = result.errors
 
-# Summary
+# Counts, then the fatal errors and the first 3 severe ones (max_messages=3)
 print(errors.summary())
 
 # Check for fatal errors

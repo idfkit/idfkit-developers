@@ -68,6 +68,11 @@ The `simulate()` function raises `SimulationError` for certain failures:
 | Timeout exceeded | `SimulationError` (exit_code=None) |
 | OS error starting process | `SimulationError` |
 | Model version differs from installed EnergyPlus | `VersionMismatchError` |
+| `annual=True` and the model has no `RunPeriod` | `SimulationError` (before EnergyPlus starts) |
+| `design_day=True` and the model has no `SizingPeriod:DesignDay` | `SimulationError` (before EnergyPlus starts) |
+| Nothing to run: no `RunPeriod` and no `SizingPeriod:*`, as in a fresh `new_document()` | `SimulationError` (before EnergyPlus starts) |
+| `model` is not a document (`None`, or a path) | `TypeError` |
+| Automatic preprocessing (ExpandObjects, Slab, Basement) fails | `ExpandObjectsError` |
 
 ### Version Mismatch
 
@@ -104,6 +109,17 @@ with `success=False`:
 
 ```python
 --8<-- "docs/snippets/simulation/errors/non_exception_failures.py:example"
+```
+
+To turn a failed run into an exception, call
+[`raise_for_status()`][idfkit.simulation.result.SimulationResult.raise_for_status],
+or `await result.async_raise_for_status()` in async code. It returns the result
+on success. On failure it raises `SimulationError`, whose message names the
+`.err` file and quotes the fatal and first severe errors, and whose `result`
+attribute is the failed result:
+
+```python
+result = simulate(model, weather).raise_for_status()
 ```
 
 ## Batch Error Handling

@@ -26,7 +26,9 @@ the arguments you'll reach for most often.
 
 ### Design-Day Only
 
-Fast simulation using only design day conditions:
+Fast simulation using only design day conditions. The model needs at least one
+`SizingPeriod:DesignDay`; without one, `simulate()` raises `SimulationError`
+before EnergyPlus starts:
 
 ```python
 --8<-- "docs/snippets/simulation/running/design_day_only.py:example"
@@ -42,7 +44,8 @@ A sizing-only model, whose `SimulationControl` requests no run period from the w
 
 ### Annual Simulation
 
-Full-year simulation:
+Full-year simulation. The model needs a `RunPeriod`; without one, `simulate()`
+raises `SimulationError` before EnergyPlus starts:
 
 ```python
 --8<-- "docs/snippets/simulation/running/annual_simulation.py:example"
@@ -50,7 +53,10 @@ Full-year simulation:
 
 ### Default Mode
 
-Without flags, EnergyPlus uses whatever run periods are defined in the model:
+Without flags, the model's `SimulationControl` decides what runs: by default its
+sizing periods, then its `RunPeriod` objects. A model with neither, such as a
+fresh `new_document()`, gives EnergyPlus nothing to run, and `simulate()` raises
+`SimulationError` before EnergyPlus starts:
 
 ```python
 --8<-- "docs/snippets/simulation/running/default_mode.py:example"
@@ -155,6 +161,11 @@ By default, outputs go to an auto-generated temp directory:
 --8<-- "docs/snippets/simulation/running/automatic_temporary_directory.py:example"
 ```
 
+The directory stays on disk until you call `result.cleanup()` or leave a
+`with simulate(...) as result:` block, which deletes it. The result reads its
+files lazily from it, so read what you need first. See
+[Releasing File Handles](results.md#releasing-file-handles).
+
 ### Explicit Directory
 
 Specify where to store outputs:
@@ -163,7 +174,8 @@ Specify where to store outputs:
 --8<-- "docs/snippets/simulation/running/explicit_directory.py:example"
 ```
 
-The directory is created if it doesn't exist.
+The directory is created if it doesn't exist. A directory you pass is never
+deleted, not even by `cleanup()`.
 
 ## Error Handling
 
@@ -185,6 +197,14 @@ The directory is created if it doesn't exist.
 --8<-- "docs/snippets/simulation/running/checking_success.py:example"
 ```
 
+To stop on a failed run instead, call
+[`raise_for_status()`][idfkit.simulation.result.SimulationResult.raise_for_status]:
+`result = simulate(model, weather).raise_for_status()`. It returns the result on
+success and raises `SimulationError` otherwise, naming the `.err` file and
+quoting the fatal and first severe errors.
+
+Interrupting `simulate()` with Ctrl-C kills the EnergyPlus subprocess.
+
 ## Model Safety
 
 `simulate()` copies your model before running — the original is never modified:
@@ -197,11 +217,13 @@ The directory is created if it doesn't exist.
 
 ### Output Suffix Modes
 
-| Value | Description |
-|-------|-------------|
-| `"C"` | Combined table files (default) |
-| `"L"` | Legacy separate table files |
-| `"D"` | Timestamped separate files |
+`output_suffix` sets the naming style of the output files:
+
+| Value | Style | Example files |
+|-------|-------|---------------|
+| `"C"` | Capital (default) | `eplus.err`, `eplusTable.htm` |
+| `"L"` | Legacy | `eplusout.err`, `eplustbl.htm` |
+| `"D"` | Dash | `eplus.err`, `eplus-table.htm` |
 
 ```python
 --8<-- "docs/snippets/simulation/running/output_suffix_modes.py:example"

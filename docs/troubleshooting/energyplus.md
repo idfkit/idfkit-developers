@@ -34,7 +34,7 @@ except Exception as e:
 **Specify path manually:**
 
 ```python
-config = find_energyplus("/path/to/EnergyPlus-24-1-0")
+config = find_energyplus(path="/path/to/EnergyPlus-24-1-0")
 result = simulate(model, weather, energyplus=config)
 ```
 
@@ -46,9 +46,15 @@ When multiple versions exist, idfkit uses the newest by default.
 
 ```python
 # Find a specific version
-config = find_energyplus("/Applications/EnergyPlus-23-2-0")
+config = find_energyplus(version=(23, 2, 0))
 result = simulate(model, weather, energyplus=config)
+
+# Or point at its install directory
+config = find_energyplus(path="/Applications/EnergyPlus-23-2-0")
 ```
+
+When no install matches `version`, the `EnergyPlusNotFoundError` lists the
+installs it found at other versions.
 
 ### Permission Denied
 
@@ -205,21 +211,23 @@ If `result.sql` is `None`:
 
 ### Missing Time-Series Data
 
-If `get_timeseries()` returns `None`:
+If `get_timeseries()` raises `ResultLookupError`:
 
-1. Verify the variable name matches exactly:
+1. Read its message: it names the closest variable names and the keys reported.
+   The same lists are on `e.suggestions` and `e.available`. To list every
+   variable in the database:
    ```python
-   # List available variables
-   for var in result.sql.get_available_variables():
+   for var in result.sql.list_variables():
        if "Temperature" in var.name:
            print(f"{var.name} | {var.key_value}")
    ```
+   A meter, such as `Electricity:Facility`, has the key `""`.
 
 2. Check the reporting frequency in your model
 
 3. Verify the output was requested:
    ```python
-   # Add output request (name is optional for Output:Variable)
+   # Output:Variable has no Name field: pass no name (one raises InvalidFieldError)
    model.add(
        "Output:Variable",
        key_value="*",

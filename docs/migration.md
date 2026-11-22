@@ -44,8 +44,8 @@ when one exists.
 | Object type | `obj.key` | `obj.obj_type` | `obj.key` |
 | Object name | `obj.Name` | `obj.name` | `obj.Name` |
 | Parent document | `obj.theidf` | `obj._document` | `obj.theidf` |
-| Field names | `obj.fieldnames` | `list(obj.data.keys())` | `obj.fieldnames` |
-| Field values | `obj.fieldvalues` | `list(obj.data.values())` | `obj.fieldvalues` |
+| Field names | `obj.fieldnames` | `obj.field_order` | `obj.fieldnames`[^fields] |
+| Field values | `obj.fieldvalues` | `[obj.get(f) for f in obj.field_order]` | `obj.fieldvalues`[^fields] |
 | Field IDD info | `obj.getfieldidd(name)` | `obj.get_field_idd(name)` | `obj.getfieldidd(name)` |
 | Field range | `obj.getrange(name)` | `obj.getrange(name)` | `obj.getrange(name)` |
 | Check range | `obj.checkrange(name)` | `obj.checkrange(name)` | `obj.checkrange(name)` |
@@ -62,16 +62,18 @@ when one exists.
 | HTML tables | `readhtml.titletable(html)` | `result.html.titletable()` | -- |
 | Window-wall ratio | `idf.set_wwr(0.4)` | `set_wwr(doc, 0.4)` | -- |
 | Match surfaces | `idf.intersect_match()` | `intersect_match(doc)` | -- |
+| Surface geometry | `surface.area`, `.azimuth`, `.tilt`, `.coords` | `calculate_surface_area(surface)`, ... | `surface.area`, ... |
 
 [^update]:
     `doc.update(d)` is part of the eppy compatibility surface; the native
     form assigns fields on the object (see [Batch updates](#batch-updates)).
-    It runs, but a type checker cannot see it on `IDFDocument`.
-    The document inherits a generated `TypedDict` so that `doc["Zone"]` resolves
-    to a typed collection without an overload stack, and pyright synthesises
-    `update` for every class in a `TypedDict` hierarchy, outranking any
-    declaration. Annotate the variable as
-    `idfkit._compat.EppyDocumentMixin` where you need the call checked.
+
+[^fields]:
+    `obj.fieldnames` and `obj.fieldvalues` reproduce eppy's layout: index 0 is
+    the type key, index 1 the name, the names are eppy's capitalised spellings,
+    extensible groups are flattened and trailing blanks trimmed. eppy's index
+    arithmetic, such as `fieldvalues[2:]`, ports unchanged. `obj.field_order`
+    is the schema's snake_case field order, without the type key or the name.
 
 ## Creating objects
 
@@ -93,6 +95,11 @@ Or using the eppy-compatible method:
 --8<-- "docs/snippets/migration/creating_objects_3.py:example"
 ```
 
+`newidfobject` takes eppy's field spellings, and the eppy idiom above, creating
+a blank object and filling it afterwards, runs as it is. Unlike `doc.add()`, it
+does not validate the object when it creates it: pass `validate=True`, or call
+`validate_document(doc)` once the object is filled.
+
 ## Accessing fields
 
 **eppy** uses the capitalised IDD field names:
@@ -107,7 +114,17 @@ Or using the eppy-compatible method:
 --8<-- "docs/snippets/migration/accessing_fields_2.py:example"
 ```
 
-Both styles resolve to the same underlying data.
+Both styles resolve to the same underlying data at run time, including eppy's
+flattened extensible spellings such as `Vertex_1_Xcoordinate`, which work with
+a `DeprecationWarning` naming the grouped form (`vertices[0].vertex_x_coordinate`).
+
+A type checker is stricter on a typed object, such as one from
+`doc["Zone"]["Office"]`: its class declares the snake_case names only, so
+pyright reports `zone.X_Origin` and `zone.x_orign` alike, though the first one
+runs. Objects reached through the eppy API (`doc.idfobjects["ZONE"]`,
+`doc.newidfobject(...)`, `doc.getobject(...)`) are untyped and accept either
+spelling, so eppy-style field access keeps type-checking while you move it to
+snake_case.
 
 ## Reference tracking (new in idfkit)
 
@@ -147,6 +164,15 @@ reference graph handles this automatically:
 ```python
 --8<-- "docs/snippets/migration/saving_files_2.py:example"
 ```
+
+`save()` writes IDF text and refuses an `.epJSON` or `.json` path; use
+`save_epjson()` for those.
+
+Saving over the file the model was read from drops its `!` comments and
+re-sorts its objects, and warns with `FormattingLossWarning`, unless the model
+was loaded with `load_idf(path, preserve_formatting=True)`; see [Preserve a
+file's formatting](how-to/preserve-formatting.md). A save keeps the file's
+encoding unless you pass `encoding=`.
 
 Or use the standalone writer for more control:
 
@@ -251,8 +277,10 @@ names of the object type:
 ## Geometry
 
 eppy relies on [geomeppy](https://github.com/jamiebull1/geomeppy) for
-geometry operations. idfkit ships its own `Vector3D` and `Polygon3D`
-classes with no external dependencies:
+geometry operations. eppy's own surface attributes, `area`, `azimuth`, `tilt`,
+`height`, `width` and `coords`, work on idfkit surfaces that have vertices. For
+new code, idfkit ships its own `Vector3D` and `Polygon3D` classes and functions,
+with no external dependencies:
 
 ```python
 --8<-- "docs/snippets/migration/geometry.py:example"
@@ -306,7 +334,8 @@ idfkit has two different strictness settings:
 - **Strict parsing** (`load_idf(..., strict_parsing=True)`) validates IDF input while
   reading and is enabled by default.
 - **Strict field access** (`load_idf(..., strict=True)`) raises on mistyped attribute
-  names when reading or writing object fields. This is on by default.
+  names when reading or writing object fields, and checks each value you assign
+  against the schema. This is on by default.
 
 eppy silently returns an empty string when you mistype a field name,
 making bugs hard to find. idfkit enables **strict field access** by
@@ -316,8 +345,15 @@ default to catch typos immediately:
 --8<-- "docs/snippets/migration/strict_mode.py:example"
 ```
 
-Strict field access is on by default. Disable it with `strict=False`
-when loading third-party IDF files that may contain non-standard fields.
+eppy code that assigns loosely typed values, such as a number as a string,
+now raises `ValidationFailedError` on assignment and
+on `update()`: a wrong type, a choice the field does not list, or a number out
+of range is refused, as `doc.add()` refuses it. Fix the value, or disable strict
+field access with `strict=False` to store it as given, for example when loading
+third-party IDF files that may contain non-standard fields.
+
+When an eppy-only attribute such as `obj.obj` or `obj.objidd` is refused, the
+`InvalidFieldError` carries a `hint` naming the idfkit way to get it.
 
 ## Running a simulation
 

@@ -221,8 +221,10 @@ covers:
 - **Post-simulation**: Uploading results
 - **Result reading**: Downloading files on demand
 
-The actual simulation happens in a local temporary directory, then results
-are copied to the configured FileSystem.
+The actual simulation happens in a local temporary directory. Its outputs, not
+the run's copy of the weather file, are then uploaded to `output_dir` through
+the configured FileSystem, and the local directory is deleted, also when the
+run raises.
 
 ## Performance Considerations
 

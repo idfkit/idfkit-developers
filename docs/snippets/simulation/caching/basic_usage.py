@@ -18,5 +18,6 @@ print(f"Runtime: {result1.runtime_seconds:.1f}s")
 
 # Second run: instant cache hit
 result2 = simulate(model, "weather.epw", cache=cache)
-print(f"Runtime: {result2.runtime_seconds:.1f}s")  # Near zero
+print(result2.cached)  # True: served from the cache
+# runtime_seconds is the stored runtime of the run that filled the entry
 # --8<-- [end:example]

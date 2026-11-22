@@ -75,12 +75,14 @@ Every field of [`SimulationProgress`][idfkit.simulation.SimulationProgress], wit
 ### Percentage Estimation
 
 The `percent` field is estimated from the current simulation date relative to
-the run period.  It is only available during the `simulating` phase when
-EnergyPlus reports the simulation period (e.g. annual runs).
+the length of the current environment.  It is only available during the
+`simulating` phase.  `simulate()` and `async_simulate()` take each
+environment's length from the model's `RunPeriod` and `SizingPeriod:*` objects,
+so `percent` is reported for design-day runs too, and on EnergyPlus releases
+(26.1, for one) that do not print the period's date range.
 
-When the period cannot be determined (design-day runs, custom periods without
-date ranges), `percent` is `None`.  Your progress indicator should handle this
-with a spinner or indeterminate bar.
+When the length cannot be determined, `percent` is `None`.  Your progress
+indicator should handle this with a spinner or indeterminate bar.
 
 ## Built-in tqdm Progress Bar
 
@@ -263,8 +265,11 @@ Combine `async_simulate_batch_stream` (job-level events) with
 ## Using ProgressParser Directly
 
 The `ProgressParser` class can be used independently to parse EnergyPlus
-stdout output -- useful for custom integrations or when processing log files
-from previous simulation runs:
+output -- useful for custom integrations or when processing log files from
+previous simulation runs.  Pass it `environment_days(model)` so it can report
+`percent` when EnergyPlus does not print the period's date range.  EnergyPlus
+prints `EnergyPlus Completed Successfully` to stderr, so feed stderr lines too
+to get the `"complete"` event:
 
 ```python
 --8<-- "docs/snippets/simulation/progress/using_progressparser_directly.py:example"

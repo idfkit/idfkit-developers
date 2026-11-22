@@ -16,4 +16,5 @@ result1 = simulate(model, weather, cache=cache)
 
 # Second run: instant cache hit
 result2 = simulate(model, weather, cache=cache)
+print(result2.cached)  # True
 # --8<-- [end:example]

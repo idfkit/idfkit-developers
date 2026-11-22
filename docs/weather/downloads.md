@@ -183,6 +183,9 @@ to override all three, or pass a directory to one downloader:
 --8<-- "docs/snippets/weather/downloads/clear_cache.py:example"
 ```
 
+Do not call `clear_cache()` while other threads or processes are downloading
+into the same cache.
+
 ## Fetch from a page: route around the missing CORS header
 
 climate.onebuilding.org sends no `Access-Control-Allow-Origin` header, so a
@@ -244,6 +247,11 @@ library's offline story is settled at install time instead: install
 ```python
 --8<-- "docs/snippets/weather/downloads/batch_downloads.py:example"
 ```
+
+Several threads or processes may share one cache directory. Each file is
+written under a temporary name and renamed into place, so a reader sees either
+nothing or the complete file, and within one process concurrent requests for
+the same station download it once.
 
 ## What EPW and DDY files contain
 

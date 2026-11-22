@@ -30,6 +30,11 @@ not know what it was handed does not have to look the key up.
     surface.vertices[0].as_dict()  # {'vertex_x_coordinate': ..., ...}
     ```
 
+    Reading a required group key that is unset, such as a vertex's z,
+    raises `MissingRequiredFieldError`; `group.get("vertex_z_coordinate")`
+    returns `None` instead. `add()` refuses a vertex without its z unless you
+    pass `validate=False`.
+
 === "TypeScript"
 
     ```ts
@@ -67,6 +72,11 @@ There is no `addVertex` and no `set_vertices`. It is a list, and the list
 operations of the host language work on it. Python's view also takes an
 `ExtensibleGroup` or a plain dict wherever it takes keyword arguments, and it
 rejects a field name the schema does not define rather than storing it.
+`add()` applies the same check to the groups it is given at creation, in either
+validate mode: an unknown group key raises `TypeError`, and so does a value that
+is not a list of groups. To seed a new object with another object's groups, copy
+them with `.as_list()` (`vertices=wall.vertices.as_list()`) rather than passing
+the live view.
 
 ## Replace the whole section
 
