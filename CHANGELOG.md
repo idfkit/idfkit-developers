@@ -36,6 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   checks on assignment in strict documents, the new loader and `save_idf()` options, result
   accessors that raise when an output is missing, `idfkit check` rules C003 to C006 and its
   `pyproject.toml` settings, the migration CLI's default target, and per-station weather search.
+- A merge no longer publishes the site, even one that moves a pinned level: the site is published
+  only by a `site-YYYY.N` release. The daily surfaces check holds the live site to the latest
+  release's levels and warns while `main` declares a level no release has published.
 - `docs/stylesheets/extra.css` holds layout rules only; every colour, font and easing comes from
   the vendored derivation.
 - The site serves its two typefaces itself from `docs/identity/material/fonts/` and no longer

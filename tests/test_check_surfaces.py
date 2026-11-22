@@ -350,3 +350,24 @@ def test_an_unknown_status_fails(surface: Surface, tmp_path: Path) -> None:
         "t",
     )
     assert run(register, FakeWeb({}), FakeSources({}), FakeRegistry(), tmp_path, "a").exit_code == 1
+
+
+def test_the_declared_level_is_read_from_the_checkout_declared_at_names(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # surfaces.yml passes a checkout of the latest site release: the live site is held to what was
+    # released, so a level merged to main but not yet released is not a failure.
+    import check_surfaces
+
+    seen: list[Path] = []
+
+    def fake_run(register: Any, web: Any, sources: Any, registry: Any, root: Path, half: str) -> Any:
+        seen.append(root)
+        return check_surfaces.Report()
+
+    monkeypatch.setattr(check_surfaces, "load_register", lambda *_: _register())
+    monkeypatch.setattr(check_surfaces, "run", fake_run)
+    released = _site(tmp_path, "1.2.0")
+    assert check_surfaces.main(["--half", "a", "--declared-at", str(released)]) == 0
+    assert check_surfaces.main(["--half", "a"]) == 0
+    assert seen == [released, check_surfaces.REPO_ROOT]
