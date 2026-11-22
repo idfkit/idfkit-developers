@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- An API page for `idfkit.versioned`: `as_version`, `AnyIDFDocument`, the release-argument aliases
+  `DocumentTypeTarget` and `ReleaseBound`, and a summary of the per-release document types. The
+  weather station page renders `GeocodingErrorKind`.
 - PR previews mark, on each rendered page, the blocks the pull request added, changed or removed
   against its base branch, with a toggle and previous/next controls; production builds are
   unaffected.
